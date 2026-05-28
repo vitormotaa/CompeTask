@@ -1,0 +1,111 @@
+<ion-content [fullscreen]="true" class="tasks-screen">
+  <div class="screen-glow screen-glow--left"></div>
+  <div class="screen-glow screen-glow--right"></div>
+
+  <section class="tasks-shell">
+    <header class="tasks-header">
+      <div>
+        <h1>Minhas Tarefas</h1>
+        <p>{{ tarefasPendentes.length + tarefasConcluidas.length }} tarefas</p>
+      </div>
+
+      <div class="status-wrap">
+        <button type="button" class="status-pill" (click)="alternarMenuStatus($event)">
+          <ion-icon name="checkmark-circle-outline"></ion-icon>
+          <span>{{ textoOrdenacao }}</span>
+          <ion-icon name="caret-down-outline" class="status-pill__chevron" [class.status-pill__chevron--open]="statusMenuAberto"></ion-icon>
+        </button>
+
+        <div class="status-menu" *ngIf="statusMenuAberto">
+          <button
+            *ngFor="let opcao of opcoesOrdenacao"
+            type="button"
+            class="status-menu__item"
+            [class.status-menu__item--active]="ordenacaoAtual === opcao.chave"
+            (click)="selecionarOrdenacao(opcao.chave)">
+            <span>{{ opcao.label }}</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <div class="tasks-stack">
+      <article
+        *ngFor="let tarefa of tarefasPendentes"
+        [class]="getClasseCard(tarefa)"
+        (click)="abrirTarefa(tarefa)">
+        <button type="button" class="task-check" [attr.aria-label]="'Concluir ' + tarefa.titulo" (click)="alternarConclusao(tarefa, $event)">
+          <span class="task-check__dot"></span>
+        </button>
+
+        <div class="task-content">
+          <div class="task-headline">
+            <h2>{{ tarefa.titulo }}</h2>
+            <span [class]="getClasseStatus(tarefa)">{{ getStatus(tarefa) }}</span>
+          </div>
+
+          <p class="task-description">{{ tarefa.descricao }}</p>
+
+          <div class="task-meta">
+            <span><ion-icon name="calendar-outline"></ion-icon> Planejada: {{ getPlanejamento(tarefa) }}</span>
+            <span><ion-icon name="flag-outline"></ion-icon> Prioridade {{ tarefa.prioridade }}</span>
+          </div>
+        </div>
+
+        <ion-icon name="chevron-forward-outline" class="task-arrow"></ion-icon>
+      </article>
+    </div>
+
+    <section class="task-group" *ngIf="totalConcluidas > 0">
+      <button type="button" class="task-group__header task-group__header--toggle" (click)="alternarConcluidas()">
+        <h2>Concluídas ({{ totalConcluidas }})</h2>
+        <ion-icon name="caret-down-outline" [class.task-group__chevron--open]="concluidasAbertas"></ion-icon>
+      </button>
+
+      <div class="task-group__body" *ngIf="concluidasAbertas">
+        <article
+          *ngFor="let tarefa of tarefasConcluidas"
+          class="task-card task-card--done"
+          (click)="abrirTarefa(tarefa)">
+          <button type="button" class="task-check task-check--done" [attr.aria-label]="'Reabrir ' + tarefa.titulo" (click)="alternarConclusao(tarefa, $event)">
+            <ion-icon name="checkmark-circle-outline"></ion-icon>
+          </button>
+
+          <div class="task-content">
+            <div class="task-headline">
+              <h2>{{ tarefa.titulo }}</h2>
+              <span [class]="getClasseStatus(tarefa)">{{ getStatus(tarefa) }}</span>
+            </div>
+
+            <p class="task-description">{{ tarefa.descricao }}</p>
+
+            <div class="task-meta">
+              <span><ion-icon name="calendar-outline"></ion-icon> Planejada: {{ getPlanejamento(tarefa) }}</span>
+              <span><ion-icon name="flag-outline"></ion-icon> Prioridade {{ tarefa.prioridade }}</span>
+            </div>
+          </div>
+
+          <ion-icon name="chevron-forward-outline" class="task-arrow"></ion-icon>
+        </article>
+      </div>
+    </section>
+
+    <p class="empty-state" *ngIf="tarefas.length === 0">Nenhuma tarefa cadastrada ainda.</p>
+
+    <button type="button" class="add-task-button" (click)="criarNovaTarefa()" aria-label="Criar nova tarefa">
+      <ion-icon name="add-outline"></ion-icon>
+    </button>
+  </section>
+
+  <nav class="bottom-nav" aria-label="Navegação inferior">
+    <button
+      *ngFor="let atalho of atalhosRodape"
+      type="button"
+      class="nav-item"
+      [class.nav-item--active]="atalho.ativo"
+      (click)="abrirAtalho(atalho)">
+      <ion-icon [name]="atalho.icon"></ion-icon>
+      <span>{{ atalho.label }}</span>
+    </button>
+  </nav>
+</ion-content>

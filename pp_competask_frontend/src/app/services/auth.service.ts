@@ -44,6 +44,7 @@ export class AuthService {
 
   private montarUsuario(email: string, senha: string, nome?: string): UsuarioModel {
     return {
+      id: new Date().toISOString(),
       nome: nome?.trim() || this.extrairNomeDoEmail(email),
       email: email.trim(),
       senha,

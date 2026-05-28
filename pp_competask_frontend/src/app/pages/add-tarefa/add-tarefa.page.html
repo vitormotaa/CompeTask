@@ -1,0 +1,85 @@
+<ion-content [fullscreen]="true" class="task-form-screen">
+  <div class="screen-glow screen-glow--left"></div>
+  <div class="screen-glow screen-glow--right"></div>
+
+  <section class="task-form-shell">
+    <header class="task-form-header">
+      <button type="button" class="back-button" (click)="voltar()" aria-label="Voltar">
+        <ion-icon name="chevron-back-outline"></ion-icon>
+      </button>
+
+      <div>
+        <h1>{{ tituloPagina }}</h1>
+        <p>Organize detalhes, execução e observações da tarefa.</p>
+      </div>
+    </header>
+
+    <form class="task-form" [formGroup]="form" (ngSubmit)="salvarTarefa()">
+      <label class="field-label">Título</label>
+      <label class="input-shell" [class.input-shell--invalid]="form.controls['titulo'].touched && form.controls['titulo'].invalid">
+        <ion-icon name="document-text-outline"></ion-icon>
+        <input type="text" formControlName="titulo" placeholder="Nome da tarefa" />
+      </label>
+
+      <label class="field-label">Descrição</label>
+      <label class="textarea-shell">
+        <ion-icon name="document-text-outline"></ion-icon>
+        <textarea formControlName="descricao" placeholder="Descreva a tarefa..."></textarea>
+      </label>
+
+      <label class="field-label">Prioridade</label>
+      <label class="input-shell" [class.input-shell--invalid]="form.controls['prioridade'].touched && form.controls['prioridade'].invalid">
+        <ion-icon name="flag-outline"></ion-icon>
+        <input type="number" formControlName="prioridade" placeholder="Ex: 1, 5, 10..." min="1" />
+      </label>
+
+      <label class="field-label">Data de Realização</label>
+      <label class="input-shell" [class.input-shell--invalid]="form.controls['dataRealizacao'].touched && form.controls['dataRealizacao'].invalid">
+        <ion-icon name="calendar-outline"></ion-icon>
+        <input type="date" formControlName="dataRealizacao" />
+      </label>
+
+      <label class="field-label">Lembrete</label>
+      <div class="reminder-grid">
+        <label class="input-shell">
+          <ion-icon name="calendar-outline"></ion-icon>
+          <input type="date" formControlName="lembreteData" />
+        </label>
+
+        <label class="input-shell">
+          <ion-icon name="time-outline"></ion-icon>
+          <input type="time" formControlName="lembreteHora" />
+        </label>
+      </div>
+
+      <label class="field-label">Tempo de execução</label>
+      <label class="textarea-shell">
+        <ion-icon name="timer-outline"></ion-icon>
+        <textarea formControlName="tempoExecucao" placeholder="Anote o tempo estimado ou gasto..."></textarea>
+      </label>
+
+      <p class="helper-text">O campo acima segue o mesmo formato das anotações.</p>
+
+      <label class="field-label">Anotações</label>
+      <label class="textarea-shell textarea-shell--tall">
+        <ion-icon name="document-text-outline"></ion-icon>
+        <textarea formControlName="anotacoes" placeholder="Adicione observações sobre a tarefa..."></textarea>
+      </label>
+
+      <ion-button class="primary-button" type="submit" expand="block">SALVAR TAREFA</ion-button>
+      <ion-button *ngIf="tarefaId" class="danger-button" type="button" expand="block" fill="outline" (click)="excluirTarefa()">EXCLUIR TAREFA</ion-button>
+    </form>
+  </section>
+
+  <nav class="bottom-nav" aria-label="Navegação inferior">
+    <button
+      *ngFor="let atalho of atalhosRodape"
+      type="button"
+      class="nav-item"
+      [class.nav-item--active]="atalho.ativo"
+      (click)="abrirAtalho(atalho)">
+      <ion-icon [name]="atalho.icon"></ion-icon>
+      <span>{{ atalho.label }}</span>
+    </button>
+  </nav>
+</ion-content>
