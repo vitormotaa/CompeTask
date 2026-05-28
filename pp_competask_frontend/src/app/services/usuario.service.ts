@@ -16,8 +16,6 @@ export class UsuarioService {
   inicializar() {
     if (!localStorage['usuarios']) {
       let usuarios: UsuarioModel[] = [
-        { id: new Date().toISOString(), nome: 'vitor', email: 'vitor@email.com', senha: '123456', diasStreak: 5, foto: 'assets/vitor.webp' },
-        { id: new Date().toISOString(), nome: 'pereira', email: 'pereira@email.com', senha: '123456', diasStreak: 12, foto: 'assets/pereira.webp' },
         { id: new Date().toISOString(), nome: 'balbino', email: 'balbino@email.com', senha: '123456', diasStreak: 3, foto: 'assets/balbino.webp' },
       ];
       localStorage.setItem('usuarios', JSON.stringify(usuarios));
@@ -25,21 +23,20 @@ export class UsuarioService {
   }
 
   salvar(usuario: UsuarioModel): boolean {
-    let usuariosJson = localStorage.getItem('usuarios');
-    if (usuariosJson) {
-      let usuarios: UsuarioModel[] = JSON.parse(usuariosJson);
-      for (let i = 0; i < usuarios.length; i++) {
-        if (usuarios[i].id === usuario.id) {
-          return false;
-        }
-      }
-      usuario.diasStreak = 0;
-      usuario.id = new Date().toISOString();
-      usuarios.push(usuario);
-      localStorage.setItem('usuarios', JSON.stringify(usuarios));
-      return true;
+    const usuarios: UsuarioModel[] = JSON.parse(localStorage.getItem('usuarios') || '[]');
+    const emailNovo = String(usuario.email || '').trim().toLowerCase();
+
+    const emailJaExiste = usuarios.some((u: UsuarioModel) => String(u.email || '').trim().toLowerCase() === emailNovo);
+    if (emailJaExiste) {
+      return false;
     }
-    return false;
+
+    usuario.email = emailNovo;
+    usuario.diasStreak = 0;
+    usuario.id = new Date().toISOString();
+    usuarios.push(usuario);
+    localStorage.setItem('usuarios', JSON.stringify(usuarios));
+    return true;
   }
 
   // salvar(usuario: UsuarioModel): Observable<UsuarioModel> {
@@ -64,7 +61,8 @@ export class UsuarioService {
 
   validar(usuario: UsuarioModel): boolean {
     let usuarios = JSON.parse(localStorage.getItem('usuarios') || '[]');
-    return usuarios.some((u: UsuarioModel) => u.email === usuario.email && u.senha === usuario.senha);
+    const email = String(usuario.email || '').trim().toLowerCase();
+    return usuarios.some((u: UsuarioModel) => String(u.email || '').trim().toLowerCase() === email && u.senha === usuario.senha);
   }
 
   salvarSessao(usuario: UsuarioModel) {
@@ -97,7 +95,8 @@ export class UsuarioService {
 
   obterUsuarioPorEmail(email: string) {
     let usuarios = JSON.parse(localStorage.getItem('usuarios') || '[]');
-    return usuarios.find((u: UsuarioModel) => u.email === email) || null;
+    const emailNormalizado = String(email || '').trim().toLowerCase();
+    return usuarios.find((u: UsuarioModel) => String(u.email || '').trim().toLowerCase() === emailNormalizado) || null;
   }
 
   atualizarUsuarioLocal(usuario: UsuarioModel): UsuarioModel | null {

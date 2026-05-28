@@ -4,7 +4,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { Router } from '@angular/router';
 import { IonButton, IonContent, IonIcon } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { mailOutline, pencil, flameOutline, personOutline, lockClosedOutline } from 'ionicons/icons';
+import { checkmarkCircleOutline, flameOutline, lockClosedOutline, mailOutline, peopleOutline, personOutline, pencil, timerOutline } from 'ionicons/icons';
 
 import { UsuarioModel } from '../../models/usuario.model';
 import { UsuarioService } from 'src/app/services/usuario.service';
@@ -12,6 +12,7 @@ import { UsuarioService } from 'src/app/services/usuario.service';
 type AtalhoRodape = {
   label: string;
   icon: string;
+  rota?: string;
   ativo?: boolean;
 };
 
@@ -29,8 +30,15 @@ export class UsuarioPage {
 
   mensagemAcao = '';
 
+  atalhosRodape: AtalhoRodape[] = [
+    { label: 'Tarefas', icon: 'checkmark-circle-outline', rota: '/tarefas' },
+    { label: 'Comunidades', icon: 'people-outline' },
+    { label: 'Timer', icon: 'timer-outline' },
+    { label: 'Usuário', icon: 'person-outline', ativo: true },
+  ];
+
   constructor(private readonly formBuilder: FormBuilder, private readonly router: Router,private usuarioService: UsuarioService) {
-    addIcons({ personOutline, pencil, flameOutline, mailOutline, lockClosedOutline });
+    addIcons({ checkmarkCircleOutline, personOutline, pencil, flameOutline, mailOutline, lockClosedOutline, peopleOutline, timerOutline });
 
     this.perfilForm = this.formBuilder.group({
       'nome': ['', Validators.compose([Validators.required])],
@@ -104,6 +112,11 @@ export class UsuarioPage {
 
   abrirAtalho(atalho: AtalhoRodape): void {
     if (atalho.ativo) {
+      return;
+    }
+
+    if (atalho.rota) {
+      this.router.navigate([atalho.rota]);
       return;
     }
 
