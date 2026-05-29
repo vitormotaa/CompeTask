@@ -8,7 +8,7 @@
 		<version>3.5.14</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>bt.cefetmg</groupId>
+	<groupId>br.cefetmg</groupId>
 	<artifactId>pp_competask</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name/>

@@ -1,13 +1,13 @@
-package bt.cefetmg.pp_competask;
+package br.cefetmg.pp_competask;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class PpCompetaskApplication {
+public class CompetaskApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(PpCompetaskApplication.class, args);
+		SpringApplication.run(CompetaskApplication.class, args);
 	}
 
 }

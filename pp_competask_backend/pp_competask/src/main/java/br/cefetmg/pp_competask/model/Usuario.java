@@ -1,6 +1,4 @@
-package bt.cefetmg.pp_competask.model;
-
-
+package br.cefetmg.pp_competask.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
