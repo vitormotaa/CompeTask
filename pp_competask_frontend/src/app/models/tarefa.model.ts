@@ -8,7 +8,7 @@ export interface TarefaModel {
   lembreteData: string;
   lembreteHora: string;
   tempoExecucao: string;
-  anotacoes: string;
+  dataConfeccao: string;
   concluida: boolean;
   criadaEm: string;
   atualizadaEm: string;

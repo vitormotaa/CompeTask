@@ -10,7 +10,7 @@
 
       <div>
         <h1>{{ tituloPagina }}</h1>
-        <p>Organize detalhes, execução e observações da tarefa.</p>
+        <p>Organize detalhes e execução da tarefa.</p>
       </div>
     </header>
 
@@ -51,20 +51,6 @@
           <input type="time" formControlName="lembreteHora" />
         </label>
       </div>
-
-      <label class="field-label">Tempo de execução</label>
-      <label class="textarea-shell">
-        <ion-icon name="timer-outline"></ion-icon>
-        <textarea formControlName="tempoExecucao" placeholder="Anote o tempo estimado ou gasto..."></textarea>
-      </label>
-
-      <p class="helper-text">O campo acima segue o mesmo formato das anotações.</p>
-
-      <label class="field-label">Anotações</label>
-      <label class="textarea-shell textarea-shell--tall">
-        <ion-icon name="document-text-outline"></ion-icon>
-        <textarea formControlName="anotacoes" placeholder="Adicione observações sobre a tarefa..."></textarea>
-      </label>
 
       <ion-button class="primary-button" type="submit" expand="block">SALVAR TAREFA</ion-button>
       <ion-button *ngIf="tarefaId" class="danger-button" type="button" expand="block" fill="outline" (click)="excluirTarefa()">EXCLUIR TAREFA</ion-button>

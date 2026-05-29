@@ -137,20 +137,10 @@
   resize: vertical;
 }
 
-.textarea-shell--tall textarea {
-  min-height: 110px;
-}
-
 .reminder-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 10px;
-}
-
-.helper-text {
-  margin: -2px 2px 8px;
-  color: rgba(182, 173, 208, 0.6);
-  font-size: 0.78rem;
 }
 
 .primary-button {

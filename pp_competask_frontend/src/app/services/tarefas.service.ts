@@ -10,7 +10,6 @@ type NovaTarefaInput = {
 	lembreteData: string;
 	lembreteHora: string;
 	tempoExecucao: string;
-	anotacoes: string;
 };
 
 type AtualizarTarefaInput = NovaTarefaInput;
@@ -58,7 +57,7 @@ export class TarefasService {
 			lembreteData: input.lembreteData,
 			lembreteHora: input.lembreteHora,
 			tempoExecucao: input.tempoExecucao,
-			anotacoes: input.anotacoes,
+			dataConfeccao: '',
 			concluida: false,
 			criadaEm: agora,
 			atualizadaEm: agora,
@@ -86,7 +85,6 @@ export class TarefasService {
 		tarefaAtual.lembreteData = input.lembreteData;
 		tarefaAtual.lembreteHora = input.lembreteHora;
 		tarefaAtual.tempoExecucao = input.tempoExecucao;
-		tarefaAtual.anotacoes = input.anotacoes;
 		tarefaAtual.atualizadaEm = new Date().toISOString();
 
 		this.salvarTodas(tarefas);
@@ -101,11 +99,15 @@ export class TarefasService {
 			return null;
 		}
 
-		tarefas[indice].concluida = !tarefas[indice].concluida;
-		tarefas[indice].atualizadaEm = new Date().toISOString();
+		const tarefaAtual = tarefas[indice];
+		const concluindoAgora = !tarefaAtual.concluida;
+
+		tarefaAtual.concluida = concluindoAgora;
+		tarefaAtual.dataConfeccao = concluindoAgora ? new Date().toISOString() : '';
+		tarefaAtual.atualizadaEm = new Date().toISOString();
 
 		this.salvarTodas(tarefas);
-		return tarefas[indice];
+		return tarefaAtual;
 	}
 
 	excluir(id: string, usuarioId?: string): boolean {

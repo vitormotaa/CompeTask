@@ -45,7 +45,6 @@ export class TarefaPage {
     lembreteData: [''],
     lembreteHora: [''],
     tempoExecucao: [''],
-    anotacoes: [''],
   });
 
   atalhosRodape: AtalhoRodape[] = [
@@ -108,7 +107,6 @@ export class TarefaPage {
       lembreteData: String(valores.lembreteData ?? ''),
       lembreteHora: String(valores.lembreteHora ?? ''),
       tempoExecucao: String(valores.tempoExecucao ?? ''),
-      anotacoes: String(valores.anotacoes ?? ''),
     };
 
     if (this.tarefaId) {
@@ -187,7 +185,6 @@ export class TarefaPage {
         lembreteData: '',
         lembreteHora: '',
         tempoExecucao: '',
-        anotacoes: '',
       });
       this.form.markAsPristine();
       this.form.markAsUntouched();
@@ -210,7 +207,6 @@ export class TarefaPage {
       lembreteData: tarefa.lembreteData,
       lembreteHora: tarefa.lembreteHora,
       tempoExecucao: tarefa.tempoExecucao,
-      anotacoes: tarefa.anotacoes,
     });
   }
 
