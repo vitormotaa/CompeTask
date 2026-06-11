@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-import { IonButton, IonContent, IonIcon } from '@ionic/angular/standalone';
+import { IonContent, IonIcon } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
   addOutline,
@@ -31,7 +31,7 @@ type AtalhoRodape = {
   templateUrl: './tarefas.page.html',
   styleUrls: ['./tarefas.page.scss'],
   standalone: true,
-  imports: [CommonModule, IonContent, IonIcon, IonButton],
+  imports: [CommonModule, IonContent, IonIcon],
 })
 export class TarefasPage {
   tarefas: TarefaModel[] = [];
@@ -49,7 +49,7 @@ export class TarefasPage {
 
   atalhosRodape: AtalhoRodape[] = [
     { label: 'Tarefas', icon: 'checkmark-circle-outline', rota: '/tarefas', ativo: true },
-    { label: 'Comunidades', icon: 'people-outline' },
+    { label: 'Comunidades', icon: 'people-outline', rota: '/comunidades' },
     { label: 'Timer', icon: 'timer-outline' },
     { label: 'Usuário', icon: 'person-outline', rota: '/usuario' },
   ];

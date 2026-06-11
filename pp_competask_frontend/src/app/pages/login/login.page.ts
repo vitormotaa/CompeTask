@@ -43,7 +43,7 @@ export class LoginPage {
     let valido = this.usuarioService.validar(this.loginForm.value);
     if (valido) {
       this.usuarioService.salvarSessao(this.usuarioService.obterUsuarioPorEmail(this.loginForm.value.email));
-      this.router.navigate(['/usuario']);
+      this.router.navigate(['/comunidades']);
     } else {
       const toast = await this.toastController.create({ message: 'Email ou senha incorretos', duration: 2000, color: 'danger' });
       toast.present();
