@@ -1,11 +1,13 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ToastController } from '@ionic/angular';
 import { IonButton, IonContent, IonIcon } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { mailOutline, lockClosedOutline, eyeOutline, eyeOffOutline } from 'ionicons/icons';
+import { UsuarioModel } from 'src/app/models/usuario.model';
 import { UsuarioService } from 'src/app/services/usuario.service';
 
 @Component({
@@ -35,11 +37,12 @@ export class LoginPage {
     });
   }
 
-  async entrar(){
+  async entrar() {
     if (this.loginForm.invalid) {
       this.loginForm.markAllAsTouched();
       return;
     }
+<<<<<<< HEAD
     let valido = this.usuarioService.validar(this.loginForm.value);
     if (valido) {
       this.usuarioService.salvarSessao(this.usuarioService.obterUsuarioPorEmail(this.loginForm.value.email));
@@ -48,24 +51,53 @@ export class LoginPage {
       const toast = await this.toastController.create({ message: 'Email ou senha incorretos', duration: 2000, color: 'danger' });
       toast.present();
     }
+=======
+>>>>>>> d0f326f8fcafac30cda7defd406adba369abe708
 
+    const email = String(this.loginForm.value.email || '').trim();
+    const senha = String(this.loginForm.value.senha || '').trim();
+
+    this.usuarioService.login(email, senha).subscribe({
+      next: (resultado: UsuarioModel) => {
+        this.usuarioService.salvarSessao(resultado);
+        this.router.navigate(['/usuario']);
+      },
+      error: async (erro: HttpErrorResponse) => {
+        const mensagem = this.obterMensagemErroLogin(erro);
+        const toast = await this.toastController.create({
+          message: mensagem,
+          duration: 2000,
+          color: 'danger'
+        });
+        await toast.present();
+      }
+    });
   }
 
   ionViewWillEnter(){
-    this.loginForm.reset();
-    this.loginForm.markAsPristine(); // indica que o formulário não foi modificado desde seu estado inicial — remove o estado dirty que poderia disparar validações visuais.
-    this.loginForm.markAsUntouched(); //marca todos os controles como não tocados — remove o estado touched para que mensagens de erro baseadas em toque não apareçam imediatamente.
-  }
+      this.loginForm.reset();
+      this.loginForm.markAsPristine(); // indica que o formulário não foi modificado desde seu estado inicial — remove o estado dirty que poderia disparar validações visuais.
+      this.loginForm.markAsUntouched(); //marca todos os controles como não tocados — remove o estado touched para que mensagens de erro baseadas em toque não apareçam imediatamente.
+    }
 
   irParaCadastro(): void {
-    this.router.navigate(['/cadastro']);
-  }
+      this.router.navigate(['/cadastro']);
+    }
 
   alternarSenhaVisibilidade(): void {
-    this.senhaVisivel = !this.senhaVisivel;
-  }
+      this.senhaVisivel = !this.senhaVisivel;
+    }
 
   ngOnInit() {
-    this.usuarioService.inicializar();
+      this.usuarioService.inicializar();
+    }
+
+  private obterMensagemErroLogin(erro: HttpErrorResponse): string {
+    const mensagemDoBackend =
+      typeof erro.error === 'string'
+        ? erro.error
+        : erro.error?.message || erro.message;
+
+    return mensagemDoBackend || 'Falha no login';
   }
 }

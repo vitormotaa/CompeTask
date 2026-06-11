@@ -11,58 +11,89 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import br.cefetmg.pp_competask.model.Usuario;
 import br.cefetmg.pp_competask.repository.UsuarioRepository;
+import br.cefetmg.pp_competask.service.UsuarioService;
 
 @RestController
 @RequestMapping("/api/v1/usuarios")
 @CrossOrigin(origins = "http://localhost:8100")
 public class UsuarioController {
 
-    private UsuarioRepository repository;
+    private final UsuarioRepository repository;
+    private final UsuarioService service;
 
-    public UsuarioController(UsuarioRepository repository){
+    public UsuarioController(UsuarioRepository repository, UsuarioService service){
         this.repository = repository;
+        this.service = service;
     }
 
-    @GetMapping("")
-    public List<Usuario> getAll(){
-        return repository.findAll();
-    }
+    // @GetMapping("")
+    // public List<Usuario> getAll(){
+    //     return service.listarAtivos();
+    // }
 
     @GetMapping("/{id}")
     public Usuario getById(@PathVariable Long id){
-        return repository.findById(id).orElse(null);
+        try {
+            return service.findById(id);
+        } catch (IllegalStateException ex) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, ex.getMessage());
+        }
+    }
+
+    @GetMapping("/checkEmail")
+    public boolean existeEmail(@RequestParam("email") String email){
+        return service.existeEmail(email);
+    }
+
+    @GetMapping("/login") //deve ser POST com JSON
+    public Usuario login(@RequestParam("email") String email,  @RequestParam("senha") String senha){
+        try {
+            return service.login(email, senha);
+        } catch (IllegalArgumentException ex) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, ex.getMessage());
+        }
     }
 
     @PostMapping("")
     public Usuario inserir(@RequestBody Usuario usuario){
         usuario.setIdUsuario(null);
-        repository.save(usuario);
-        return usuario;
+        try {
+            return service.salvar(usuario);
+        } catch (IllegalArgumentException ex) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, ex.getMessage());
+        }
     }
 
     @DeleteMapping("/{id}")
     public Usuario excluir(@PathVariable Long id){
-        Usuario usuario = repository.findById(id).orElse(null);
-        if (usuario == null){
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Entidade com id " + id + " não encontrada.");
+        try {
+            return service.desativar(id);
+        } catch (IllegalStateException ex) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, ex.getMessage());
         }
-        repository.delete(usuario);
-        return usuario;
     }
 
     @PutMapping("")
     public Usuario alterar(@RequestBody Usuario usuario){
-        if (usuario.getIdUsuario() == null){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "id é obrigatório.");
+        try {
+            return service.alterar(usuario);
+        } catch (IllegalStateException ex) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, ex.getMessage());
+        } catch (IllegalArgumentException ex) {
+            if ("id é obrigatório.".equals(ex.getMessage())) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage());
+            }
+            throw new ResponseStatusException(HttpStatus.CONFLICT, ex.getMessage());
         }
-        repository.save(usuario);
-        return usuario;
     }
+
+
     
 
 }

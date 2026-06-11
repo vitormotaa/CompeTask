@@ -1,4 +1,5 @@
 import { CommonModule } from '@angular/common';
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -70,25 +71,34 @@ export class UsuarioPage {
       return;
     }
 
-    let mudancas = this.perfilForm.value;
-    let usuario = this.usuario;
-
-    usuario.nome = String(mudancas.nome ?? usuario.nome);
-    if (mudancas.senha){
-      usuario.senha = String(mudancas.senha);
-    }
+    const mudancas = this.perfilForm.value;
     const fotoVal = mudancas.foto;
-    if (fotoVal !== undefined && fotoVal !== '') {
-      usuario.foto = String(fotoVal);
-    }
 
-    const result = this.usuarioService.atualizarUsuarioLocal(usuario);
-    if (result) {
-      this.usuario = result;
-      this.mensagemAcao = 'Alterações salvas.';
-    } else {
-      this.mensagemAcao = 'Não foi possível salvar. Verifique o email.';
-    }
+    const usuarioAtualizado: UsuarioModel = {
+      ...this.usuario,
+      nome: String(mudancas.nome ?? this.usuario.nome),
+      email: String(mudancas.email ?? this.usuario.email),
+      senha: mudancas.senha ? String(mudancas.senha) : this.usuario.senha,
+      foto: fotoVal !== undefined && fotoVal !== '' ? String(fotoVal) : this.usuario.foto,
+      diasStreak: this.usuario.diasStreak,
+    };
+
+    this.usuarioService.atualizarUsuarioLocal(usuarioAtualizado).subscribe({
+      next: (resultado: UsuarioModel) => {
+        this.usuario = resultado;
+        this.perfilForm.patchValue({
+          nome: resultado.nome,
+          email: resultado.email,
+          senha: '',
+          foto: ''
+        });
+        this.fotoPreview = resultado.foto || null;
+        this.mensagemAcao = 'Alterações salvas.';
+      },
+      error: async (erro: HttpErrorResponse) => {
+        this.mensagemAcao = this.obterMensagemErroSalvar(erro);
+      }
+    });
   }
 
   excluirConta(): void {
@@ -97,12 +107,14 @@ export class UsuarioPage {
       return;
     }
     const id = this.usuario.id;
-    const result = this.usuarioService.excluirUsuario(id);
-    if (!result) {
-      this.mensagemAcao = 'Não foi possível excluir a conta.';
-      return;
-    }
-    this.router.navigate(['/login']);
+    this.usuarioService.excluirUsuario(id).subscribe({
+      next: () => {
+        this.router.navigate(['/login']);
+      },
+      error: (erro: HttpErrorResponse) => {
+        this.mensagemAcao = this.obterMensagemErroSalvar(erro);
+      }
+    });
   }
 
   sairConta(): void {
@@ -140,5 +152,14 @@ export class UsuarioPage {
       this.perfilForm.patchValue({ foto: fotoBase64 });
     };
     leitor.readAsDataURL(arquivo);
+  }
+
+  private obterMensagemErroSalvar(erro: HttpErrorResponse): string {
+    const mensagemDoBackend =
+      typeof erro.error === 'string'
+        ? erro.error
+        : erro.error?.message || erro.message;
+
+    return mensagemDoBackend || 'Não foi possível salvar as alterações.';
   }
 }

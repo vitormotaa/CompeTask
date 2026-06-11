@@ -7,6 +7,7 @@ import { UsuarioService } from 'src/app/services/usuario.service';
 import { addIcons } from 'ionicons';
 import { mailOutline, lockClosedOutline, eyeOutline, eyeOffOutline, personOutline, cameraOutline } from 'ionicons/icons';
 import { UsuarioModel } from 'src/app/models/usuario.model';
+import { ToastController } from '@ionic/angular';
 
 @Component({
   selector: 'app-cadastro',
@@ -20,9 +21,14 @@ export class CadastroPage {
   cadastroForm: FormGroup;
   fotoPreview: string | null = null;
 
+  // arquivo selecionado (usado para upload via FormData ou validações)
+  fotoArquivo: File | null = null;
+  private readonly MAX_BYTES = 1 * 1024 * 1024; // 1 MB
+
   senhaVisivel = false;
 
-  constructor(private readonly formBuilder: FormBuilder, private readonly router: Router, private usuarioService: UsuarioService) {
+
+  constructor(private readonly formBuilder: FormBuilder, private readonly router: Router, private usuarioService: UsuarioService, private readonly toastController: ToastController) {
     this.cadastroForm = this.formBuilder.group({
       'nome': ['', Validators.compose([Validators.required])],
       'email': ['', Validators.compose([Validators.required, Validators.email])],
@@ -31,13 +37,13 @@ export class CadastroPage {
     });
 
     addIcons({
-          'mail-outline': mailOutline,
-          'lock-closed-outline': lockClosedOutline,
-          'eye-outline': eyeOutline,
-          'eye-off-outline': eyeOffOutline,
-          'person-outline': personOutline,
-          'camera-outline': cameraOutline
-        }); 
+      'mail-outline': mailOutline,
+      'lock-closed-outline': lockClosedOutline,
+      'eye-outline': eyeOutline,
+      'eye-off-outline': eyeOffOutline,
+      'person-outline': personOutline,
+      'camera-outline': cameraOutline
+    });
   }
 
   cadastrar(): void {
@@ -46,30 +52,51 @@ export class CadastroPage {
       return;
     }
 
-    // this.usuarioService.salvar(this.cadastroForm.value).subscribe({
-    //   next: (resultado: UsuarioModel) => {
-    //     this.router.navigate(['/login']);
-    //   },
-    //   error: (erro) => {
-    //     console.log(erro);
-    //    this.router.navigate(['/usuario']);
-    //   }
-    // });
+    this.usuarioService.emailEmUso(String(this.cadastroForm.value.email || '').trim()).subscribe({
+      next: (emailTaEmUso: boolean) => {
+        if (!emailTaEmUso) {
+          this.usuarioService.salvar(this.cadastroForm.value).subscribe({
+            next: (resultado: UsuarioModel) => {
+              this.usuarioService.salvarSessao(resultado);
+              this.router.navigate(['/login']);
+            },
+            error: (erro) => {
+              if (erro.status === 409) {
+                this.exibirMensagem('Email já cadastrado.');
+                return;
+              }
 
-    let salvo = this.usuarioService.salvar(this.cadastroForm.value);
-    if (!salvo) {
-      this.cadastroForm.get('email')?.setErrors({ emailEmUso: true });
-      this.cadastroForm.get('email')?.markAsTouched();
-      return;
-    }
-    this.router.navigate(['/login']);
+              this.exibirMensagem('Erro ao cadastrar usuário.');
+            }
+          });
+        } else {
+          const emailCtrl = this.cadastroForm.get('email');
+          emailCtrl?.setValue('');                     // limpa o campo
+          emailCtrl?.setErrors({ emailEmUso: true }); // define erro customizado
+          emailCtrl?.markAsTouched();                  // mostra estado tocado (exibe validação)
+          emailCtrl?.updateValueAndValidity();
+          this.exibirMensagem('Email já em uso.');
+        }
+      },
+      error: (erro) => {
+        this.exibirMensagem('Erro ao cadastrar usuário.');
+      }
+    })
+
+    // let salvo = this.usuarioService.salvar(this.cadastroForm.value);
+    // if (!salvo) {
+    //   this.cadastroForm.get('email')?.setErrors({ emailEmUso: true });
+    //   this.cadastroForm.get('email')?.markAsTouched();
+    //   return;
+    // }
+    // this.router.navigate(['/login']);
   }
 
-  ngOnInit(){
+  ngOnInit() {
     this.usuarioService.inicializar();
   }
 
-  ionViewWillEnter(){
+  ionViewWillEnter() {
     this.cadastroForm.reset();
     this.fotoPreview = null;
     this.cadastroForm.markAsPristine(); // indica que o formulário não foi modificado desde seu estado inicial — remove o estado dirty que poderia disparar validações visuais.
@@ -90,18 +117,35 @@ export class CadastroPage {
 
     if (!arquivo) {
       this.fotoPreview = null;
+      this.fotoArquivo = null;
       this.cadastroForm.patchValue({ foto: '' });
       return;
     }
 
-    const leitor = new FileReader();
+    // validar tamanho
+    if (arquivo.size > this.MAX_BYTES) {
+      this.exibirMensagem('Imagem muito grande. Máx 1 MB.');
+      this.fotoArquivo = null;
+      input.value = '';
+      return;
+    }
 
+    // tudo OK: armazenar File e gerar preview (sem gravar base64 no form)
+    this.fotoArquivo = arquivo;
+    const leitor = new FileReader();
     leitor.onload = () => {
       const fotoBase64 = String(leitor.result || '');
       this.fotoPreview = fotoBase64;
-      this.cadastroForm.patchValue({ foto: fotoBase64 });
+      this.cadastroForm.patchValue({ foto: '' });
     };
-
     leitor.readAsDataURL(arquivo);
+  }
+
+  async exibirMensagem(texto: string) {
+    const toast = await this.toastController.create({
+      message: texto,
+      duration: 1500
+    });
+    toast.present();
   }
 }

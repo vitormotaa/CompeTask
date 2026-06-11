@@ -1,7 +1,4 @@
 <ion-content [fullscreen]="true" class="tasks-screen">
-  <div class="screen-glow screen-glow--left"></div>
-  <div class="screen-glow screen-glow--right"></div>
-
   <section class="tasks-shell">
     <header class="tasks-header">
       <div>
@@ -11,7 +8,7 @@
 
       <div class="status-wrap">
         <button type="button" class="status-pill" (click)="alternarMenuStatus($event)">
-          <ion-icon name="checkmark-circle-outline"></ion-icon>
+          <ion-icon name="filter-outline"></ion-icon>
           <span>{{ textoOrdenacao }}</span>
           <ion-icon name="caret-down-outline" class="status-pill__chevron" [class.status-pill__chevron--open]="statusMenuAberto"></ion-icon>
         </button>
@@ -41,14 +38,14 @@
         <div class="task-content">
           <div class="task-headline">
             <h2>{{ tarefa.titulo }}</h2>
-            <span [class]="getClasseStatus(tarefa)">{{ getStatus(tarefa) }}</span>
+            <span *ngIf="getStatus(tarefa) !== 'Em andamento'" [class]="getClasseStatus(tarefa)">{{ getStatus(tarefa) }}</span>
           </div>
 
           <p class="task-description">{{ tarefa.descricao }}</p>
 
           <div class="task-meta">
             <span><ion-icon name="calendar-outline"></ion-icon> Planejada: {{ getPlanejamento(tarefa) }}</span>
-            <span><ion-icon name="flag-outline"></ion-icon> Prioridade {{ tarefa.prioridade }}</span>
+            <span class="task-meta__priority"><ion-icon name="flag-outline"></ion-icon> Prioridade {{ tarefa.prioridade }}</span>
           </div>
         </div>
 
@@ -74,14 +71,14 @@
           <div class="task-content">
             <div class="task-headline">
               <h2>{{ tarefa.titulo }}</h2>
-              <span [class]="getClasseStatus(tarefa)">{{ getStatus(tarefa) }}</span>
+              <span *ngIf="getStatus(tarefa) !== 'Em andamento'" [class]="getClasseStatus(tarefa)">{{ getStatus(tarefa) }}</span>
             </div>
 
             <p class="task-description">{{ tarefa.descricao }}</p>
 
             <div class="task-meta">
               <span><ion-icon name="calendar-outline"></ion-icon> Planejada: {{ getPlanejamento(tarefa) }}</span>
-              <span><ion-icon name="flag-outline"></ion-icon> Prioridade {{ tarefa.prioridade }}</span>
+              <span class="task-meta__priority"><ion-icon name="flag-outline"></ion-icon> Prioridade {{ tarefa.prioridade }}</span>
             </div>
           </div>
 

@@ -41,4 +41,7 @@ public class Usuario {
 
     @Column(nullable = false)
     private Integer streak = 0;
+
+    @Column(nullable = false)
+    private Boolean ativo = true;
 }
