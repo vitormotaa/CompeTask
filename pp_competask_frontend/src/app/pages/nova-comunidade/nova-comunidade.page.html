@@ -1,0 +1,59 @@
+<ion-content [fullscreen]="true" class="community-create-screen">
+  <div class="screen-glow screen-glow--left"></div>
+  <div class="screen-glow screen-glow--right"></div>
+
+  <section class="community-create-shell">
+    <header class="community-create-header">
+      <button type="button" class="back-button" (click)="voltar()" aria-label="Voltar">
+        <ion-icon name="arrow-back-outline"></ion-icon>
+      </button>
+
+      <div>
+        <h1>Nova Comunidade</h1>
+      </div>
+    </header>
+
+    <section class="image-block">
+      <button type="button" class="image-selector" (click)="fileInput.click()" aria-label="Selecionar imagem da comunidade">
+        <ng-container *ngIf="fotoPreview; else defaultImage">
+          <img [src]="fotoPreview" alt="Pré-visualização da comunidade" />
+        </ng-container>
+
+        <ng-template #defaultImage>
+          <ion-icon name="image-outline"></ion-icon>
+        </ng-template>
+      </button>
+
+      <p>Imagem da comunidade</p>
+      <input #fileInput type="file" accept="image/*" hidden (change)="selecionarFoto($event)" />
+    </section>
+
+    <form class="community-form" [formGroup]="form" (ngSubmit)="salvar()">
+      <label class="field-label">Nome</label>
+      <label class="input-shell">
+        <ion-icon name="people-outline"></ion-icon>
+        <input type="text" formControlName="nome" placeholder="Nome da comunidade" />
+      </label>
+
+      <label class="field-label">Descrição</label>
+      <label class="textarea-shell">
+        <ion-icon name="person-outline"></ion-icon>
+        <textarea formControlName="descricao" placeholder="Sobre o que é essa comunidade..."></textarea>
+      </label>
+
+      <label class="field-label">Acesso</label>
+      <label class="select-shell">
+        <ion-icon name="globe-outline"></ion-icon>
+        <select formControlName="acesso">
+          <option value="publico">Pública</option>
+          <option value="privado">Privada</option>
+        </select>
+      </label>
+
+      <p class="hint-text">Por enquanto, tudo fica apenas na interface e no estado local.</p>
+      <p class="action-message" *ngIf="mensagemAcao">{{ mensagemAcao }}</p>
+
+      <ion-button class="primary-button" type="submit" expand="block">CRIAR COMUNIDADE</ion-button>
+    </form>
+  </section>
+</ion-content>

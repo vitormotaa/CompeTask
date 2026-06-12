@@ -19,6 +19,14 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/usuario/usuario.page').then((m) => m.UsuarioPage),
   },
   {
+    path: 'comunidades',
+    loadComponent: () => import('./pages/comunidades/comunidades.page').then((m) => m.ComunidadesPage),
+  },
+  {
+    path: 'comunidades/nova',
+    loadComponent: () => import('./pages/nova-comunidade/nova-comunidade.page').then((m) => m.NovaComunidadePage),
+  },
+  {
     path: 'tarefas',
     loadComponent: () => import('./pages/tarefas/tarefas.page').then((m) => m.TarefasPage),
   },

@@ -1,0 +1,92 @@
+<ion-content [fullscreen]="true" class="communities-screen">
+  <div class="screen-glow screen-glow--left"></div>
+  <div class="screen-glow screen-glow--right"></div>
+
+  <section class="communities-shell">
+    <header class="communities-header">
+      <div>
+        <h1>Suas comunidades</h1>
+      </div>
+    </header>
+
+    <label class="search-shell">
+      <ion-icon name="search-outline"></ion-icon>
+      <input type="text" name="busca" [(ngModel)]="busca" placeholder="Buscar comunidades..." />
+    </label>
+
+    <div class="communities-stack">
+      <article
+        *ngFor="let comunidade of comunidadesFiltradas"
+        class="community-card"
+        (click)="abrirComunidade(comunidade)">
+        <div class="community-avatar" [style.--avatar-color]="comunidade.cor">
+          <ion-icon [name]="comunidade.icone"></ion-icon>
+        </div>
+
+        <div class="community-content">
+          <div class="community-headline">
+            <h2>
+              {{ comunidade.nome }}
+              <span *ngIf="comunidade.destaque" class="community-crown">👑</span>
+            </h2>
+          </div>
+          <p>{{ comunidade.membros }} membros</p>
+        </div>
+
+        <ion-icon name="chevron-forward-outline" class="community-arrow"></ion-icon>
+      </article>
+    </div>
+
+    <p class="action-message" *ngIf="mensagemAcao">{{ mensagemAcao }}</p>
+
+    <button type="button" class="add-community-button" (click)="abrirModal()" aria-label="Criar comunidade">
+      <ion-icon name="add-outline"></ion-icon>
+    </button>
+
+    <div class="community-modal-backdrop" *ngIf="modalAberto" (click)="fecharModal()"></div>
+
+    <section class="community-modal" *ngIf="modalAberto" role="dialog" aria-modal="true" aria-label="Ações de comunidades">
+      <header class="community-modal__header">
+        <h2>Comunidades</h2>
+        <button type="button" class="community-modal__close" (click)="fecharModal()" aria-label="Fechar">
+          <ion-icon name="close-outline"></ion-icon>
+        </button>
+      </header>
+
+      <div class="community-modal__options">
+        <button type="button" class="community-modal__option" (click)="selecionarAcao('criar')">
+          <span class="community-modal__icon community-modal__icon--primary">
+            <ion-icon name="add-outline"></ion-icon>
+          </span>
+          <span>Criar comunidade</span>
+        </button>
+
+        <button type="button" class="community-modal__option" (click)="selecionarAcao('publicas')">
+          <span class="community-modal__icon community-modal__icon--cyan">
+            <ion-icon name="globe-outline"></ion-icon>
+          </span>
+          <span>Buscar comunidades públicas</span>
+        </button>
+
+        <button type="button" class="community-modal__option" (click)="selecionarAcao('privadas')">
+          <span class="community-modal__icon community-modal__icon--violet">
+            <ion-icon name="key-outline"></ion-icon>
+          </span>
+          <span>Entrar numa comunidade privada</span>
+        </button>
+      </div>
+    </section>
+  </section>
+
+  <nav class="bottom-nav" aria-label="Navegação inferior">
+    <button
+      *ngFor="let atalho of atalhosRodape"
+      type="button"
+      class="nav-item"
+      [class.nav-item--active]="atalho.ativo"
+      (click)="abrirAtalho(atalho)">
+      <ion-icon [name]="atalho.icon"></ion-icon>
+      <span>{{ atalho.label }}</span>
+    </button>
+  </nav>
+</ion-content>
