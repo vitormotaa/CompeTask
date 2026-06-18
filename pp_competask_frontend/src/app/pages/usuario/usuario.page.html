@@ -1,78 +1,80 @@
-<ion-content [fullscreen]="true" class="profile-screen">
-  <div class="screen-glow screen-glow--left"></div>
-  <div class="screen-glow screen-glow--right"></div>
+<ion-content [fullscreen]="true" class="usuario-page">
+  <header class="topo">
+    <h1>Usuário</h1>
 
-  <section class="profile-shell">
-    <header class="profile-header">
-      <h1>Usuário</h1>
+    <div class="notificacao">
+      <ion-icon name="notifications-outline"></ion-icon>
+      <span>5</span>
+    </div>
+  </header>
 
-      <!-- <button type="button" class="notification-button" aria-label="Notificações">
-        <ion-icon name="notifications-outline"></ion-icon>
-        <span class="notification-badge"></span>
-      </button> -->
-    </header>
+  <div class="usuario-info">
+    <div class="avatar-container">
+      <div class="avatar">
+        <ng-container *ngIf="fotoPreview; else avatarPadrao">
+          <img [src]="fotoPreview" alt="Foto do usuário" />
+        </ng-container>
 
-    <div class="profile-hero">
-      <div class="profile-avatar-wrap">
-        <div class="profile-avatar">
-          <ng-container *ngIf="fotoPreview; else avatarIcon">
-            <img [src]="fotoPreview" alt="Avatar" class="profile-avatar-img" />
-          </ng-container>
-          <ng-template #avatarIcon>
-            <ion-icon name="person-outline"></ion-icon>
-          </ng-template>
-        </div>
-
-        <button type="button" class="avatar-edit" aria-label="Editar foto de perfil" (click)="fileInput.click()">
-          <ion-icon name="pencil"></ion-icon>
-        </button>
-
-        <input #fileInput type="file" accept="image/*" hidden (change)="selecionarFoto($event)" />
+        <ng-template #avatarPadrao>
+          <ion-icon name="person-outline"></ion-icon>
+        </ng-template>
       </div>
 
-      <div class="streak-pill">
-        <ion-icon name="flame-outline"></ion-icon>
-        <strong>{{ usuario?.diasStreak }}</strong>
-        <span>dias de streak</span>
-      </div>
+      <button type="button" class="editar-avatar" (click)="fileInput.click()">
+        <ion-icon name="pencil"></ion-icon>
+      </button>
+
+      <input
+        #fileInput
+        type="file"
+        accept="image/*"
+        hidden
+        (change)="selecionarFoto($event)"
+      />
     </div>
 
-    <form class="profile-form" [formGroup]="perfilForm" (ngSubmit)="salvarAlteracoes()">
-      <label class="field-label">Nome</label>
-      <label class="input-shell" [class.input-shell--invalid]="perfilForm.controls['nome'].touched && perfilForm.controls['nome'].invalid">
-        <ion-icon name="person-outline"></ion-icon>
-        <input type="text" formControlName="nome" placeholder="Usuário" />
-      </label>
+    <div class="streak">{{ usuario?.diasStreak }} dias de streak</div>
+  </div>
 
-      <label class="field-label">Email</label>
-      <label class="input-shell" [class.input-shell--invalid]="perfilForm.controls['email'].touched && perfilForm.controls['email'].invalid">
-        <ion-icon name="mail-outline"></ion-icon>
-        <input type="email" formControlName="email" placeholder="usuario@email.com" readonly />
-      </label>
+  <form
+    class="profile-form"
+    [formGroup]="perfilForm"
+    (ngSubmit)="salvarAlteracoes()"
+  >
+    <label>Nome</label>
+    <input class="campo" type="text" formControlName="nome" placeholder="Usuário" />
 
-      <label class="field-label">Senha</label>
-      <label class="input-shell">
-        <ion-icon name="lock-closed-outline"></ion-icon>
-        <input type="password" formControlName="senha" placeholder="••••••••" />
-      </label>
+    <label>Email</label>
+    <input class="campo" type="email" formControlName="email" placeholder="usuario@email.com" readonly />
 
-      <p class="helper-text">Deixe em branco para manter a senha atual.</p>
+    <label>Senha</label>
+    <input class="campo" type="password" formControlName="senha" placeholder="********" />
 
-      <p class="action-message" *ngIf="mensagemAcao">{{ mensagemAcao }}</p>
+    <small class="texto-ajuda">Deixe em branco para manter a senha atual.</small>
 
-      <ion-button class="primary-button" type="submit" expand="block">SALVAR ALTERAÇÕES</ion-button>
-      <ion-button class="danger-button" type="button" expand="block" fill="outline" (click)="excluirConta()">EXCLUIR CONTA</ion-button>
-      <ion-button class="warning-button" type="button" expand="block" fill="outline" (click)="sairConta()">SAIR DA CONTA</ion-button>
-    </form>
-  </section>
+    <p class="mensagem" *ngIf="mensagemAcao">{{ mensagemAcao }}</p>
 
-  <nav class="bottom-nav" aria-label="Navegação inferior">
+    <ion-button expand="block" class="btn-salvar" type="submit">
+      SALVAR ALTERAÇÕES
+    </ion-button>
+
+    <ion-button expand="block" class="btn-sair" type="button" (click)="sairConta()">
+      SAIR DA CONTA
+    </ion-button>
+
+    <ion-button expand="block" class="btn-excluir" type="button" (click)="excluirConta()">
+      EXCLUIR CONTA
+    </ion-button>
+  </form>
+
+  <nav class="bottom-nav">
     <button
       *ngFor="let atalho of atalhosRodape"
       type="button"
       class="nav-item"
       [class.nav-item--active]="atalho.ativo"
-      (click)="abrirAtalho(atalho)">
+      (click)="abrirAtalho(atalho)"
+    >
       <ion-icon [name]="atalho.icon"></ion-icon>
       <span>{{ atalho.label }}</span>
     </button>
