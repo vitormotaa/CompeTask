@@ -262,6 +262,81 @@
   color: #b18cff;
 }
 
+.private-modal {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  z-index: 13;
+  width: min(92vw, 510px);
+  transform: translate(-50%, -50%);
+  padding: 26px;
+  border-radius: 14px;
+  border: 1px solid rgba(122, 94, 255, 0.9);
+  background: #1d103d;
+  box-shadow: 0 24px 50px rgba(5, 2, 14, 0.45);
+}
+
+.private-modal h2 {
+  margin: 0 0 12px;
+  color: #ffffff;
+  font-size: 1.28rem;
+  letter-spacing: -0.03em;
+}
+
+.private-modal p {
+  margin: 0 0 20px;
+  color: rgba(230, 222, 246, 0.7);
+  font-size: 0.92rem;
+}
+
+.private-modal__field {
+  display: flex;
+  min-height: 60px;
+  margin-bottom: 16px;
+  padding: 0 20px;
+  border: 1px solid #704cff;
+  border-radius: 14px;
+  background: #17072f;
+}
+
+.private-modal__field input {
+  width: 100%;
+  border: 0;
+  outline: none;
+  background: transparent;
+  color: #ffffff;
+  font: inherit;
+}
+
+.private-modal__field input::placeholder {
+  color: rgba(222, 216, 239, 0.42);
+}
+
+.private-modal__actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.private-modal__button {
+  min-height: 54px;
+  border: 0;
+  border-radius: 14px;
+  color: #dfd7f3;
+  font: inherit;
+  font-weight: 700;
+}
+
+.private-modal__button--muted {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.private-modal__button--primary {
+  background: #4b32a3;
+  color: rgba(255, 255, 255, 0.74);
+}
+
 .bottom-nav {
   position: fixed;
   left: 0;
