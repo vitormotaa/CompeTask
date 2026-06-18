@@ -111,8 +111,14 @@ export class TarefasPage {
       return;
     }
 
-    this.tarefasService.alternarConclusao(tarefa.id, usuarioAtual.id);
-    this.carregarTarefas();
+    this.tarefasService.alternarConclusao(tarefa, usuarioAtual.id).subscribe({
+      next: () => {
+        this.carregarTarefas();
+      },
+      error: () => {
+        console.log("deu erro aqui na hora de concluir tarefa no banco")
+      }
+    });
   }
 
   abrirAtalho(atalho: AtalhoRodape): void {

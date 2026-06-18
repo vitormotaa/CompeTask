@@ -1,5 +1,6 @@
 package br.cefetmg.pp_competask.service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,7 +40,7 @@ public class TarefaService {
         tarefa.setDataRealizacao(dto.getDataRealizacao());
         tarefa.setLembreteData(dto.getLembreteData());
         tarefa.setLembreteHora(dto.getLembreteHora());
-        tarefa.setTempoExecucao(null);
+        tarefa.setTempoExecucao(dto.getTempoExecucao());
         tarefa.setConcluida(false);
         tarefa.setDataConfeccao(null);
         
@@ -56,6 +57,17 @@ public class TarefaService {
         tarefa.setDataRealizacao(dto.getDataRealizacao());
         tarefa.setLembreteData(dto.getLembreteData());
         tarefa.setLembreteHora(dto.getLembreteHora());
+        tarefa.setTempoExecucao(dto.getTempoExecucao());
+
+        if (dto.getConcluida() != null) {
+            tarefa.setConcluida(dto.getConcluida());
+
+            if (dto.getConcluida()) {
+                tarefa.setDataConfeccao(LocalDate.now().toString());
+            } else {
+                tarefa.setDataConfeccao(null);
+            }
+        }
 
         return new TarefaResponseDTO(tarefaRepository.save(tarefa));
     }

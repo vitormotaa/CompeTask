@@ -76,6 +76,26 @@
         </button>
       </div>
     </section>
+
+    <div class="community-modal-backdrop" *ngIf="modalPrivadoAberto" (click)="fecharModalPrivado()"></div>
+
+    <section class="private-modal" *ngIf="modalPrivadoAberto" role="dialog" aria-modal="true" aria-label="Entrar em comunidade privada">
+      <h2>Entrar em comunidade privada</h2>
+      <p>Informe o código e a senha da comunidade.</p>
+
+      <label class="private-modal__field">
+        <input type="text" name="codigoPrivado" [(ngModel)]="codigoPrivado" placeholder="Código" />
+      </label>
+
+      <label class="private-modal__field">
+        <input type="password" name="senhaPrivada" [(ngModel)]="senhaPrivada" placeholder="Senha" />
+      </label>
+
+      <div class="private-modal__actions">
+        <button type="button" class="private-modal__button private-modal__button--muted" (click)="fecharModalPrivado()">Cancelar</button>
+        <button type="button" class="private-modal__button private-modal__button--primary" (click)="entrarComunidadePrivada()">Entrar</button>
+      </div>
+    </section>
   </section>
 
   <nav class="bottom-nav" aria-label="Navegação inferior">

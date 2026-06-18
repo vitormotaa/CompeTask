@@ -43,6 +43,9 @@ type AcaoModalComunidade = 'criar' | 'publicas' | 'privadas';
 export class ComunidadesPage {
   busca = '';
   modalAberto = false;
+  modalPrivadoAberto = false;
+  codigoPrivado = '';
+  senhaPrivada = '';
   mensagemAcao = '';
 
   readonly comunidades: Array<ComunidadeModel & { membros: number; destaque?: boolean; icone: string; cor: string }> = [
@@ -152,6 +155,23 @@ export class ComunidadesPage {
     this.modalAberto = false;
   }
 
+  abrirModalPrivado(): void {
+    this.modalAberto = false;
+    this.modalPrivadoAberto = true;
+    this.codigoPrivado = '';
+    this.senhaPrivada = '';
+    this.mensagemAcao = '';
+  }
+
+  fecharModalPrivado(): void {
+    this.modalPrivadoAberto = false;
+  }
+
+  entrarComunidadePrivada(): void {
+    this.modalPrivadoAberto = false;
+    this.router.navigate(['/comunidades', 3]);
+  }
+
   selecionarAcao(acao: AcaoModalComunidade): void {
     if (acao === 'criar') {
       this.router.navigate(['/comunidades/nova']);
@@ -164,12 +184,11 @@ export class ComunidadesPage {
       return;
     }
 
-    this.mensagemAcao = 'Entrada em comunidade privada será conectada depois.';
-    this.modalAberto = false;
+    this.abrirModalPrivado();
   }
 
   abrirComunidade(comunidade: ComunidadeModel): void {
-    this.mensagemAcao = `Abrindo ${comunidade.nome}...`;
+    this.router.navigate(['/comunidades', comunidade.idComunidade]);
   }
 
   abrirAtalho(atalho: AtalhoRodape): void {

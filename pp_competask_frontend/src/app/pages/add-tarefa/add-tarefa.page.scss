@@ -155,10 +155,12 @@
   letter-spacing: 0.04em;
   --border-color: #ff002d;
   --color: #ff002d;
-  --background: transparent;
-  --background-activated: rgba(255, 0, 45, 0.08);
+  --background: #162050;
+  --background-activated: #11183f;
   --box-shadow: none;
-  --border-radius: 12px;
+  --border-radius: 8px;
+  --border-style: solid;
+  --border-width: 2px;
 }
 
 .bottom-nav {

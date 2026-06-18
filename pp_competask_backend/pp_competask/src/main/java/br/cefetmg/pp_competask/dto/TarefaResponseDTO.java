@@ -21,8 +21,8 @@ public class TarefaResponseDTO {
     private String lembreteHora;
     private String tempoExecucao;
     private boolean concluida;
+    private String dataConfeccao;
     // private String atualizadaEm;
-    // private String dataConfeccao
 
     public TarefaResponseDTO(Tarefa tarefa){
         this.id = tarefa.getIdTarefa();
@@ -35,5 +35,6 @@ public class TarefaResponseDTO {
         this.lembreteHora = tarefa.getLembreteHora();
         this.tempoExecucao = tarefa.getTempoExecucao();
         this.concluida = tarefa.isConcluida();
+        this.dataConfeccao = tarefa.getDataConfeccao();
     }
 }

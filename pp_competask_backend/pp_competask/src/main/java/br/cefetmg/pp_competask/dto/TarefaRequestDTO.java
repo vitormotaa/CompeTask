@@ -28,4 +28,10 @@ public class TarefaRequestDTO {
 
     private String lembreteHora;
 
+    private String tempoExecucao;
+
+    private Boolean concluida;
+
+    private String dataConfeccao;
+
 }
