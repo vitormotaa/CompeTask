@@ -42,17 +42,6 @@ export class LoginPage {
       this.loginForm.markAllAsTouched();
       return;
     }
-<<<<<<< HEAD
-    let valido = this.usuarioService.validar(this.loginForm.value);
-    if (valido) {
-      this.usuarioService.salvarSessao(this.usuarioService.obterUsuarioPorEmail(this.loginForm.value.email));
-      this.router.navigate(['/comunidades']);
-    } else {
-      const toast = await this.toastController.create({ message: 'Email ou senha incorretos', duration: 2000, color: 'danger' });
-      toast.present();
-    }
-=======
->>>>>>> d0f326f8fcafac30cda7defd406adba369abe708
 
     const email = String(this.loginForm.value.email || '').trim();
     const senha = String(this.loginForm.value.senha || '').trim();

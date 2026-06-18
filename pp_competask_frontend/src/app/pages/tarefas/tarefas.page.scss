@@ -1,19 +1,5 @@
 :host {
   display: block;
-<<<<<<< HEAD
-  background: #ffffff;
-}
-
-.tasks-screen {
-  --background: #ffffff;
-  color: #17204a;
-  --padding-top: 20px;
-  --padding-bottom: 118px;
-}
-
-.screen-glow {
-  display: none;
-=======
   min-height: 100%;
 }
 
@@ -31,7 +17,6 @@
   position: absolute;
   border-radius: 999px;
   pointer-events: none;
->>>>>>> d0f326f8fcafac30cda7defd406adba369abe708
 }
 
 .tasks-screen::before {
@@ -55,11 +40,7 @@
   z-index: 1;
   width: min(100%, 430px);
   margin: 0 auto;
-<<<<<<< HEAD
-  padding: 0 14px 22px;
-=======
   padding: 6px 16px 24px;
->>>>>>> d0f326f8fcafac30cda7defd406adba369abe708
 }
 
 .tasks-header {
@@ -67,11 +48,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-<<<<<<< HEAD
-  margin-bottom: 14px;
-=======
   margin-bottom: 16px;
->>>>>>> d0f326f8fcafac30cda7defd406adba369abe708
 }
 
 .status-wrap {
@@ -80,64 +57,38 @@
 
 .tasks-header h1 {
   margin: 0;
-<<<<<<< HEAD
-  color: #1d234d;
-  font-size: 1.78rem;
-  line-height: 1;
-  letter-spacing: -0.05em;
-  font-weight: 800;
-=======
   font-size: 2rem;
   line-height: 1.05;
   letter-spacing: -0.05em;
   font-weight: 800;
   color: #2f3263;
->>>>>>> d0f326f8fcafac30cda7defd406adba369abe708
 }
 
 .tasks-header p {
   margin: 8px 0 0;
-<<<<<<< HEAD
-  color: #6f7699;
-  font-size: 0.8rem;
-=======
   color: #69729a;
   font-size: 0.88rem;
->>>>>>> d0f326f8fcafac30cda7defd406adba369abe708
 }
 
 .status-pill {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-<<<<<<< HEAD
-  min-height: 30px;
-  padding: 0 12px;
-  border: 0;
-  border-radius: 999px;
-  background: #20d6cb;
-  color: #12344b;
-=======
   min-height: 34px;
   padding: 0 14px;
   border: 0;
   border-radius: 999px;
   background: #18d3c7;
   color: #0a3a42;
->>>>>>> d0f326f8fcafac30cda7defd406adba369abe708
   font: inherit;
   font-size: 0.9rem;
   font-weight: 700;
-<<<<<<< HEAD
-  box-shadow: 0 8px 18px rgba(32, 214, 203, 0.25);
-=======
   box-shadow: 0 8px 18px rgba(24, 211, 199, 0.22);
 }
 
 .status-pill ion-icon {
   color: #0a3a42;
   font-size: 1rem;
->>>>>>> d0f326f8fcafac30cda7defd406adba369abe708
 }
 
 .status-pill__chevron {
@@ -148,13 +99,6 @@
   transform: rotate(180deg);
 }
 
-<<<<<<< HEAD
-.status-pill ion-icon {
-  color: inherit;
-}
-
-=======
->>>>>>> d0f326f8fcafac30cda7defd406adba369abe708
 .status-menu {
   position: absolute;
   top: calc(100% + 8px);
@@ -162,17 +106,10 @@
   z-index: 12;
   min-width: 170px;
   padding: 8px;
-<<<<<<< HEAD
-  border: 1px solid rgba(122, 94, 255, 0.2);
-  border-radius: 16px;
-  background: #ffffff;
-  box-shadow: 0 18px 30px rgba(31, 32, 59, 0.14);
-=======
   border: 1px solid rgba(47, 50, 99, 0.1);
   border-radius: 16px;
   background: rgba(255, 255, 255, 0.98);
   box-shadow: 0 18px 30px rgba(33, 38, 79, 0.12);
->>>>>>> d0f326f8fcafac30cda7defd406adba369abe708
 }
 
 .status-menu__item {
@@ -181,23 +118,14 @@
   border-radius: 12px;
   padding: 10px 12px;
   background: transparent;
-<<<<<<< HEAD
-  color: #25305b;
-=======
   color: #2f3263;
->>>>>>> d0f326f8fcafac30cda7defd406adba369abe708
   text-align: left;
   font: inherit;
 }
 
 .status-menu__item--active {
-<<<<<<< HEAD
-  background: rgba(32, 214, 203, 0.12);
-  color: #13b5aa;
-=======
   background: rgba(24, 211, 199, 0.12);
   color: #0d9f95;
->>>>>>> d0f326f8fcafac30cda7defd406adba369abe708
 }
 
 .tasks-stack,
@@ -216,16 +144,6 @@
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-<<<<<<< HEAD
-  min-height: 42px;
-  padding: 0 14px;
-  border: 0;
-  border-radius: 12px;
-  background: #5f24d6;
-  color: #ffffff;
-  text-align: left;
-  box-shadow: 0 10px 22px rgba(95, 36, 214, 0.18);
-=======
   padding: 14px 16px;
   border: 0;
   border-radius: 14px;
@@ -233,27 +151,18 @@
   color: #f8f4ff;
   text-align: left;
   box-shadow: 0 10px 20px rgba(40, 7, 71, 0.12);
->>>>>>> d0f326f8fcafac30cda7defd406adba369abe708
 }
 
 .task-group__header h2 {
   margin: 0;
   font-size: 0.98rem;
-<<<<<<< HEAD
-  color: #ffffff;
-=======
   color: inherit;
->>>>>>> d0f326f8fcafac30cda7defd406adba369abe708
   font-weight: 700;
 }
 
 .task-group__header ion-icon {
   font-size: 1rem;
-<<<<<<< HEAD
-  color: #f2f2ff;
-=======
   color: rgba(255, 255, 255, 0.82);
->>>>>>> d0f326f8fcafac30cda7defd406adba369abe708
   transition: transform 0.2s ease;
 }
 
@@ -271,29 +180,6 @@
   display: grid;
   grid-template-columns: auto 1fr auto;
   gap: 12px;
-<<<<<<< HEAD
-  align-items: start;
-  padding: 12px 12px 13px;
-  border-radius: 12px;
-  border: 0;
-  background: linear-gradient(180deg, #5c17a3 0%, #4c148d 100%);
-  box-shadow: 0 10px 18px rgba(28, 7, 63, 0.18);
-}
-
-.task-card--late {
-  box-shadow: 0 10px 18px rgba(235, 70, 118, 0.18);
-}
-
-.task-card--done {
-  box-shadow: 0 10px 18px rgba(32, 214, 203, 0.14);
-}
-
-.task-check {
-  width: 22px;
-  height: 22px;
-  margin-top: 4px;
-  border: 1.5px solid rgba(203, 195, 255, 0.78);
-=======
   align-items: center;
   padding: 14px 14px 14px 12px;
   border-radius: 18px;
@@ -315,20 +201,10 @@
   height: 24px;
   margin-top: 0;
   border: 2px solid rgba(181, 156, 255, 0.7);
->>>>>>> d0f326f8fcafac30cda7defd406adba369abe708
   border-radius: 50%;
   background: transparent;
   display: grid;
   place-items: center;
-<<<<<<< HEAD
-  color: #20d6cb;
-}
-
-.task-check--done {
-  border-color: #20d6cb;
-  background: #20d6cb;
-  color: #1c1743;
-=======
   color: #18d3c7;
   flex: 0 0 auto;
 }
@@ -337,18 +213,13 @@
   border-color: #18d3c7;
   background: #18d3c7;
   color: #14313e;
->>>>>>> d0f326f8fcafac30cda7defd406adba369abe708
 }
 
 .task-check__dot {
   width: 10px;
   height: 10px;
   border-radius: 50%;
-<<<<<<< HEAD
-  background: #20d6cb;
-=======
   background: #18d3c7;
->>>>>>> d0f326f8fcafac30cda7defd406adba369abe708
   opacity: 0;
 }
 
@@ -374,13 +245,8 @@
 .task-headline h2 {
   margin: 0;
   color: #ffffff;
-<<<<<<< HEAD
-  font-size: 0.96rem;
-  line-height: 1.2;
-=======
   font-size: 1rem;
   line-height: 1.18;
->>>>>>> d0f326f8fcafac30cda7defd406adba369abe708
   letter-spacing: -0.03em;
   font-weight: 700;
 }
@@ -389,11 +255,7 @@
 .task-card--done .task-description {
   text-decoration: line-through;
   text-decoration-thickness: 1.5px;
-<<<<<<< HEAD
-  color: rgba(255, 255, 255, 0.62);
-=======
   color: rgba(245, 239, 255, 0.6);
->>>>>>> d0f326f8fcafac30cda7defd406adba369abe708
 }
 
 .task-chip {
@@ -401,40 +263,16 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-<<<<<<< HEAD
-  min-height: 20px;
-  padding: 0 8px;
-  border-radius: 999px;
-  background: rgba(32, 214, 203, 0.12);
-  color: #20d6cb;
-=======
   min-height: 18px;
   padding: 0;
   border-radius: 0;
   background: transparent;
   color: #18d3c7;
->>>>>>> d0f326f8fcafac30cda7defd406adba369abe708
   font-size: 0.66rem;
   font-weight: 700;
 }
 
 .task-chip--late {
-<<<<<<< HEAD
-  background: rgba(255, 82, 120, 0.12);
-  color: #ff8ea7;
-}
-
-.task-chip--done {
-  background: rgba(32, 214, 203, 0.16);
-  color: #20d6cb;
-}
-
-.task-description {
-  margin: 7px 0 10px;
-  color: rgba(255, 255, 255, 0.82);
-  font-size: 0.78rem;
-  line-height: 1.35;
-=======
   color: #ff5c7d;
 }
 
@@ -447,21 +285,14 @@
   color: rgba(242, 237, 255, 0.72);
   font-size: 0.78rem;
   line-height: 1.28;
->>>>>>> d0f326f8fcafac30cda7defd406adba369abe708
 }
 
 .task-meta {
   display: flex;
   flex-wrap: wrap;
-<<<<<<< HEAD
-  gap: 8px 12px;
-  color: rgba(255, 255, 255, 0.78);
-  font-size: 0.66rem;
-=======
   gap: 6px 10px;
   color: rgba(237, 231, 255, 0.72);
   font-size: 0.68rem;
->>>>>>> d0f326f8fcafac30cda7defd406adba369abe708
 }
 
 .task-meta span {
@@ -479,12 +310,7 @@
 }
 
 .task-meta ion-icon {
-<<<<<<< HEAD
-  font-size: 0.9rem;
-  color: #20d6cb;
-=======
   font-size: 0.78rem;
->>>>>>> d0f326f8fcafac30cda7defd406adba369abe708
 }
 
 .task-arrow {
@@ -495,11 +321,7 @@
 
 .empty-state {
   margin: 14px 0 0;
-<<<<<<< HEAD
-  color: #6f7699;
-=======
   color: #69729a;
->>>>>>> d0f326f8fcafac30cda7defd406adba369abe708
   text-align: center;
 }
 
@@ -512,15 +334,9 @@
   height: 54px;
   border: 0;
   border-radius: 50%;
-<<<<<<< HEAD
-  background: #20d6cb;
-  color: #13314b;
-  box-shadow: 0 14px 28px rgba(32, 214, 203, 0.28);
-=======
   background: #18d3c7;
   color: #0d3b41;
   box-shadow: 0 12px 24px rgba(24, 211, 199, 0.28);
->>>>>>> d0f326f8fcafac30cda7defd406adba369abe708
   display: grid;
   place-items: center;
 }
@@ -538,17 +354,10 @@
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 4px;
-<<<<<<< HEAD
-  padding: 10px 12px 14px;
-  background: #5a0fa0;
-  border-top: 0;
-  backdrop-filter: blur(18px);
-=======
   padding: 12px 12px 14px;
   background: linear-gradient(180deg, #5a0ea5 0%, #490694 100%);
   border-top: 0;
   box-shadow: 0 -8px 24px rgba(52, 10, 92, 0.16);
->>>>>>> d0f326f8fcafac30cda7defd406adba369abe708
 }
 
 .nav-item {
@@ -558,10 +367,6 @@
   gap: 5px;
   border: 0;
   background: transparent;
-<<<<<<< HEAD
-  color: rgba(255, 255, 255, 0.58);
-  font-size: 0.68rem;
-=======
   color: rgba(255, 255, 255, 0.56);
   font-size: 0.72rem;
   padding: 4px 0 0;
@@ -577,7 +382,6 @@
   border-radius: 999px;
   background: transparent;
   transform: translateX(-50%);
->>>>>>> d0f326f8fcafac30cda7defd406adba369abe708
 }
 
 .nav-item ion-icon {
@@ -585,14 +389,9 @@
 }
 
 .nav-item--active {
-<<<<<<< HEAD
-  color: #20d6cb;
-}
-=======
   color: #f8ffff;
 }
 
 .nav-item--active::after {
   background: #18d3c7;
 }
->>>>>>> d0f326f8fcafac30cda7defd406adba369abe708

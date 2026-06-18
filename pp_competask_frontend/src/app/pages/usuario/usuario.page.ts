@@ -5,7 +5,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { Router } from '@angular/router';
 import { IonButton, IonContent, IonIcon } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { checkmarkCircleOutline, flameOutline, lockClosedOutline, mailOutline, peopleOutline, personOutline, pencil, timerOutline } from 'ionicons/icons';
+import { checkmarkCircleOutline, flameOutline, lockClosedOutline, mailOutline, peopleOutline, personOutline, pencil, timerOutline, notifications, notificationsOutline } from 'ionicons/icons';
 
 import { UsuarioModel } from '../../models/usuario.model';
 import { UsuarioService } from 'src/app/services/usuario.service';
@@ -39,7 +39,7 @@ export class UsuarioPage {
   ];
 
   constructor(private readonly formBuilder: FormBuilder, private readonly router: Router,private usuarioService: UsuarioService) {
-    addIcons({ checkmarkCircleOutline, personOutline, pencil, flameOutline, mailOutline, lockClosedOutline, peopleOutline, timerOutline });
+    addIcons({notificationsOutline,personOutline,pencil,notifications,flameOutline,mailOutline,lockClosedOutline,checkmarkCircleOutline,peopleOutline,timerOutline});
 
     this.perfilForm = this.formBuilder.group({
       'nome': ['', Validators.compose([Validators.required])],
