@@ -86,6 +86,7 @@ export class TarefasService {
 	}
 
 	//método de inserção de tarefa no banco (criar tarefa) - API
+
 	inserir(tarefa: Partial<TarefaModel>): Observable<TarefaModel> {
 		return this.http.post<TarefaModel>(this.API_URL, tarefa);
 	}
@@ -115,27 +116,21 @@ export class TarefasService {
 	// }
 
 	//método de atualização de tarefa no banco - API
+
+	//O CORRETO É USAR PATCH, MAS O BACK TA COM PUT E NAO FAÇO A MAIS VAGA IDEIA DE COMO MUDAR ISSO
 	atualizar(id: string, tarefa: Partial<TarefaModel>): Observable<TarefaModel>{
 		return this.http.put<TarefaModel>(`${this.API_URL}/${id}`, tarefa);
 	}
 
-	alternarConclusao(id: string, usuarioId?: string): TarefaModel | null {
-		const tarefas = this.obterTodas();
-		const indice = tarefas.findIndex((tarefa) => tarefa.id === id && (!usuarioId || tarefa.usuarioId === usuarioId));
+	alternarConclusao(tarefa: TarefaModel, usuarioId: string): Observable<TarefaModel> {
+		const concluindoAgora = !tarefa.concluida;
+		const payload = {
+			...tarefa,
+			usuarioId: Number(usuarioId) as unknown as string,
+			concluida: concluindoAgora,
+		};
 
-		if (indice === -1) {
-			return null;
-		}
-
-		const tarefaAtual = tarefas[indice];
-		const concluindoAgora = !tarefaAtual.concluida;
-
-		tarefaAtual.concluida = concluindoAgora;
-		tarefaAtual.dataConfeccao = concluindoAgora ? new Date().toISOString() : '';
-		tarefaAtual.atualizadaEm = new Date().toISOString();
-
-		this.salvarTodas(tarefas);
-		return tarefaAtual;
+		return this.atualizar(tarefa.id, payload);
 	}
 
 	//ta em comentario só por contad do nome, nao quero dar conflito com o metodo de baixo ai
