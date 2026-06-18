@@ -1,0 +1,57 @@
+INSERT INTO tbusuario (id_usuario, email, nome, senha, ativo, streak, foto) VALUES  (1, 'teste@email.com', 'teste', '123456', 1, 0);
+
+INSERT INTO tbtarefa (
+    concluida, 
+    prioridade, 
+    id_tarefa, 
+    usuario_id, 
+    data_confeccao, 
+    data_realizacao, 
+    descricao, 
+    lembrete_data, 
+    lembrete_hora, 
+    tempo_execucao, 
+    titulo
+) 
+VALUES (
+    false,                    
+    1,                       
+    1,                        
+    1,                      
+    '2026-06-18',            
+    '2026-06-20',            
+    'Descrição da tarefa',   
+    '2026-06-20',           
+    '14:30:00',             
+    '02:00:00',              
+    'Título da Tarefa'        
+);
+
+
+
+INSERT INTO tbtarefa (
+    concluida, 
+    prioridade, 
+    id_tarefa, 
+    usuario_id, 
+    data_confeccao, 
+    data_realizacao, 
+    descricao, 
+    lembrete_data, 
+    lembrete_hora, 
+    tempo_execucao, 
+    titulo
+) 
+VALUES (
+    false,                    
+    1,                       
+    2,                        
+    1,                      
+    '2026-06-18',            
+    '2026-06-20',            
+    'Descrição da tarefa 2',   
+    '2026-06-20',           
+    '14:30:00',             
+    '02:00:00',              
+    'Título da Tarefa 2'        
+);

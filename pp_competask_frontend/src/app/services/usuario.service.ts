@@ -66,11 +66,6 @@ export class UsuarioService {
     );
   }
 
-  validar(usuario: UsuarioModel): boolean {
-    let usuarios = JSON.parse(localStorage.getItem('usuarios') || '[]');
-    const email = String(usuario.email || '').trim().toLowerCase();
-    return usuarios.some((u: UsuarioModel) => String(u.email || '').trim().toLowerCase() === email && u.senha === usuario.senha);
-  }
 
   salvarSessao(usuario: UsuarioModel) {
     if (!localStorage.getItem('usuarioSessao')) {

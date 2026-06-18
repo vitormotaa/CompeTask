@@ -210,6 +210,7 @@ export class TarefasPage {
     }
   }
 
+  //API
   private carregarTarefas(): void {
     const usuarioAtual = this.usuarioService.obterUsuarioSessao();
     if (!usuarioAtual) {
@@ -217,8 +218,43 @@ export class TarefasPage {
       return;
     }
 
-    this.tarefas = this.tarefasService.obterPorUsuario(usuarioAtual.id);
+    this.tarefasService.buscarTarefasUsuario(usuarioAtual.id).subscribe({
+      next: (resultado: TarefaModel[]) => {
+          this.tarefas = resultado;
+          this.tarefasService.guardarTarefasLocal(this.tarefas);
+      },
+      error:  () => {
+          console.log("deu erro aqui na hora de puxar as tarefas do usuario do banco")
+      }
+    });
   }
+
+  // private ordenarTarefas(tarefas: TarefaModel[]): TarefaModel[] {
+  //   return [...tarefas].sort((a, b) => {
+  //     if (this.ordenacaoAtual === 'data') {
+  //       return this.compararDatas(a.dataRealizacao, b.dataRealizacao);
+  //     }
+
+  //     if (this.ordenacaoAtual === 'prioridade') {
+  //       return a.prioridade - b.prioridade;
+  //     }
+
+  //     if (this.ordenacaoAtual === 'alfabetica') {
+  //       return a.titulo.localeCompare(b.titulo, 'pt-BR', { sensitivity: 'base' });
+  //     }
+
+  //     const pesoA = this.pesoStatus(a);
+  //     const pesoB = this.pesoStatus(b);
+
+  //     if (pesoA !== pesoB) {
+  //       return pesoA - pesoB;
+  //     }
+
+  //     return b.atualizadaEm.localeCompare(a.atualizadaEm);
+  //   });
+  // }
+
+  //esse método de cima já existia, tava dando um erro nele por conta dessa atualizadaEm (que na prática nem existe mais), ai eu pedi pro gemini corrigir e ele deu esse método aqui de baixo, vou deixar tudo aqui porque nao sei o funcionamento exato de nada disso
 
   private ordenarTarefas(tarefas: TarefaModel[]): TarefaModel[] {
     return [...tarefas].sort((a, b) => {
@@ -227,11 +263,13 @@ export class TarefasPage {
       }
 
       if (this.ordenacaoAtual === 'prioridade') {
-        return a.prioridade - b.prioridade;
+        // Garante que prioridade nula ou indefinida seja tratada como 0
+        return (a.prioridade ?? 0) - (b.prioridade ?? 0);
       }
 
       if (this.ordenacaoAtual === 'alfabetica') {
-        return a.titulo.localeCompare(b.titulo, 'pt-BR', { sensitivity: 'base' });
+        // CORREÇÃO 1: Protege o título se ele vier nulo
+        return (a.titulo ?? '').localeCompare(b.titulo ?? '', 'pt-BR', { sensitivity: 'base' });
       }
 
       const pesoA = this.pesoStatus(a);
@@ -241,7 +279,8 @@ export class TarefasPage {
         return pesoA - pesoB;
       }
 
-      return b.atualizadaEm.localeCompare(a.atualizadaEm);
+      // CORREÇÃO 2: Protege o campo atualizadaEm caso seja uma tarefa nova sem data de modificação
+      return (b.atualizadaEm ?? '').localeCompare(a.atualizadaEm ?? '');
     });
   }
 

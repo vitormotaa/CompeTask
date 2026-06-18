@@ -78,6 +78,7 @@ export class TarefaPage {
 
   ionViewWillEnter(): void {
     this.tarefaId = this.route.snapshot.paramMap.get('id');
+    // console.log(this.tarefaId);
     this.carregarTarefa();
   }
 
@@ -85,6 +86,7 @@ export class TarefaPage {
     return this.tarefaId ? 'Editar Tarefa' : 'Nova Tarefa';
   }
 
+  //API
   salvarTarefa(): void {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
@@ -100,6 +102,7 @@ export class TarefaPage {
 
     const valores = this.form.getRawValue();
     const payload = {
+      usuarioId: Number(usuarioAtual.id) as unknown as string,
       titulo: String(valores.titulo ?? ''),
       descricao: String(valores.descricao ?? ''),
       prioridade: Number(valores.prioridade ?? 1),
@@ -110,23 +113,31 @@ export class TarefaPage {
     };
 
     if (this.tarefaId) {
-      const tarefaAtualizada = this.tarefasService.atualizar(this.tarefaId, payload, usuarioAtual.id);
-
-      if (!tarefaAtualizada) {
-        this.mensagemAcao = 'Tarefa não encontrada.';
-        this.router.navigate(['/tarefas']);
-        return;
-      }
-      this.router.navigate(['/tarefas']);
-      return;
+      console.log("to em editar");
+      this.tarefasService.atualizar(this.tarefaId, payload).subscribe({
+        next: (resultado: TarefaModel) => {
+          this.router.navigate(['/tarefas']);
+        },
+        error: () => {
+          console.log("deu erro aqui na hora de ATUALIZAR tarefa do usuario no banco")
+        }
+      });
+    } else {
+      console.log("to em adicionar");
+      this.tarefasService.inserir(payload).subscribe({
+        next: (resultado: TarefaModel) => {
+          this.router.navigate(['/tarefas']);
+        },
+        error: () => {
+          console.log("deu erro aqui na hora de criar tarefa do usuario no banco")
+        }
+      });
     }
-
-    this.tarefasService.criar(payload, usuarioAtual.id);
-    this.router.navigate(['/tarefas']);
   }
 
   excluirTarefa(): void {
     if (!this.tarefaId) {
+      console.log("1")
       return;
     }
 
@@ -139,16 +150,18 @@ export class TarefaPage {
 
     const confirmar = window.confirm('Tem certeza que deseja excluir esta tarefa?');
     if (!confirmar) {
+      console.log("2")
       return;
     }
 
-    const excluida = this.tarefasService.excluir(this.tarefaId, usuarioAtual.id);
-    if (!excluida) {
-      this.mensagemAcao = 'Tarefa não encontrada.';
-      return;
-    }
-
-    this.router.navigate(['/tarefas']);
+    this.tarefasService.excluir(this.tarefaId).subscribe({
+      next: (resultado: void) => {
+        this.router.navigate(['/tarefas']);
+      },
+      error: () => {
+        console.log("deu erro aqui na hora de EXCLUIR tarefa do usuario no banco")
+      }
+    });
   }
 
   voltar(): void {

@@ -1,7 +1,6 @@
 package br.cefetmg.pp_competask.controller;
 
-import java.util.List;
-
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -16,7 +15,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import br.cefetmg.pp_competask.model.Usuario;
-import br.cefetmg.pp_competask.repository.UsuarioRepository;
 import br.cefetmg.pp_competask.service.UsuarioService;
 
 @RestController
@@ -24,13 +22,13 @@ import br.cefetmg.pp_competask.service.UsuarioService;
 @CrossOrigin(origins = "http://localhost:8100")
 public class UsuarioController {
 
-    private final UsuarioRepository repository;
-    private final UsuarioService service;
+    @Autowired
+    private UsuarioService service;
 
-    public UsuarioController(UsuarioRepository repository, UsuarioService service){
-        this.repository = repository;
-        this.service = service;
-    }
+    // public UsuarioController(UsuarioRepository repository, UsuarioService service){
+    //     this.repository = repository;
+    //     this.service = service;
+    // }
 
     // @GetMapping("")
     // public List<Usuario> getAll(){
