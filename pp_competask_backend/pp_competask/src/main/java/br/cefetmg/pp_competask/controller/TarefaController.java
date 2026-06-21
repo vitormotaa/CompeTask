@@ -14,18 +14,16 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
+
 
 import br.cefetmg.pp_competask.dto.TarefaRequestDTO;
 import br.cefetmg.pp_competask.dto.TarefaResponseDTO;
-import br.cefetmg.pp_competask.model.Tarefa;
-import br.cefetmg.pp_competask.repository.TarefaRepository;
 import br.cefetmg.pp_competask.service.TarefaService;
 import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/v1/tarefas")
-@CrossOrigin(origins = "http://localhost:8100")
+@CrossOrigin(origins = "//editar ")
 public class TarefaController {
 
     @Autowired

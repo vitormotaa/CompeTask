@@ -49,7 +49,7 @@ export class LoginPage {
     this.usuarioService.login(email, senha).subscribe({
       next: (resultado: UsuarioModel) => {
         this.usuarioService.salvarSessao(resultado);
-        this.router.navigate(['/usuario']);
+        this.router.navigate(['/tarefas']);
       },
       error: async (erro: HttpErrorResponse) => {
         const mensagem = this.obterMensagemErroLogin(erro);
