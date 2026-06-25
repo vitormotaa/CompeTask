@@ -448,24 +448,46 @@
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 4px;
-  padding: 8px 8px 10px;
-  background: #52008c;
+  padding: 12px 12px 14px;
+  background: linear-gradient(180deg, #5a0ea5 0%, #490694 100%);
+  border-top: 0;
+  box-shadow: 0 -8px 24px rgba(52, 10, 92, 0.16);
 }
 
 .community-tabs__item {
+  position: relative;
   display: grid;
   justify-items: center;
-  gap: 4px;
+  gap: 5px;
   border: 0;
   background: transparent;
-  color: rgba(255, 255, 255, 0.72);
-  font-size: 0.62rem;
+  color: rgba(255, 255, 255, 0.56);
+  font-size: 0.72rem;
+  padding: 4px 0 0;
+}
+
+
+.community-tabs__item::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: -8px;
+  width: 30px;
+  height: 4px;
+  border-radius: 999px;
+  background: transparent;
+  transform: translateX(-50%);
 }
 
 .community-tabs__item ion-icon {
-  font-size: 1rem;
+  font-size: 1.15rem;
+
 }
 
 .community-tabs__item--active {
-  color: #12cbc5;
+  color: #f8ffff;
+}
+
+.community-tabs__item--active::after {
+  background: #18d3c7;
 }
