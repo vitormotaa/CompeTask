@@ -4,6 +4,7 @@ package br.cefetmg.pp_competask.service;
 
 import org.springframework.stereotype.Service;
 
+import br.cefetmg.pp_competask.dto.UsuarioResponseLoginDTO;
 import br.cefetmg.pp_competask.model.Usuario;
 import br.cefetmg.pp_competask.repository.UsuarioRepository;
 
@@ -44,12 +45,15 @@ public class UsuarioService {
             .anyMatch(usuario -> Boolean.TRUE.equals(usuario.getAtivo()) && email.equals(usuario.getEmail()));
     }
 
-    public Usuario login(String email, String senha) {
+    public UsuarioResponseLoginDTO login(String email, String senha) {
         Usuario usuario = repository.findByEmailAndSenha(email, senha);
 
         validarUsuarioAtivoOuLoginInvalido(usuario);
 
-        return usuario;
+        //GAMIBARRA?
+        UsuarioResponseLoginDTO usuarioResponseLoginDTO = new UsuarioResponseLoginDTO(usuario);
+
+        return usuarioResponseLoginDTO;
     }
 
     public Usuario alterar(Usuario usuario) {

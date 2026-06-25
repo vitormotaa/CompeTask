@@ -15,3 +15,9 @@ spring:
     properties:
       hibernate:
         format_sql: true
+      
+  springdoc:
+    swagger-ui:
+      path: /docs
+    api-docs:
+      path: /openapi-specs

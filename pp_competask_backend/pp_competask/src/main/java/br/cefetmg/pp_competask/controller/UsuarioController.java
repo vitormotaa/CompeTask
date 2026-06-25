@@ -14,12 +14,16 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
+import br.cefetmg.pp_competask.dto.UsuarioResponseLoginDTO;
 import br.cefetmg.pp_competask.model.Usuario;
 import br.cefetmg.pp_competask.service.UsuarioService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @RequestMapping("/api/v1/usuarios")
 @CrossOrigin(origins = "http://localhost:8100")
+@Tag(name = "Usuários", description = "Endpoints para gerenciamento de usuários do COMPETASK")
 public class UsuarioController {
 
     @Autowired
@@ -28,7 +32,7 @@ public class UsuarioController {
     // public UsuarioController(UsuarioRepository repository, UsuarioService service){
     //     this.repository = repository;
     //     this.service = service;
-    // }
+    // }    
 
     // @GetMapping("")
     // public List<Usuario> getAll(){
@@ -36,6 +40,10 @@ public class UsuarioController {
     // }
 
     @GetMapping("/{id}")
+    @Operation(
+        summary = "Buscar usuário por ID", 
+        description = ""
+    )
     public Usuario getById(@PathVariable Long id){
         try {
             return service.findById(id);
@@ -45,12 +53,20 @@ public class UsuarioController {
     }
 
     @GetMapping("/checkEmail")
+    @Operation(
+        summary = "Checar email disponível", 
+        description = ""
+    )
     public boolean existeEmail(@RequestParam("email") String email){
         return service.existeEmail(email);
     }
 
     @GetMapping("/login") //deve ser POST com JSON
-    public Usuario login(@RequestParam("email") String email,  @RequestParam("senha") String senha){
+    @Operation(
+        summary = "Login", 
+        description = ""
+    )
+    public UsuarioResponseLoginDTO login(@RequestParam("email") String email,  @RequestParam("senha") String senha){
         try {
             return service.login(email, senha);
         } catch (IllegalArgumentException ex) {
@@ -59,6 +75,10 @@ public class UsuarioController {
     }
 
     @PostMapping("")
+    @Operation(
+        summary = "Criar usuário", 
+        description = ""
+    )
     public Usuario inserir(@RequestBody Usuario usuario){
         usuario.setIdUsuario(null);
         try {
@@ -69,6 +89,10 @@ public class UsuarioController {
     }
 
     @DeleteMapping("/{id}")
+    @Operation(
+        summary = "Excluir usuário", 
+        description = ""
+    )
     public Usuario excluir(@PathVariable Long id){
         try {
             return service.desativar(id);
@@ -78,6 +102,10 @@ public class UsuarioController {
     }
 
     @PutMapping("")
+    @Operation(
+        summary = "Editar usuário", 
+        description = ""
+    )
     public Usuario alterar(@RequestBody Usuario usuario){
         try {
             return service.alterar(usuario);
@@ -90,8 +118,4 @@ public class UsuarioController {
             throw new ResponseStatusException(HttpStatus.CONFLICT, ex.getMessage());
         }
     }
-
-
-    
-
 }
