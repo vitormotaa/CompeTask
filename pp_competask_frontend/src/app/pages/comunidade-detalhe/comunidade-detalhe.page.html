@@ -11,8 +11,8 @@
       </div>
 
       <button type="button" class="settings-button" (click)="editarComunidade()" aria-label="Editar comunidade">
-        <img *ngIf="comunidade.foto; else communityIcon" [src]="comunidade.foto" alt="" />
-        <ng-template #communityIcon>
+        <img *ngIf="comunidade.foto; else iconeComunidade" [src]="comunidade.foto" alt="" />
+          <ng-template #iconeComunidade>
           <ion-icon name="people-outline"></ion-icon>
         </ng-template>
       </button>

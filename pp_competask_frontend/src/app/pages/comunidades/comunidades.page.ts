@@ -74,6 +74,8 @@ export class ComunidadesPage {
   }
 
   ionViewWillEnter(): void {
+    this.fecharModal();
+    this.fecharModalPrivado();
     this.carregarComunidades();
   }
 
@@ -171,6 +173,7 @@ export class ComunidadesPage {
 
   selecionarAcao(acao: AcaoModalComunidade): void {
     if (acao === 'criar') {
+      this.modalAberto = false;
       this.router.navigate(['/comunidades/nova']);
       return;
     }

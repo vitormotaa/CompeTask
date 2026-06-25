@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { IonContent, IonIcon } from '@ionic/angular/standalone';
@@ -35,7 +35,7 @@ type OrdenacaoComunidade = 'status' | 'data' | 'prioridade' | 'alfabetica';
   standalone: true,
   imports: [CommonModule, FormsModule, IonContent, IonIcon],
 })
-export class ComunidadeDetalhePage implements OnInit {
+export class ComunidadeDetalhePage {
   abaAtual: AbaComunidade = 'tarefas';
   rankingAtual: PeriodoRanking = 'semanal';
   novoCheckinAberto = false;
@@ -106,7 +106,11 @@ export class ComunidadeDetalhePage implements OnInit {
     return this.opcoesOrdenacao.find((opcao) => opcao.chave === this.ordenacaoAtual)?.label ?? 'Status';
   }
 
-  ngOnInit(): void {
+  ionViewWillEnter(): void {
+    this.carregarComunidade();
+  }
+
+  carregarComunidade(): void {
     const id = this.route.snapshot.paramMap.get('id');
 
     if (!id) {
