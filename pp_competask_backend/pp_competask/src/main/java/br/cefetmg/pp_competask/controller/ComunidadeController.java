@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -81,7 +82,7 @@ public class ComunidadeController {
         return ResponseEntity.ok(comunidadeResponseDTO);
     }
 
-    @PutMapping("/foto/{id}")
+    @PatchMapping("/foto/{id}")
     @Operation(summary = "Atualizar foto da comunidade", description = "")
     public ResponseEntity<ComunidadeResponseDTO> atualizarFoto(@PathVariable Long id,
             @RequestParam(value = "arquivo", required = false) MultipartFile arquivo) {

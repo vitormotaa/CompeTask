@@ -42,4 +42,8 @@ public class Checkin {
     @ManyToOne
     @JoinColumn(name = "comunidade_id", nullable = false)
     private Comunidade comunidade;
+
+    @ManyToOne
+    @JoinColumn(name = "tarefa_id", nullable = false)
+    private Tarefa tarefa;
 }

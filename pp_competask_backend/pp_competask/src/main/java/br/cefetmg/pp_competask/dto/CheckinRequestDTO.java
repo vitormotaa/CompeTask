@@ -24,4 +24,7 @@ public class CheckinRequestDTO {
 
     @NotNull(message = "Comunidade é obrigatória")
     private Long comunidadeId;
+
+    @NotNull(message = "Tarefa é obrigatória")
+    private Long tarefaId;
 }

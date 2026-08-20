@@ -16,6 +16,7 @@ public class CheckinResponseDTO {
     private String dataHoraEnvio;
     private Long usuarioId;
     private Long comunidadeId;
+    private Long tarefaId;
 
     public CheckinResponseDTO(Checkin checkin){
         this.id = checkin.getIdCheckin();
@@ -24,5 +25,6 @@ public class CheckinResponseDTO {
         this.dataHoraEnvio = checkin.getDataHoraEnvio();
         this.usuarioId = checkin.getUsuario().getIdUsuario();
         this.comunidadeId = checkin.getComunidade().getIdComunidade();
+        this.tarefaId = checkin.getTarefa().getIdTarefa();
     }
 }
