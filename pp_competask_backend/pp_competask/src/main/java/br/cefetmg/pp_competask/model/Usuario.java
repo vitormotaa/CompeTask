@@ -43,6 +43,9 @@ public class Usuario {
     @Column(columnDefinition = "TEXT", nullable = true)
     private String foto; //na teoria daria pra ja comecar a foto com uma url de imagem padrao (aquele bonequinho la) ai caso o usuario nao bote foto, vai essa padrao e se botar so sobrescreve
 
+    @Column(length = 255, nullable = true)
+    private String fotoPublicId;
+
     @Column(nullable = false)
     private Integer streak = 0;
 

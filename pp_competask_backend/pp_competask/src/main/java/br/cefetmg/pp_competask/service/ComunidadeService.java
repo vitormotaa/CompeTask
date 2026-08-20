@@ -1,13 +1,16 @@
 package br.cefetmg.pp_competask.service;
 
+import java.io.IOException;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import br.cefetmg.pp_competask.dto.ComunidadeRequestDTO;
 import br.cefetmg.pp_competask.dto.ComunidadeResponseDTO;
+import br.cefetmg.pp_competask.dto.ImagemUploadDTO;
 import br.cefetmg.pp_competask.model.Comunidade;
 import br.cefetmg.pp_competask.model.MembroComunidade;
 import br.cefetmg.pp_competask.model.Usuario;
@@ -26,6 +29,9 @@ public class ComunidadeService {
 
     @Autowired
     private MembroComunidadeRepository membroComunidadeRepository;
+
+    @Autowired
+    private ImagemService imagemService;
 
     @Transactional(readOnly = true)
     public List<ComunidadeResponseDTO> getAll() {
@@ -89,9 +95,33 @@ public class ComunidadeService {
     }
 
     @Transactional
-    public void excluir(Long id) {
-        // verificar se existe ai madna excluir
-        comunidadeRepository.deleteById(id);
+    public void excluir(Long id) throws IOException {
+        Comunidade comunidade = comunidadeRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Comunidade não encontrada."));
+
+        imagemService.excluir(comunidade.getFotoPublicId());
+        comunidadeRepository.delete(comunidade);
+    }
+
+    @Transactional
+    public ComunidadeResponseDTO atualizarFoto(Long id, MultipartFile arquivo) throws IOException {
+        Comunidade comunidade = comunidadeRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Comunidade não encontrada."));
+
+        ImagemUploadDTO imagem = imagemService.salvar(arquivo);
+            if (imagem == null) {
+                return new ComunidadeResponseDTO(comunidade);
+            }
+
+        String fotoPublicIdAnterior = comunidade.getFotoPublicId();
+
+        comunidade.setFoto(imagem.getUrl());
+        comunidade.setFotoPublicId(imagem.getPublicId());
+        comunidadeRepository.save(comunidade);
+
+        imagemService.excluir(fotoPublicIdAnterior);
+
+        return new ComunidadeResponseDTO(comunidade);
     }
 
     @Transactional

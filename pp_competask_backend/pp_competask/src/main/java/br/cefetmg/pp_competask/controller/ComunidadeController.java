@@ -1,5 +1,6 @@
 package br.cefetmg.pp_competask.controller;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -14,7 +15,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import br.cefetmg.pp_competask.dto.ComunidadeRequestDTO;
@@ -78,12 +81,31 @@ public class ComunidadeController {
         return ResponseEntity.ok(comunidadeResponseDTO);
     }
 
+    @PutMapping("/foto/{id}")
+    @Operation(summary = "Atualizar foto da comunidade", description = "")
+    public ResponseEntity<ComunidadeResponseDTO> atualizarFoto(@PathVariable Long id,
+            @RequestParam(value = "arquivo", required = false) MultipartFile arquivo) {
+        try {
+            return ResponseEntity.ok(comunidadeService.atualizarFoto(id, arquivo));
+        } catch (IllegalArgumentException ex) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage());
+        } catch (IOException ex) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Não foi possível enviar a imagem.");
+        }
+    }
+
     // excluir comunidade
     @DeleteMapping("/{id}")
     @Operation(summary = "Excluir comunidade", description = "")
     public ResponseEntity<ComunidadeResponseDTO> excluir(@PathVariable Long id) {
-        comunidadeService.excluir(id);
-        return ResponseEntity.noContent().build();
+        try {
+            comunidadeService.excluir(id);
+            return ResponseEntity.noContent().build();
+        } catch (IllegalArgumentException ex) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, ex.getMessage());
+        } catch (IOException ex) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Não foi possível excluir a imagem.");
+        }
     }
 
     // listar todas as tarefas por id da comunidade

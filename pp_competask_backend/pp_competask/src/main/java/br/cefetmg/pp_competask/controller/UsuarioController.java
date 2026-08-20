@@ -1,5 +1,7 @@
 package br.cefetmg.pp_competask.controller;
 
+import java.io.IOException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import br.cefetmg.pp_competask.dto.AutentificacaoRequestDTO;
@@ -108,6 +111,19 @@ public class UsuarioController {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage());
             }
             throw new ResponseStatusException(HttpStatus.CONFLICT, ex.getMessage());
+        }
+    }
+
+    @PatchMapping("/foto/{id}")
+    @Operation(summary = "Atualizar foto do usuário")
+    public ResponseEntity<UsuarioResponseDTO> atualizarFoto(@PathVariable Long id,
+            @RequestParam(value = "arquivo", required = false) MultipartFile arquivo) {
+        try {
+            return ResponseEntity.ok(usuarioService.atualizarFoto(id, arquivo));
+        } catch (IllegalArgumentException ex) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage());
+        } catch (IOException ex) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Não foi possível enviar a imagem.");
         }
     }
 }

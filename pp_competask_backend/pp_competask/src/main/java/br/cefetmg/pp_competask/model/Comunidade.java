@@ -45,6 +45,9 @@ public class Comunidade {
     @Column(columnDefinition = "TEXT", nullable = true)
     private String foto;
 
+    @Column(length = 255, nullable = true)
+    private String fotoPublicId;
+
     @OneToMany(mappedBy = "comunidade", cascade = CascadeType.ALL)
     private List<MembroComunidade> membros = new ArrayList<>();
 

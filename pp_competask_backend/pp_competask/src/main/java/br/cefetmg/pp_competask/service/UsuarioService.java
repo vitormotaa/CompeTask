@@ -1,6 +1,9 @@
 package br.cefetmg.pp_competask.service;
 
+import java.io.IOException;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.multipart.MultipartFile;
 
 // import java.util.List;
 
@@ -8,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import br.cefetmg.pp_competask.dto.AutentificacaoRequestDTO;
+import br.cefetmg.pp_competask.dto.ImagemUploadDTO;
 import br.cefetmg.pp_competask.dto.UsuarioRequestDTO;
 import br.cefetmg.pp_competask.dto.UsuarioResponseDTO;
 import br.cefetmg.pp_competask.model.Usuario;
@@ -18,6 +22,9 @@ public class UsuarioService {
 
     @Autowired
     private UsuarioRepository usuarioRepository;
+
+    @Autowired
+    private ImagemService imagemService;
 
     @Transactional
     public UsuarioResponseDTO inserir(UsuarioRequestDTO dto){
@@ -99,5 +106,26 @@ public class UsuarioService {
 
         return new UsuarioResponseDTO(usuarioRepository.save(usuario));
 
+    }
+
+    @Transactional
+    public UsuarioResponseDTO atualizarFoto(Long id, MultipartFile arquivo) throws IOException {
+        Usuario usuario = usuarioRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Usuario nao encontrado."));
+
+        ImagemUploadDTO imagem = imagemService.salvar(arquivo);
+            if (imagem == null) {
+                return new UsuarioResponseDTO(usuario);
+            }
+
+        String fotoPublicIdAnterior = usuario.getFotoPublicId();
+
+        usuario.setFoto(imagem.getUrl());
+        usuario.setFotoPublicId(imagem.getPublicId());
+        usuarioRepository.save(usuario);
+
+        imagemService.excluir(fotoPublicIdAnterior);
+
+        return new UsuarioResponseDTO(usuario);
     }
 }
