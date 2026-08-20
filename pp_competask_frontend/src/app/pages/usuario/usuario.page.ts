@@ -34,7 +34,7 @@ export class UsuarioPage {
   atalhosRodape: AtalhoRodape[] = [
     { label: 'Tarefas', icon: 'checkmark-circle-outline', rota: '/tarefas' },
     { label: 'Comunidades', icon: 'people-outline', rota: '/comunidades' },
-    { label: 'Timer', icon: 'timer-outline', rota: '/timer' },
+    { label: 'Cronômetro', icon: 'timer-outline', rota: '/timer' },
     { label: 'Usuário', icon: 'person-outline', ativo: true },
   ];
 

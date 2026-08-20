@@ -1,66 +1,37 @@
 <ion-content [fullscreen]="true" class="timer-screen">
   <section class="timer-shell">
     <header class="timer-header">
-      <h1>Timer e Cronometro</h1>
+      <h1>Cronometro</h1>
       <p>Marque seu foco e salve direto na tarefa.</p>
     </header>
 
-    <div class="segment" role="tablist" aria-label="Modo de contagem">
+    <section class="dial-wrap">
+      <div class="dial">
+        <strong>{{ tempoExibidoCronometro }}</strong>
+      </div>
+    </section>
+
+    <section class="actions" *ngIf="!mostrarAcoesPausa">
       <button
         type="button"
-        class="segment__item"
-        [class.segment__item--active]="abaAtual === 'cronometro'"
-        (click)="selecionarAba('cronometro')">
-        <ion-icon name="timer-outline"></ion-icon>
-        <span>Cronometro</span>
+        class="cta-button"
+        (click)="rodando ? pausarCronometro() : iniciarCronometro()">
+        <ion-icon [name]="rodando ? 'pause-outline' : 'play-outline'"></ion-icon>
+        <span>{{ rodando ? 'PAUSAR' : 'INICIAR' }}</span>
+      </button>
+    </section>
+
+    <section class="actions actions--split" *ngIf="mostrarAcoesPausa">
+      <button type="button" class="ghost-button" (click)="pararCronometro()">
+        <ion-icon name="stop-outline"></ion-icon>
+        <span>PARAR</span>
       </button>
 
-      <button
-        type="button"
-        class="segment__item"
-        [class.segment__item--active]="abaAtual === 'timer'"
-        (click)="selecionarAba('timer')">
-        <ion-icon name="hourglass-outline"></ion-icon>
-        <span>Timer</span>
+      <button type="button" class="cta-button" (click)="retomarCronometro()">
+        <ion-icon name="play-outline"></ion-icon>
+        <span>RETOMAR</span>
       </button>
-    </div>
-
-    <ng-container *ngIf="abaAtual === 'cronometro'; else timerEmBreve">
-      <section class="dial-wrap">
-        <div class="dial">
-          <strong>{{ tempoExibidoCronometro }}</strong>
-        </div>
-      </section>
-
-      <section class="actions" *ngIf="!mostrarAcoesPausa">
-        <button
-          type="button"
-          class="cta-button"
-          (click)="rodando ? pausarCronometro() : iniciarCronometro()">
-          <ion-icon [name]="rodando ? 'pause-outline' : 'play-outline'"></ion-icon>
-          <span>{{ rodando ? 'PAUSAR' : 'INICIAR' }}</span>
-        </button>
-      </section>
-
-      <section class="actions actions--split" *ngIf="mostrarAcoesPausa">
-        <button type="button" class="ghost-button" (click)="pararCronometro()">
-          <ion-icon name="stop-outline"></ion-icon>
-          <span>PARAR</span>
-        </button>
-
-        <button type="button" class="cta-button" (click)="retomarCronometro()">
-          <ion-icon name="play-outline"></ion-icon>
-          <span>RETOMAR</span>
-        </button>
-      </section>
-    </ng-container>
-
-    <ng-template #timerEmBreve>
-      <section class="timer-placeholder">
-        <h2>Modo timer</h2>
-        <p>O modo de contagem regressiva sera liberado em breve.</p>
-      </section>
-    </ng-template>
+    </section>
 
     <p class="action-message" *ngIf="mensagemAcao">{{ mensagemAcao }}</p>
   </section>

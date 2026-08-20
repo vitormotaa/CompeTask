@@ -18,10 +18,11 @@ import {
   imageOutline,
   paperPlaneOutline,
   peopleOutline,
-  trophyOutline,
-} from 'ionicons/icons';
+  trophyOutline, calendarOutline, chevronForwardOutline } from 'ionicons/icons';
 
 import { ComunidadesService } from '../../services/comunidades.service';
+import { TarefaModel } from '../../models/tarefa.model';
+import { TarefasService } from '../../services/tarefas.service';
 import { UsuarioService } from '../../services/usuario.service';
 
 type AbaComunidade = 'tarefas' | 'chat' | 'checkins' | 'ranking';
@@ -50,10 +51,11 @@ export class ComunidadeDetalhePage {
     nome: 'Carregando...',
     membros: 0,
     foto: '',
+    adm: false,
   };
   mensagemAcao = '';
 
-  readonly tarefas: any[] = [];
+  tarefas: TarefaModel[] = [];
   readonly mensagens: any[] = [];
   readonly checkins: any[] = [];
   readonly ranking: any[] = [];
@@ -82,28 +84,36 @@ export class ComunidadeDetalhePage {
     private readonly router: Router,
     private readonly route: ActivatedRoute,
     private readonly comunidadesService: ComunidadesService,
+    private readonly tarefasService: TarefasService,
     private readonly usuarioService: UsuarioService
   ) {
-    addIcons({
-      addOutline,
-      arrowBackOutline,
-      cameraOutline,
-      caretDownOutline,
-      chatbubbleOutline,
-      checkmarkCircleOutline,
-      checkboxOutline,
-      chevronDownOutline,
-      flagOutline,
-      filterOutline,
-      imageOutline,
-      paperPlaneOutline,
-      peopleOutline,
-      trophyOutline,
-    });
+    addIcons({arrowBackOutline,peopleOutline,filterOutline,caretDownOutline,checkmarkCircleOutline,calendarOutline,flagOutline,chevronForwardOutline,addOutline,paperPlaneOutline,cameraOutline,imageOutline,chatbubbleOutline,checkboxOutline,chevronDownOutline,trophyOutline,});
   }
 
   get textoOrdenacao(): string {
     return this.opcoesOrdenacao.find((opcao) => opcao.chave === this.ordenacaoAtual)?.label ?? 'Status';
+  }
+
+  get usuarioEhAdministrador(): boolean {
+    return this.comunidade.adm;
+  }
+
+  get tarefasOrdenadas(): TarefaModel[] {
+    return [...this.tarefas].sort((tarefaA, tarefaB) => {
+      if (this.ordenacaoAtual === 'data') {
+        return this.compararDatas(tarefaA.dataRealizacao, tarefaB.dataRealizacao);
+      }
+
+      if (this.ordenacaoAtual === 'prioridade') {
+        return tarefaA.prioridade - tarefaB.prioridade;
+      }
+
+      if (this.ordenacaoAtual === 'alfabetica') {
+        return tarefaA.titulo.localeCompare(tarefaB.titulo, 'pt-BR', { sensitivity: 'base' });
+      }
+
+      return Number(tarefaA.concluida) - Number(tarefaB.concluida);
+    });
   }
 
   ionViewWillEnter(): void {
@@ -139,7 +149,9 @@ export class ComunidadeDetalhePage {
           nome: comunidade.nome,
           membros: comunidade.membros.length,
           foto: comunidade.foto,
+          adm: comunidade.membros.some((membro) => membro.usuarioId === Number(usuarioAtual.id) && membro.adm),
         };
+        this.carregarTarefas();
       },
       error: () => {
         this.mensagemAcao = 'Nao foi possivel carregar a comunidade.';
@@ -152,11 +164,31 @@ export class ComunidadeDetalhePage {
   }
 
   editarComunidade(): void {
-    if (!this.comunidade.idComunidade) {
+    if (!this.usuarioEhAdministrador || !this.comunidade.idComunidade) {
       return;
     }
 
     this.router.navigate(['/comunidades/editar', this.comunidade.idComunidade]);
+  }
+
+  criarTarefaComunitaria(): void {
+    if (!this.usuarioEhAdministrador || !this.comunidade.idComunidade) {
+      return;
+    }
+
+    this.router.navigate(['/tarefas/nova'], {
+      queryParams: { comunidadeId: this.comunidade.idComunidade },
+    });
+  }
+
+  abrirTarefa(tarefa: TarefaModel): void {
+    if (!this.usuarioEhAdministrador) {
+      return;
+    }
+
+    this.router.navigate(['/tarefas/editar', tarefa.id], {
+      queryParams: { comunidadeId: this.comunidade.idComunidade },
+    });
   }
 
   alternarMenuStatus(event: Event): void {
@@ -193,5 +225,35 @@ export class ComunidadeDetalhePage {
 
   enviarMensagem(): void {
     this.mensagemChat = '';
+  }
+
+  private carregarTarefas(): void {
+    this.comunidadesService.listarTarefas(this.comunidade.idComunidade).subscribe({
+      next: (tarefas) => {
+        this.tarefas = tarefas;
+      },
+      error: () => {
+        this.mensagemAcao = 'Nao foi possivel carregar as tarefas da comunidade.';
+      },
+    });
+  }
+
+  getStatus(tarefa: TarefaModel): string {
+    return tarefa.concluida ? 'Concluida' : 'Em andamento';
+  }
+
+  getPlanejamento(tarefa: TarefaModel): string {
+    if (!tarefa.dataRealizacao) {
+      return 'Sem prazo definido';
+    }
+
+    const data = new Date(`${tarefa.dataRealizacao}T00:00:00`);
+    return Number.isNaN(data.getTime()) ? tarefa.dataRealizacao : data.toLocaleDateString('pt-BR');
+  }
+
+  private compararDatas(dataA: string, dataB: string): number {
+    const valorA = dataA ? new Date(`${dataA}T00:00:00`).getTime() : Number.MAX_SAFE_INTEGER;
+    const valorB = dataB ? new Date(`${dataB}T00:00:00`).getTime() : Number.MAX_SAFE_INTEGER;
+    return valorA - valorB;
   }
 }

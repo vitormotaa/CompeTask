@@ -39,20 +39,22 @@
       </div>
       <small class="field-help">Você será notificado nesse horário.</small>
 
-      <label class="field-label">Tempo gasto</label>
-      <label class="textarea-shell textarea-shell--timer">
-        <textarea
-          formControlName="tempoExecucao"
-          placeholder="Os tempos do cronômetro/timer serão salvos aqui no formato [dd/mm/aaaa] hh:mm:ss"
-          readonly
-          style="resize: none;"
-        ></textarea>
-      </label>
+      <ng-container *ngIf="!comunidadeId">
+        <label class="field-label">Tempo gasto</label>
+        <label class="textarea-shell textarea-shell--timer">
+          <textarea
+            formControlName="tempoExecucao"
+            placeholder="Os tempos do cronômetro/timer serão salvos aqui no formato [dd/mm/aaaa] hh:mm:ss"
+            readonly
+            style="resize: none;"
+          ></textarea>
+        </label>
+      </ng-container>
 
       <p class="mensagem" *ngIf="mensagemAcao">{{ mensagemAcao }}</p>
 
       <ion-button class="primary-button" type="submit" expand="block">
-        {{ tarefaId ? 'SALVAR TAREFA' : 'CRIAR TAREFA' }}
+        {{ textoBotaoSalvar }}
       </ion-button>
       <ion-button *ngIf="tarefaId" class="danger-button" type="button" expand="block" fill="outline" (click)="excluirTarefa()">EXCLUIR TAREFA</ion-button>
     </form>

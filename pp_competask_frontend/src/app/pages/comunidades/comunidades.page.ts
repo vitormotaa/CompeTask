@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { IonContent, IonIcon } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
+import { forkJoin } from 'rxjs';
 import {
   addOutline,
   chevronForwardOutline,
@@ -39,19 +40,23 @@ type AcaoModalComunidade = 'criar' | 'publicas' | 'privadas';
 })
 export class ComunidadesPage {
   busca = '';
+  buscaPublicas = '';
   modalAberto = false;
+  modalPublicasAberto = false;
   modalPrivadoAberto = false;
   codigoPrivado = '';
   senhaPrivada = '';
   mensagemAcao = '';
   carregando = false;
+  entrandoComunidadeId: number | null = null;
   comunidades: ComunidadeModel[] = [];
+  comunidadesPublicas: ComunidadeModel[] = [];
 
   atalhosRodape: AtalhoRodape[] = [
     { label: 'Tarefas', icon: 'checkmark-circle-outline', rota: '/tarefas' },
     { label: 'Comunidades', icon: 'people-outline', ativo: true },
-    { label: 'Timer', icon: 'timer-outline', rota: '/timer' },
-    { label: 'Usuario', icon: 'person-outline', rota: '/usuario' },
+    { label: 'Cronômetro', icon: 'timer-outline', rota: '/timer' },
+    { label: 'Usuário', icon: 'person-outline', rota: '/usuario' },
   ];
 
   constructor(
@@ -75,6 +80,7 @@ export class ComunidadesPage {
 
   ionViewWillEnter(): void {
     this.fecharModal();
+    this.fecharModalPublicas();
     this.fecharModalPrivado();
     this.carregarComunidades();
   }
@@ -95,7 +101,17 @@ export class ComunidadesPage {
     });
   }
 
-  carregarComunidades(): void {
+  get comunidadesPublicasFiltradas(): ComunidadeModel[] {
+    const termo = this.buscaPublicas.trim().toLowerCase();
+
+    if (!termo) {
+      return this.comunidadesPublicas;
+    }
+
+    return this.comunidadesPublicas.filter((comunidade) => comunidade.nome.toLowerCase().includes(termo));
+  }
+
+  carregarComunidades(mensagemSucesso = ''): void {
     const usuarioAtual = this.usuarioService.obterUsuarioSessao();
 
     if (!usuarioAtual?.id) {
@@ -109,6 +125,7 @@ export class ComunidadesPage {
     this.comunidadesService.listarPorUsuario(usuarioAtual.id).subscribe({
       next: (comunidades) => {
         this.comunidades = comunidades;
+        this.mensagemAcao = mensagemSucesso;
         this.carregando = false;
       },
       error: () => {
@@ -119,11 +136,24 @@ export class ComunidadesPage {
   }
 
   carregarComunidadesPublicas(): void {
+    const usuarioAtual = this.usuarioService.obterUsuarioSessao();
+
+    if (!usuarioAtual?.id) {
+      this.mensagemAcao = 'Voce precisa estar logado para buscar comunidades publicas.';
+      return;
+    }
+
     this.carregando = true;
-    this.comunidadesService.listarPublicas().subscribe({
-      next: (comunidades) => {
-        this.comunidades = comunidades;
-        this.mensagemAcao = 'Mostrando comunidades publicas.';
+    this.mensagemAcao = '';
+    forkJoin({
+      publicas: this.comunidadesService.listarPublicas(),
+      doUsuario: this.comunidadesService.listarPorUsuario(usuarioAtual.id),
+    }).subscribe({
+      next: ({ publicas, doUsuario }) => {
+        const comunidadesDoUsuario = new Set(doUsuario.map((comunidade) => comunidade.idComunidade));
+        this.comunidadesPublicas = publicas.filter((comunidade) => !comunidadesDoUsuario.has(comunidade.idComunidade));
+        this.buscaPublicas = '';
+        this.modalPublicasAberto = true;
         this.carregando = false;
       },
       error: () => {
@@ -154,6 +184,13 @@ export class ComunidadesPage {
     this.modalAberto = false;
   }
 
+  fecharModalPublicas(): void {
+    this.modalPublicasAberto = false;
+    this.comunidadesPublicas = [];
+    this.buscaPublicas = '';
+    this.entrandoComunidadeId = null;
+  }
+
   abrirModalPrivado(): void {
     this.modalAberto = false;
     this.modalPrivadoAberto = true;
@@ -180,11 +217,34 @@ export class ComunidadesPage {
 
     if (acao === 'publicas') {
       this.modalAberto = false;
-      this.mensagemAcao = 'Busca de comunidades publicas ainda nao esta disponivel.';
+      this.carregarComunidadesPublicas();
       return;
     }
 
     this.abrirModalPrivado();
+  }
+
+  entrarComunidadePublica(comunidade: ComunidadeModel): void {
+    const usuarioAtual = this.usuarioService.obterUsuarioSessao();
+
+    if (!usuarioAtual?.id) {
+      this.mensagemAcao = 'Voce precisa estar logado para entrar em uma comunidade.';
+      return;
+    }
+
+    this.entrandoComunidadeId = comunidade.idComunidade;
+    this.comunidadesService.entrar(comunidade.idComunidade, Number(usuarioAtual.id)).subscribe({
+      next: () => {
+        this.comunidadesPublicas = this.comunidadesPublicas.filter((item) => item.idComunidade !== comunidade.idComunidade);
+        this.entrandoComunidadeId = null;
+        this.fecharModalPublicas();
+        this.carregarComunidades(`Voce entrou em ${comunidade.nome}.`);
+      },
+      error: () => {
+        this.entrandoComunidadeId = null;
+        this.mensagemAcao = 'Nao foi possivel entrar na comunidade.';
+      },
+    });
   }
 
   abrirComunidade(comunidade: ComunidadeModel): void {

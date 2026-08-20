@@ -14,7 +14,13 @@ type NovaTarefaInput = {
 	tempoExecucao: string;
 };
 
-type AtualizarTarefaInput = NovaTarefaInput;
+type TarefaRequestInput = NovaTarefaInput & {
+	usuarioId: number;
+	comunidadeId?: number;
+	inComunidade?: boolean;
+};
+
+type AtualizarTarefaInput = TarefaRequestInput;
 
 @Injectable({
 	providedIn: 'root',
@@ -92,8 +98,12 @@ export class TarefasService {
 
 	//método de inserção de tarefa no banco (criar tarefa) - API
 
-	inserir(tarefa: Partial<TarefaModel>): Observable<TarefaModel> {
+	inserir(tarefa: TarefaRequestInput): Observable<TarefaModel> {
 		return this.http.post<TarefaModel>(this.API_URL, tarefa);
+	}
+
+	inserirNaComunidade(tarefa: TarefaRequestInput): Observable<TarefaModel> {
+		return this.http.post<TarefaModel>(`${this.API_URL}/comunidade`, tarefa);
 	}
 
 	//método que existia previamente e deixei por ele usar esses trem de input e type (que tem la em cima do codigo)
@@ -123,7 +133,7 @@ export class TarefasService {
 	//método de atualização de tarefa no banco - API
 
 	//O CORRETO É USAR PATCH, MAS O BACK TA COM PUT E NAO FAÇO A MAIS VAGA IDEIA DE COMO MUDAR ISSO
-	atualizar(id: string, tarefa: Partial<TarefaModel>): Observable<TarefaModel>{
+	atualizar(id: string, tarefa: AtualizarTarefaInput): Observable<TarefaModel>{
 		return this.http.put<TarefaModel>(`${this.API_URL}/${id}`, tarefa);
 	}
 

@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 import { ComunidadeInput, ComunidadeModel } from '../models/comunidade.model';
+import { TarefaModel } from '../models/tarefa.model';
 
 @Injectable({
   providedIn: 'root',
@@ -30,6 +31,16 @@ export class ComunidadesService {
     return this.http.get<any[]>(`${this.API_URL}/usuario/${idUsuario}`).pipe(
       map((comunidades) => comunidades.map((comunidade) => this.converterParaModelo(comunidade)))
     );
+  }
+
+  entrar(idComunidade: number, usuarioId: number): Observable<ComunidadeModel> {
+    return this.http.post<any>(`${this.API_URL}/entrar/${idComunidade}`, { usuarioId }).pipe(
+      map((comunidade) => this.converterParaModelo(comunidade))
+    );
+  }
+
+  listarTarefas(idComunidade: number): Observable<TarefaModel[]> {
+    return this.http.get<TarefaModel[]>(`${this.API_URL}/tarefas/${idComunidade}`);
   }
 
   buscarPorId(id: string): Observable<ComunidadeModel | null> {

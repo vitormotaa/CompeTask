@@ -37,6 +37,7 @@ type AtalhoRodape = {
 })
 export class TarefaPage {
   tarefaId: string | null = null;
+  comunidadeId: string | null = null;
   mensagemAcao = '';
   form = this.formBuilder.group({
     titulo: ['', Validators.required],
@@ -74,17 +75,28 @@ export class TarefaPage {
       timerOutline,
     });
 
-    this.tarefaId = this.route.snapshot.paramMap.get('id');
+    this.atualizarContextoRota();
   }
 
   ionViewWillEnter(): void {
-    this.tarefaId = this.route.snapshot.paramMap.get('id');
-    // console.log(this.tarefaId);
+    this.atualizarContextoRota();
     this.carregarTarefa();
   }
 
   get tituloPagina(): string {
+    if (this.comunidadeId && !this.tarefaId) {
+      return 'Nova Tarefa da Comunidade';
+    }
+
     return this.tarefaId ? 'Editar Tarefa' : 'Nova Tarefa';
+  }
+
+  get textoBotaoSalvar(): string {
+    if (this.tarefaId) {
+      return 'SALVAR TAREFA';
+    }
+
+    return this.comunidadeId ? 'CRIAR TAREFA DA COMUNIDADE' : 'CRIAR TAREFA';
   }
 
   //API
@@ -103,7 +115,7 @@ export class TarefaPage {
 
     const valores = this.form.getRawValue();
     const payload = {
-      usuarioId: Number(usuarioAtual.id) as unknown as string,
+      usuarioId: Number(usuarioAtual.id),
       titulo: String(valores.titulo ?? ''),
       descricao: String(valores.descricao ?? ''),
       prioridade: Number(valores.prioridade ?? 1),
@@ -111,23 +123,27 @@ export class TarefaPage {
       lembreteData: String(valores.lembreteData ?? ''),
       lembreteHora: String(valores.lembreteHora ?? ''),
       tempoExecucao: String(valores.tempoExecucao ?? ''),
+      comunidadeId: this.comunidadeId ? Number(this.comunidadeId) : undefined,
+      inComunidade: Boolean(this.comunidadeId),
     };
 
     if (this.tarefaId) {
-      console.log("to em editar");
       this.tarefasService.atualizar(this.tarefaId, payload).subscribe({
         next: (resultado: TarefaModel) => {
-          this.router.navigate(['/tarefas']);
+          this.voltar();
         },
         error: (erro: HttpErrorResponse) => {
           this.tratarErroSalvar(erro);
         }
       });
     } else {
-      console.log("to em adicionar");
-      this.tarefasService.inserir(payload).subscribe({
+      const requisicao = this.comunidadeId
+        ? this.tarefasService.inserirNaComunidade(payload)
+        : this.tarefasService.inserir(payload);
+
+      requisicao.subscribe({
         next: (resultado: TarefaModel) => {
-          this.router.navigate(['/tarefas']);
+          this.voltar();
         },
         error: (erro: HttpErrorResponse) => {
           this.tratarErroSalvar(erro);
@@ -157,7 +173,7 @@ export class TarefaPage {
 
     this.tarefasService.excluir(this.tarefaId).subscribe({
       next: (resultado: void) => {
-        this.router.navigate(['/tarefas']);
+        this.voltar();
       },
       error: () => {
         console.log("deu erro aqui na hora de EXCLUIR tarefa do usuario no banco")
@@ -166,6 +182,11 @@ export class TarefaPage {
   }
 
   voltar(): void {
+    if (this.comunidadeId) {
+      this.router.navigate(['/comunidades', this.comunidadeId]);
+      return;
+    }
+
     this.router.navigate(['/tarefas']);
   }
 
@@ -222,6 +243,11 @@ export class TarefaPage {
         this.router.navigate(['/tarefas']);
       },
     });
+  }
+
+  private atualizarContextoRota(): void {
+    this.tarefaId = this.route.snapshot.paramMap.get('id');
+    this.comunidadeId = this.route.snapshot.queryParamMap.get('comunidadeId');
   }
 
   private tratarErroSalvar(erro: HttpErrorResponse): void {

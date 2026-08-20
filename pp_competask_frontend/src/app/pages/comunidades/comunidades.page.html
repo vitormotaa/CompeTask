@@ -83,6 +83,50 @@
       </div>
     </section>
 
+    <div class="community-modal-backdrop" *ngIf="modalPublicasAberto" (click)="fecharModalPublicas()"></div>
+
+    <section class="public-communities-modal" *ngIf="modalPublicasAberto" role="dialog" aria-modal="true" aria-label="Comunidades publicas">
+      <header class="community-modal__header">
+        <h2>Comunidades publicas</h2>
+        <button type="button" class="community-modal__close" (click)="fecharModalPublicas()" aria-label="Fechar">
+          <ion-icon name="close-outline"></ion-icon>
+        </button>
+      </header>
+
+      <label class="public-communities-search">
+        <ion-icon name="search-outline"></ion-icon>
+        <input type="search" name="buscaPublicas" [(ngModel)]="buscaPublicas" placeholder="Buscar por nome..." />
+      </label>
+
+      <p class="public-communities-modal__empty" *ngIf="comunidadesPublicas.length === 0">
+        Nao ha novas comunidades publicas para voce entrar.
+      </p>
+
+      <p class="public-communities-modal__empty" *ngIf="comunidadesPublicas.length > 0 && comunidadesPublicasFiltradas.length === 0">
+        Nenhuma comunidade encontrada.
+      </p>
+
+      <article *ngFor="let comunidade of comunidadesPublicasFiltradas" class="public-community-row">
+        <div class="community-avatar" [style.--avatar-color]="escolherCor(comunidade)">
+          <img *ngIf="comunidade.foto; else iconePublica" [src]="comunidade.foto" alt="" />
+          <ng-template #iconePublica>
+            <ion-icon [name]="escolherIcone(comunidade)"></ion-icon>
+          </ng-template>
+        </div>
+        <div class="public-community-row__content">
+          <h3>{{ comunidade.nome }}</h3>
+          <p>{{ contarMembros(comunidade) }} membros</p>
+        </div>
+        <button
+          type="button"
+          class="public-community-row__join"
+          [disabled]="entrandoComunidadeId === comunidade.idComunidade"
+          (click)="entrarComunidadePublica(comunidade)">
+          {{ entrandoComunidadeId === comunidade.idComunidade ? 'Entrando...' : 'Entrar' }}
+        </button>
+      </article>
+    </section>
+
     <div class="community-modal-backdrop" *ngIf="modalPrivadoAberto" (click)="fecharModalPrivado()"></div>
 
     <section class="private-modal" *ngIf="modalPrivadoAberto" role="dialog" aria-modal="true" aria-label="Entrar em comunidade privada">

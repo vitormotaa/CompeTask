@@ -7,7 +7,6 @@ import { addIcons } from 'ionicons';
 import {
   checkmarkCircleOutline,
   closeOutline,
-  hourglassOutline,
   pauseOutline,
   peopleOutline,
   personOutline,
@@ -27,8 +26,6 @@ type AtalhoRodape = {
   ativo?: boolean;
 };
 
-type AbaTimer = 'cronometro' | 'timer';
-
 @Component({
   selector: 'app-timer',
   templateUrl: './timer.page.html',
@@ -37,7 +34,6 @@ type AbaTimer = 'cronometro' | 'timer';
   imports: [CommonModule, FormsModule, IonContent, IonIcon],
 })
 export class TimerPage implements OnDestroy {
-  abaAtual: AbaTimer = 'cronometro';
   rodando = false;
   modalSalvarAberto = false;
   mensagemAcao = '';
@@ -52,8 +48,8 @@ export class TimerPage implements OnDestroy {
   atalhosRodape: AtalhoRodape[] = [
     { label: 'Tarefas', icon: 'checkmark-circle-outline', rota: '/tarefas' },
     { label: 'Comunidades', icon: 'people-outline', rota: '/comunidades' },
-    { label: 'Timer', icon: 'timer-outline', rota: '/timer', ativo: true },
-    { label: 'Usuario', icon: 'person-outline', rota: '/usuario' },
+    { label: 'Cronômetro', icon: 'timer-outline', rota: '/timer', ativo: true },
+    { label: 'Usuário', icon: 'person-outline', rota: '/usuario' },
   ];
 
   private intervaloCronometroId: number | null = null;
@@ -67,7 +63,6 @@ export class TimerPage implements OnDestroy {
     addIcons({
       checkmarkCircleOutline,
       closeOutline,
-      hourglassOutline,
       pauseOutline,
       peopleOutline,
       personOutline,
@@ -96,19 +91,6 @@ export class TimerPage implements OnDestroy {
 
   get mostrarAcoesPausa(): boolean {
     return !this.rodando && this.tempoDecorridoMs > 0;
-  }
-
-  selecionarAba(aba: AbaTimer): void {
-    if (this.abaAtual === aba) {
-      return;
-    }
-
-    this.abaAtual = aba;
-
-    if (aba === 'timer') {
-      this.pararIntervalo();
-      this.rodando = false;
-    }
   }
 
   iniciarCronometro(): void {

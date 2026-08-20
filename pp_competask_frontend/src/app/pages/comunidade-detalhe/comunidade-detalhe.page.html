@@ -10,7 +10,12 @@
         <p><ion-icon name="people-outline"></ion-icon> {{ comunidade.membros }} membros</p>
       </div>
 
-      <button type="button" class="settings-button" (click)="editarComunidade()" aria-label="Editar comunidade">
+      <button
+        type="button"
+        class="settings-button"
+        [disabled]="!usuarioEhAdministrador"
+        (click)="editarComunidade()"
+        [attr.aria-label]="usuarioEhAdministrador ? 'Editar comunidade' : 'Foto da comunidade'">
         <img *ngIf="comunidade.foto; else iconeComunidade" [src]="comunidade.foto" alt="" />
           <ng-template #iconeComunidade>
           <ion-icon name="people-outline"></ion-icon>
@@ -44,9 +49,37 @@
           </div>
         </div>
 
-        <p class="empty-state">Nenhuma tarefa cadastrada nessa comunidade.</p>
+        <p class="empty-state" *ngIf="tarefas.length === 0">Nenhuma tarefa cadastrada nessa comunidade.</p>
 
-        <button type="button" class="floating-action" aria-label="Criar tarefa da comunidade">
+        <article
+          *ngFor="let tarefa of tarefasOrdenadas"
+          class="task-card"
+          [class.task-card--done]="tarefa.concluida"
+          [class.task-card--editable]="usuarioEhAdministrador"
+          (click)="abrirTarefa(tarefa)">
+          <div class="task-content">
+            <div class="task-headline">
+              <h2>{{ tarefa.titulo }}</h2>
+              <span class="task-chip">{{ getStatus(tarefa) }}</span>
+            </div>
+
+            <p class="task-description" *ngIf="tarefa.descricao">{{ tarefa.descricao }}</p>
+
+            <div class="task-meta">
+              <span><ion-icon name="calendar-outline"></ion-icon> Planejada: {{ getPlanejamento(tarefa) }}</span>
+              <span class="task-meta__priority"><ion-icon name="flag-outline"></ion-icon> Prioridade {{ tarefa.prioridade }}</span>
+            </div>
+          </div>
+
+          <ion-icon *ngIf="usuarioEhAdministrador" name="chevron-forward-outline" class="task-arrow"></ion-icon>
+        </article>
+
+        <button
+          *ngIf="usuarioEhAdministrador"
+          type="button"
+          class="floating-action"
+          (click)="criarTarefaComunitaria()"
+          aria-label="Criar tarefa da comunidade">
           <ion-icon name="add-outline"></ion-icon>
         </button>
       </div>
