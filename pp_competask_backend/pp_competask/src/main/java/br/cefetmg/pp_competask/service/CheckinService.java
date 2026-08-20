@@ -37,6 +37,9 @@ public class CheckinService {
 	@Autowired
 	private MembroComunidadeRepository membroComunidadeRepository;
 
+	@Autowired
+	private ImagemService imagemService;
+
 	@Transactional(readOnly = true)
 	public List<CheckinResponseDTO> buscarCheckinsPorComunidadeId(Long id) {
 		List<Checkin> checkins = checkinRepository.findAllByComunidadeIdComunidade(id);
@@ -74,6 +77,7 @@ public class CheckinService {
 		Checkin checkin = new Checkin();
 		checkin.setDescricao(dto.getDescricao());
 		checkin.setFoto(dto.getFoto());
+		checkin.setFotoPublicId(dto.getFotoPublicId());
 		checkin.setDataHoraEnvio(dto.getDataHoraEnvio());
 		checkin.setUsuario(usuario);
 		checkin.setComunidade(comunidade);
@@ -86,7 +90,7 @@ public class CheckinService {
 	}
 
 	@Transactional
-	public void excluir(Long id) {
+	public void excluir(Long id) throws java.io.IOException {
 		Checkin checkin = checkinRepository.findById(id)
 				.orElseThrow(() -> new IllegalArgumentException("Check-in não encontrado."));
 
@@ -101,6 +105,7 @@ public class CheckinService {
 
 		membroComunidade.setPontuacao(membroComunidade.getPontuacao() - 1);
 		membroComunidadeRepository.save(membroComunidade);
+		imagemService.excluir(checkin.getFotoPublicId());
 		checkinRepository.delete(checkin);
 	}
 }

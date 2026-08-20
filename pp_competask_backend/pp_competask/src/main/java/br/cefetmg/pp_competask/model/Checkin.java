@@ -33,6 +33,9 @@ public class Checkin {
     private String foto;
 
     @Column(length = 255, nullable = false)
+    private String fotoPublicId;
+
+    @Column(length = 255, nullable = false)
     private String dataHoraEnvio;
 
     @ManyToOne

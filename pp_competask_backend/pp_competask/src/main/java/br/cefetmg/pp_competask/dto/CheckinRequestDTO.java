@@ -16,6 +16,9 @@ public class CheckinRequestDTO {
     @NotBlank(message = "Foto é obrigatória")
     private String foto;
 
+    @NotBlank(message = "Identificador da foto é obrigatório")
+    private String fotoPublicId;
+
     @NotBlank(message = "Data hora envio é obrigatória")
     private String dataHoraEnvio;
 

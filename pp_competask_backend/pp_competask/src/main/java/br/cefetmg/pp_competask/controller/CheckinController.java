@@ -25,7 +25,6 @@ import br.cefetmg.pp_competask.service.CheckinService;
 import br.cefetmg.pp_competask.service.ImagemService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/v1/checkins")
@@ -64,12 +63,17 @@ public class CheckinController {
 
 	@PostMapping("")
 	@Operation(summary = "Criar check-in")
-	public ResponseEntity<CheckinResponseDTO> inserir(@Valid @RequestBody CheckinRequestDTO checkinRequestDTO) {
+	public ResponseEntity<CheckinResponseDTO> inserir(@RequestBody CheckinRequestDTO checkinRequestDTO) {
 		try {
+			validarCamposObrigatorios(checkinRequestDTO);
 			CheckinResponseDTO checkinResponseDTO = checkinService.inserir(checkinRequestDTO);
 			return ResponseEntity.status(HttpStatus.CREATED).body(checkinResponseDTO);
 		} catch (IllegalArgumentException ex) {
+			excluirImagem(checkinRequestDTO.getFotoPublicId());
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage());
+		} catch (RuntimeException ex) {
+			excluirImagem(checkinRequestDTO.getFotoPublicId());
+			throw ex;
 		}
 	}
 
@@ -81,6 +85,30 @@ public class CheckinController {
 			return ResponseEntity.noContent().build();
 		} catch (IllegalArgumentException ex) {
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, ex.getMessage());
+		} catch (IOException ex) {
+			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Não foi possível excluir a imagem.");
+		}
+	}
+
+	private void validarCamposObrigatorios(CheckinRequestDTO dto) {
+		if (dto.getFoto() == null || dto.getFoto().isBlank()) {
+			throw new IllegalArgumentException("Foto é obrigatória");
+		}
+		if (dto.getFotoPublicId() == null || dto.getFotoPublicId().isBlank()) {
+			throw new IllegalArgumentException("Identificador da foto é obrigatório");
+		}
+		if (dto.getDataHoraEnvio() == null || dto.getDataHoraEnvio().isBlank()) {
+			throw new IllegalArgumentException("Data hora envio é obrigatória");
+		}
+		if (dto.getUsuarioId() == null || dto.getComunidadeId() == null || dto.getTarefaId() == null) {
+			throw new IllegalArgumentException("Usuário, comunidade e tarefa são obrigatórios");
+		}
+	}
+
+	private void excluirImagem(String publicId) {
+		try {
+			imagemService.excluir(publicId);
+		} catch (IOException ex) {
 		}
 	}
 }
