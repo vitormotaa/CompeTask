@@ -1,5 +1,6 @@
 package br.cefetmg.pp_competask.controller;
 
+import java.io.IOException;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,12 +13,16 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import br.cefetmg.pp_competask.dto.CheckinRequestDTO;
 import br.cefetmg.pp_competask.dto.CheckinResponseDTO;
+import br.cefetmg.pp_competask.dto.ImagemUploadDTO;
 import br.cefetmg.pp_competask.service.CheckinService;
+import br.cefetmg.pp_competask.service.ImagemService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -31,10 +36,30 @@ public class CheckinController {
 	@Autowired
 	private CheckinService checkinService;
 
+	@Autowired
+	private ImagemService imagemService;
+
 	@GetMapping("/comunidade/{id}")
 	@Operation(summary = "Buscar check-ins por comunidade")
 	public List<CheckinResponseDTO> getAllByComunidadeId(@PathVariable Long id) {
 		return checkinService.buscarCheckinsPorComunidadeId(id);
+	}
+
+	@PostMapping("/imagens")
+	@Operation(summary = "Enviar imagem para check-in")
+	public ResponseEntity<ImagemUploadDTO> enviarImagem(@RequestParam("arquivo") MultipartFile arquivo) {
+		try {
+			ImagemUploadDTO imagem = imagemService.salvar(arquivo);
+			if (imagem == null) {
+				throw new IllegalArgumentException("A imagem é obrigatória.");
+			}
+
+			return ResponseEntity.status(HttpStatus.CREATED).body(imagem);
+		} catch (IllegalArgumentException ex) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage());
+		} catch (IOException ex) {
+			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Não foi possível enviar a imagem.");
+		}
 	}
 
 	@PostMapping("")
