@@ -13,5 +13,7 @@ public interface CheckinRepository extends JpaRepository<Checkin, Long> {
     boolean existsByUsuarioIdUsuarioAndComunidadeIdComunidadeAndTarefaIdTarefa(Long usuarioId, Long comunidadeId,
             Long tarefaId);
 
+    List<Checkin> findAllByUsuarioIdUsuarioAndComunidadeIdComunidade(Long usuarioId, Long comunidadeId);
+
     List<Checkin> findAllByComunidadeIdComunidade(Long comunidadeId);
 }

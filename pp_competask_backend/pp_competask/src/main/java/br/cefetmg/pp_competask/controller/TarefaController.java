@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -93,9 +94,14 @@ public class TarefaController {
     // alterar estado de concluída da tarefa
     @PatchMapping("/conclusao/{id}")
     @Operation(summary = "Editar tarefa")
-    public ResponseEntity<TarefaResponseDTO> alterarConclusao(@PathVariable Long id) {
-        TarefaResponseDTO tarefaResponseDTO = tarefaService.alterarConclusao(id);
-        return ResponseEntity.ok(tarefaResponseDTO);
+    public ResponseEntity<TarefaResponseDTO> alterarConclusao(@PathVariable Long id,
+            @RequestParam Long usuarioId) {
+        try {
+            TarefaResponseDTO tarefaResponseDTO = tarefaService.alterarConclusao(id, usuarioId);
+            return ResponseEntity.ok(tarefaResponseDTO);
+        } catch (IllegalArgumentException ex) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage());
+        }
     }
 
     // adicionar e alterar o tempo de conclusão de uma tarefa

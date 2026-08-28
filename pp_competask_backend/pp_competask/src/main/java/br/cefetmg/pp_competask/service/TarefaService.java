@@ -1,7 +1,9 @@
 package br.cefetmg.pp_competask.service;
 
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -9,10 +11,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import br.cefetmg.pp_competask.dto.TarefaRequestDTO;
 import br.cefetmg.pp_competask.dto.TarefaResponseDTO;
+import br.cefetmg.pp_competask.model.Checkin;
 import br.cefetmg.pp_competask.model.Comunidade;
 import br.cefetmg.pp_competask.model.MembroComunidade;
 import br.cefetmg.pp_competask.model.Tarefa;
 import br.cefetmg.pp_competask.model.Usuario;
+import br.cefetmg.pp_competask.repository.CheckinRepository;
 import br.cefetmg.pp_competask.repository.ComunidadeRepository;
 import br.cefetmg.pp_competask.repository.MembroComunidadeRepository;
 import br.cefetmg.pp_competask.repository.TarefaRepository;
@@ -32,6 +36,9 @@ public class TarefaService {
 
     @Autowired
     private MembroComunidadeRepository membroComunidadeRepository;
+
+    @Autowired
+    private CheckinRepository checkinRepository;
 
     @Transactional(readOnly = true)
     public List<TarefaResponseDTO> buscarTarefasPorUsuarioId(Long id) {
@@ -69,9 +76,12 @@ public class TarefaService {
 
     @Transactional
     public TarefaResponseDTO atualizar(Long id, TarefaRequestDTO dto) {
-        // ver se existe tarefa com esse id
         Tarefa tarefa = tarefaRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Tarefa nao encontrada."));
+
+        if (tarefa.isInComunidade()) {
+            validarAdministrador(dto.getUsuarioId(), tarefa.getComunidade().getIdComunidade());
+        }
 
         tarefa.setTitulo(dto.getTitulo());
         tarefa.setDescricao(dto.getDescricao());
@@ -105,17 +115,21 @@ public class TarefaService {
     }
 
     @Transactional
-    public TarefaResponseDTO alterarConclusao(Long id) {
-        if (!tarefaRepository.existsById(id)) {
-            throw new IllegalArgumentException("Tarefa nao encontrada.");
+    public TarefaResponseDTO alterarConclusao(Long id, Long usuarioId) {
+        Tarefa tarefa = tarefaRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Tarefa nao encontrada."));
+
+        if (tarefa.isInComunidade()) {
+            validarAdministrador(usuarioId, tarefa.getComunidade().getIdComunidade());
         }
 
-        Tarefa tarefa = tarefaRepository.findById(id).orElse(null);
         if (tarefa.isConcluida()) {
             tarefa.setConcluida(false);
         } else {
             tarefa.setConcluida(true);
         }
+
+        tarefa.setDataConfeccao(tarefa.isConcluida() ? LocalDate.now().toString() : null);
 
         return new TarefaResponseDTO(tarefaRepository.save(tarefa));
     }
@@ -169,10 +183,30 @@ public class TarefaService {
     }
 
     @Transactional(readOnly = true)
-    public List<TarefaResponseDTO> buscarTarefasPorComunidadeId(Long id) {
-        List<Tarefa> tarefas = tarefaRepository.findAllByComunidadeIdComunidade(id);
-        return tarefas.stream().map(TarefaResponseDTO::new).toList();
+    public List<TarefaResponseDTO> buscarTarefasPorComunidadeId(Long comunidadeId, Long usuarioId) {
+        List<Tarefa> tarefas = tarefaRepository.findAllByComunidadeIdComunidade(comunidadeId);
+        Set<Long> tarefasComCheckin = new HashSet<>();
+
+        for (Checkin checkin : checkinRepository
+                .findAllByUsuarioIdUsuarioAndComunidadeIdComunidade(usuarioId, comunidadeId)) {
+            tarefasComCheckin.add(checkin.getTarefa().getIdTarefa());
+        }
+
+        return tarefas.stream().map(tarefa -> {
+            TarefaResponseDTO dto = new TarefaResponseDTO(tarefa);
+            dto.setConcluidaPeloUsuario(
+                    tarefa.isConcluida() || tarefasComCheckin.contains(tarefa.getIdTarefa()));
+            return dto;
+        }).toList();
     }
 
-    // botar mais de um usuário na comunidade
+    private void validarAdministrador(Long usuarioId, Long comunidadeId) {
+        MembroComunidade membro = membroComunidadeRepository
+                .findByUsuarioIdUsuarioAndComunidadeIdComunidade(usuarioId, comunidadeId);
+
+        if (membro == null || !membro.isAdm()) {
+            throw new IllegalArgumentException(
+                    "Apenas administradores podem editar ou concluir tarefas da comunidade.");
+        }
+    }
 }

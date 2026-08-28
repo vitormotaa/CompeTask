@@ -57,6 +57,11 @@ public class CheckinService {
 		Tarefa tarefa = tarefaRepository.findById(dto.getTarefaId())
 				.orElseThrow(() -> new IllegalArgumentException("Tarefa não encontrada."));
 
+		if (tarefa.isConcluida()) {
+			throw new IllegalArgumentException(
+					"Esta tarefa já foi concluída pelo administrador para todos os membros.");
+		}
+
 		if (tarefa.getComunidade() == null
 				|| !tarefa.getComunidade().getIdComunidade().equals(comunidade.getIdComunidade())) {
 			throw new IllegalArgumentException("A tarefa não pertence a esta comunidade.");

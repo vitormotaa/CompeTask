@@ -112,8 +112,9 @@ public class ComunidadeController {
     // listar todas as tarefas por id da comunidade
     @GetMapping("/tarefas/{id}")
     @Operation(summary = "Buscar tarefas da comunidade por ID", description = "")
-    public List<TarefaResponseDTO> getAllByComunidadeId(@PathVariable Long id) {
-        return tarefaService.buscarTarefasPorComunidadeId(id);
+    public List<TarefaResponseDTO> getAllByComunidadeId(@PathVariable Long id,
+            @RequestParam Long usuarioId) {
+        return tarefaService.buscarTarefasPorComunidadeId(id, usuarioId);
     }
 
     // entrar em comunidades que o usuário não é dono

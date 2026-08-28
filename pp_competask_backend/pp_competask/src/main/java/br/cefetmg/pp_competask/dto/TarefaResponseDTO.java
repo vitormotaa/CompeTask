@@ -20,6 +20,7 @@ public class TarefaResponseDTO {
     private String lembreteHora;
     private String tempoExecucao;
     private boolean concluida;
+    private boolean concluidaPeloUsuario;
     private String dataConfeccao;
     private Long comunidadeId;
     private boolean inComunidade;
@@ -36,6 +37,7 @@ public class TarefaResponseDTO {
         this.lembreteHora = tarefa.getLembreteHora();
         this.tempoExecucao = tarefa.getTempoExecucao();
         this.concluida = tarefa.isConcluida();
+        this.concluidaPeloUsuario = tarefa.isConcluida();
         this.dataConfeccao = tarefa.getDataConfeccao();
         this.comunidadeId = tarefa.getComunidade() != null ? tarefa.getComunidade().getIdComunidade() : null;
         this.inComunidade = tarefa.isInComunidade();
