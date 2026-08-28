@@ -110,7 +110,7 @@ public class ComunidadeController {
     }
 
     // listar todas as tarefas por id da comunidade
-    @GetMapping("/tarefas/{id}")
+    @GetMapping({ "/{id}/tarefas", "/tarefas/{id}" })
     @Operation(summary = "Buscar tarefas da comunidade por ID", description = "")
     public List<TarefaResponseDTO> getAllByComunidadeId(@PathVariable Long id,
             @RequestParam Long usuarioId) {
