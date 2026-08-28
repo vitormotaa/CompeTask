@@ -121,15 +121,15 @@ public class TarefaService {
 
         if (tarefa.isInComunidade()) {
             validarAdministrador(usuarioId, tarefa.getComunidade().getIdComunidade());
+        } else if (tarefa.getUsuario() == null
+                || !tarefa.getUsuario().getIdUsuario().equals(usuarioId)) {
+            throw new IllegalArgumentException(
+                    "Apenas o proprietário pode concluir esta tarefa.");
         }
 
-        if (tarefa.isConcluida()) {
-            tarefa.setConcluida(false);
-        } else {
-            tarefa.setConcluida(true);
-        }
-
-        tarefa.setDataConfeccao(tarefa.isConcluida() ? LocalDate.now().toString() : null);
+        tarefa.setConcluida(!tarefa.isConcluida());
+        tarefa.setDataConfeccao(
+                tarefa.isConcluida() ? LocalDate.now().toString() : null);
 
         return new TarefaResponseDTO(tarefaRepository.save(tarefa));
     }
