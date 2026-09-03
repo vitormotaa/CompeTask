@@ -1,6 +1,7 @@
 package br.cefetmg.pp_competask.service;
 
 import java.time.LocalDate;
+import java.util.Objects;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -67,6 +68,7 @@ public class TarefaService {
         tarefa.setDataRealizacao(dto.getDataRealizacao());
         tarefa.setLembreteData(dto.getLembreteData());
         tarefa.setLembreteHora(dto.getLembreteHora());
+        tarefa.setLembreteNotificada(false);
         tarefa.setTempoExecucao(dto.getTempoExecucao());
         tarefa.setConcluida(false);
         tarefa.setDataConfeccao(null);
@@ -79,6 +81,9 @@ public class TarefaService {
         Tarefa tarefa = tarefaRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Tarefa nao encontrada."));
 
+        boolean lembreteAlterado = !Objects.equals(tarefa.getLembreteData(), dto.getLembreteData())
+            || !Objects.equals(tarefa.getLembreteHora(), dto.getLembreteHora());
+
         if (tarefa.isInComunidade()) {
             validarAdministrador(dto.getUsuarioId(), tarefa.getComunidade().getIdComunidade());
         }
@@ -89,6 +94,9 @@ public class TarefaService {
         tarefa.setDataRealizacao(dto.getDataRealizacao());
         tarefa.setLembreteData(dto.getLembreteData());
         tarefa.setLembreteHora(dto.getLembreteHora());
+        if (lembreteAlterado) {
+            tarefa.setLembreteNotificada(false);
+        }
         tarefa.setTempoExecucao(dto.getTempoExecucao());
 
         if (dto.getConcluida() != null) {
@@ -173,6 +181,7 @@ public class TarefaService {
         tarefa.setDataRealizacao(dto.getDataRealizacao());
         tarefa.setLembreteData(dto.getLembreteData());
         tarefa.setLembreteHora(dto.getLembreteHora());
+        tarefa.setLembreteNotificada(false);
         tarefa.setTempoExecucao(dto.getTempoExecucao());
         tarefa.setConcluida(false);
         tarefa.setDataConfeccao(null);

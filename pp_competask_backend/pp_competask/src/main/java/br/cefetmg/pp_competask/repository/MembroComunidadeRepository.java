@@ -12,6 +12,8 @@ public interface MembroComunidadeRepository extends JpaRepository<MembroComunida
 
     List<MembroComunidade> findByUsuarioIdUsuario(Long idUsuario);
 
+    List<MembroComunidade> findByComunidadeIdComunidade(Long comunidadeId);
+
     boolean existsByUsuarioIdUsuarioAndComunidadeIdComunidade(Long usuarioId, Long comunidadeId);
 
     MembroComunidade findByUsuarioIdUsuarioAndComunidadeIdComunidade(Long usuarioId, Long comunidadeId);
