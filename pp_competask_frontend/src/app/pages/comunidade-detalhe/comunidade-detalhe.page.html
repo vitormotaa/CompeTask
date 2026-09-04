@@ -54,7 +54,7 @@
         <article
           *ngFor="let tarefa of tarefasOrdenadas"
           class="task-card"
-          [class.task-card--done]="tarefa.concluida"
+          [class.task-card--done]="tarefaEstaConcluida(tarefa)"
           [class.task-card--editable]="usuarioEhAdministrador"
           (click)="abrirTarefa(tarefa)">
           <div class="task-content">
@@ -72,6 +72,13 @@
           </div>
 
           <ion-icon *ngIf="usuarioEhAdministrador" name="chevron-forward-outline" class="task-arrow"></ion-icon>
+          <button
+            *ngIf="usuarioEhAdministrador"
+            type="button"
+            class="task-check-all"
+            (click)="concluirParaTodos(tarefa, $event)">
+            {{ tarefa.concluida ? 'Desfazer para todos' : 'Concluir para todos' }}
+          </button>
         </article>
 
         <button
@@ -106,14 +113,13 @@
         <p class="empty-state" *ngIf="checkins.length === 0">Nenhum check-in por enquanto.</p>
 
         <article *ngFor="let checkin of checkins" class="checkin-card">
-          <div class="checkin-photo">{{ checkin.icone }}</div>
+          <div class="checkin-photo">
+            <img [src]="checkin.foto" alt="Foto do check-in" />
+          </div>
           <div class="checkin-body">
-            <div>
-              <h2>{{ checkin.titulo }}</h2>
-              <span>{{ checkin.tempo }}</span>
-            </div>
-            <p>{{ checkin.descricao }}</p>
-            <strong>Por {{ checkin.autor }}</strong>
+            <h2>{{ getTituloCheckin(checkin) }}</h2>
+            <p class="checkin-author">Usuário #{{ checkin.usuarioId }} · {{ checkin.dataHoraEnvio | date: 'dd/MM/yyyy HH:mm' }}</p>
+            <p class="checkin-description">{{ getDescricaoCheckin(checkin) }}</p>
           </div>
         </article>
 
@@ -151,17 +157,30 @@
     <h2>Novo check-in</h2>
     <p>Prove que voce concluiu a tarefa.</p>
 
-    <button type="button" class="photo-drop">
-      <ion-icon name="image-outline"></ion-icon>
-      <span>Adicionar foto</span>
-    </button>
+    <label class="photo-drop" for="checkinFotoInput">
+      <img *ngIf="fotoPreview" [src]="fotoPreview" alt="Pré-visualização da foto" />
+      <ng-container *ngIf="!fotoPreview">
+        <ion-icon name="camera-outline"></ion-icon>
+        <span>Abrir câmera</span>
+      </ng-container>
+      <input id="checkinFotoInput" type="file" accept="image/*" capture="environment" hidden (change)="selecionarFoto($event)" />
+    </label>
 
-    <input type="text" name="checkinTitulo" [(ngModel)]="checkinTitulo" placeholder="Titulo" />
+    <select name="checkinTarefaId" [(ngModel)]="checkinTarefaId">
+      <option value="">Selecione a tarefa</option>
+      <option *ngFor="let tarefa of tarefas" [value]="tarefa.id" [disabled]="tarefa.concluida || tarefa.concluidaPeloUsuario">
+        {{ tarefa.titulo }}
+      </option>
+    </select>
+
+    <input type="text" name="checkinTitulo" [(ngModel)]="checkinTitulo" placeholder="Titulo *" required />
     <textarea name="checkinDescricao" [(ngModel)]="checkinDescricao" placeholder="Descricao"></textarea>
 
     <div class="checkin-modal__actions">
       <button type="button" class="checkin-modal__button checkin-modal__button--muted" (click)="fecharNovoCheckin()">Cancelar</button>
-      <button type="button" class="checkin-modal__button checkin-modal__button--primary" (click)="publicarCheckin()">Publicar</button>
+      <button type="button" class="checkin-modal__button checkin-modal__button--primary" [disabled]="checkinEnviando" (click)="publicarCheckin()">
+        {{ checkinEnviando ? 'Enviando...' : 'Publicar' }}
+      </button>
     </div>
   </section>
 

@@ -142,7 +142,15 @@ export class TarefasService {
 	}
 
 	alternarConclusao(tarefa: TarefaModel, usuarioId: string): Observable<TarefaModel> {
-		return this.http.patch<TarefaModel>(`${this.API_URL}/conclusao/${tarefa.id}`, {});
+		return this.http.patch<TarefaModel>(`${this.API_URL}/conclusao/${tarefa.id}`, {}, {
+			params: { usuarioId },
+		});
+	}
+
+	concluirParaTodos(tarefa: TarefaModel, usuarioId: string): Observable<TarefaModel> {
+		return this.http.patch<TarefaModel>(`${this.API_URL}/conclusao/${tarefa.id}`, {}, {
+			params: { usuarioId },
+		});
 	}
 
 	//ta em comentario só por contad do nome, nao quero dar conflito com o metodo de baixo ai
