@@ -38,8 +38,7 @@ public class NotificacaoService {
     public void processarLembretes() {
         LocalDateTime agora = LocalDateTime.now();
 
-        for (Tarefa tarefa : tarefaRepository
-                .findAllByLembreteDataIsNotNullAndLembreteHoraIsNotNullAndLembreteNotificadaFalseAndConcluidaFalse()) {
+        for (Tarefa tarefa : tarefaRepository.findLembretesPendentes()) {
             LocalDateTime lembrete = converterDataHora(tarefa);
             if (lembrete == null || lembrete.isAfter(agora)) {
                 continue;
