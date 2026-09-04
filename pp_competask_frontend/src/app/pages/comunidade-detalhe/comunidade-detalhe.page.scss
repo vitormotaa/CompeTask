@@ -368,20 +368,36 @@
   color: #ffffff;
 }
 
+.checkin-card {
+  display: grid;
+  grid-template-columns: 112px 1fr;
+  overflow: hidden;
+}
+
 .checkin-photo {
-  height: 132px;
   display: grid;
   place-items: center;
-  font-size: 2.4rem;
+  background: #3d006b;
+}
+
+.checkin-photo img {
+  width: 100%;
+  height: 100%;
+  min-height: 132px;
+  object-fit: cover;
 }
 
 .checkin-body {
   padding: 14px;
 }
 
-.checkin-body h2,
-.checkin-body p {
-  margin: 0 0 8px;
+.checkin-body h2 {
+  margin: 0 0 5px;
+}
+
+.checkin-author {
+  margin: 0 0 12px;
+  font-size: 0.75rem;
 }
 
 .ranking-tabs {
@@ -486,6 +502,42 @@
   place-items: center;
   align-content: center;
   gap: 8px;
+}
+
+.photo-drop img {
+  width: 100%;
+  height: 116px;
+  object-fit: cover;
+  border-radius: 6px;
+}
+
+.checkin-modal select {
+  width: 100%;
+  min-height: 44px;
+  margin-bottom: 10px;
+  padding: 0 12px;
+  border: 1.5px solid #52008c;
+  border-radius: 8px;
+  background: #eaf0f8;
+  color: #1b214d;
+  font: inherit;
+}
+
+.task-check-all {
+  align-self: center;
+  min-height: 34px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 6px;
+  background: #12cbc5;
+  color: #10194a;
+  font: inherit;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.task-check-all:disabled {
+  opacity: 0.55;
 }
 
 .checkin-modal input,

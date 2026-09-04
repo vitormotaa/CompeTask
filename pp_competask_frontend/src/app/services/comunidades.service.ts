@@ -39,8 +39,12 @@ export class ComunidadesService {
     );
   }
 
-  listarTarefas(idComunidade: number): Observable<TarefaModel[]> {
-    return this.http.get<TarefaModel[]>(`${this.API_URL}/tarefas/${idComunidade}`);
+  listarTarefas(idComunidade: number, idUsuario: number): Observable<TarefaModel[]> {
+    return this.http.get<TarefaModel[]>(`${this.API_URL}/${idComunidade}/tarefas`, {
+      params: { usuarioId: idUsuario },
+    }).pipe(
+      map((tarefas) => tarefas.map((tarefa) => ({ ...tarefa, inComunidade: true, comunidadeId: idComunidade })))
+    );
   }
 
   buscarPorId(id: string): Observable<ComunidadeModel | null> {

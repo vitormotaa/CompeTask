@@ -10,6 +10,9 @@ export interface TarefaModel {
   tempoExecucao: string;
   dataConfeccao: string;
   concluida: boolean;
+  concluidaPeloUsuario?: boolean;
+  comunidadeId?: number;
+  inComunidade?: boolean;
   criadaEm: string;
   atualizadaEm: string;
 }
