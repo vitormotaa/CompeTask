@@ -15,4 +15,6 @@ public interface TarefaRepository extends JpaRepository<Tarefa, Long> {
     List<Tarefa> findAllByUsuarioIdUsuarioAndInComunidadeFalse(Long id);
 
     List<Tarefa> findAllByComunidadeIdComunidade(Long id);
+
+    List<Tarefa> findAllByLembreteDataIsNotNullAndLembreteHoraIsNotNullAndLembreteNotificadaFalseAndConcluidaFalse();
 } 

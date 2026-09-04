@@ -55,6 +55,9 @@ public class Tarefa {
     @Column(length = 255, nullable = true)
     private String lembreteHora;
 
+    @Column(nullable = false)
+    private boolean lembreteNotificada;
+
     @Column(length = 255, nullable = true)
     private String tempoExecucao;
 
