@@ -23,11 +23,13 @@ import org.springframework.web.server.ResponseStatusException;
 
 import br.cefetmg.pp_competask.dto.ComunidadeRequestDTO;
 import br.cefetmg.pp_competask.dto.ComunidadeResponseDTO;
+import br.cefetmg.pp_competask.dto.MensagemResponseDTO;
 import br.cefetmg.pp_competask.dto.PeriodoRanking;
 import br.cefetmg.pp_competask.dto.RankingResponseDTO;
 import br.cefetmg.pp_competask.dto.TarefaResponseDTO;
 import br.cefetmg.pp_competask.service.CheckinService;
 import br.cefetmg.pp_competask.service.ComunidadeService;
+import br.cefetmg.pp_competask.service.MensagemService;
 import br.cefetmg.pp_competask.service.TarefaService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -48,6 +50,9 @@ public class ComunidadeController {
 
     @Autowired
     private CheckinService checkinService;
+
+    @Autowired
+    private MensagemService mensagemService;
 
     // listar todas as comunidades
     @GetMapping("")
@@ -128,6 +133,13 @@ public class ComunidadeController {
     @Operation(summary = "Buscar ranking da comunidade por período", description = "")
     public List<RankingResponseDTO> getRanking(@PathVariable Long id, @RequestParam PeriodoRanking periodo) {
         return checkinService.buscarRanking(id, periodo);
+    }
+
+    // histórico de mensagens do chat da comunidade
+    @GetMapping("/{id}/mensagens")
+    @Operation(summary = "Buscar histórico de mensagens do chat da comunidade", description = "")
+    public List<MensagemResponseDTO> getMensagens(@PathVariable Long id) {
+        return mensagemService.buscarHistoricoPorComunidadeId(id);
     }
 
     // entrar em comunidades que o usuário não é dono
