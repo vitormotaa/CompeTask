@@ -1,8 +1,10 @@
 package br.cefetmg.pp_competask.repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import br.cefetmg.pp_competask.model.Checkin;
@@ -16,4 +18,10 @@ public interface CheckinRepository extends JpaRepository<Checkin, Long> {
     List<Checkin> findAllByUsuarioIdUsuarioAndComunidadeIdComunidade(Long usuarioId, Long comunidadeId);
 
     List<Checkin> findAllByComunidadeIdComunidade(Long comunidadeId);
+
+    @Query("SELECT c.usuario.idUsuario, c.usuario.nome, COUNT(c) FROM Checkin c "
+            + "WHERE c.comunidade.idComunidade = :comunidadeId AND c.dataHoraEnvio BETWEEN :inicio AND :fim "
+            + "GROUP BY c.usuario.idUsuario, c.usuario.nome "
+            + "ORDER BY COUNT(c) DESC")
+    List<Object[]> rankingPorPeriodo(Long comunidadeId, LocalDateTime inicio, LocalDateTime fim);
 }

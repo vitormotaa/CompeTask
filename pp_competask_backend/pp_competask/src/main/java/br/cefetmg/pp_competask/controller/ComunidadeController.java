@@ -23,7 +23,10 @@ import org.springframework.web.server.ResponseStatusException;
 
 import br.cefetmg.pp_competask.dto.ComunidadeRequestDTO;
 import br.cefetmg.pp_competask.dto.ComunidadeResponseDTO;
+import br.cefetmg.pp_competask.dto.PeriodoRanking;
+import br.cefetmg.pp_competask.dto.RankingResponseDTO;
 import br.cefetmg.pp_competask.dto.TarefaResponseDTO;
+import br.cefetmg.pp_competask.service.CheckinService;
 import br.cefetmg.pp_competask.service.ComunidadeService;
 import br.cefetmg.pp_competask.service.TarefaService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -42,6 +45,9 @@ public class ComunidadeController {
 
     @Autowired
     private TarefaService tarefaService;
+
+    @Autowired
+    private CheckinService checkinService;
 
     // listar todas as comunidades
     @GetMapping("")
@@ -115,6 +121,13 @@ public class ComunidadeController {
     public List<TarefaResponseDTO> getAllByComunidadeId(@PathVariable Long id,
             @RequestParam Long usuarioId) {
         return tarefaService.buscarTarefasPorComunidadeId(id, usuarioId);
+    }
+
+    // ranking da comunidade por período (semanal, mensal ou anual)
+    @GetMapping("/{id}/ranking")
+    @Operation(summary = "Buscar ranking da comunidade por período", description = "")
+    public List<RankingResponseDTO> getRanking(@PathVariable Long id, @RequestParam PeriodoRanking periodo) {
+        return checkinService.buscarRanking(id, periodo);
     }
 
     // entrar em comunidades que o usuário não é dono

@@ -128,4 +128,10 @@ public class UsuarioService {
 
         return new UsuarioResponseDTO(usuario);
     }
+
+    @Transactional(readOnly = true)
+    public String obterNome(Long id) {
+        Usuario usuario = usuarioRepository.findById(id).orElse(null);
+        return usuario.getNome();
+    }
 }

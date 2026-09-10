@@ -126,4 +126,10 @@ public class UsuarioController {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Não foi possível enviar a imagem.");
         }
     }
+
+    @GetMapping("/obterNome")
+    @Operation(summary = "Obter nome do usuário")
+    public String obterNome(@PathVariable Long id){
+        return usuarioService.obterNome(id);
+    }
 }

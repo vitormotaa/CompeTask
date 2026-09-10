@@ -97,7 +97,7 @@ public class CheckinController {
 		if (dto.getFotoPublicId() == null || dto.getFotoPublicId().isBlank()) {
 			throw new IllegalArgumentException("Identificador da foto é obrigatório");
 		}
-		if (dto.getDataHoraEnvio() == null || dto.getDataHoraEnvio().isBlank()) {
+		if (dto.getDataHoraEnvio() == null) {
 			throw new IllegalArgumentException("Data hora envio é obrigatória");
 		}
 		if (dto.getUsuarioId() == null || dto.getComunidadeId() == null || dto.getTarefaId() == null) {

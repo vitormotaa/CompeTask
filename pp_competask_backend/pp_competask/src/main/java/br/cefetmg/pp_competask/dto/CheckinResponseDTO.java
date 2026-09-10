@@ -1,5 +1,7 @@
 package br.cefetmg.pp_competask.dto;
 
+import java.time.LocalDateTime;
+
 import br.cefetmg.pp_competask.model.Checkin;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,7 +15,7 @@ public class CheckinResponseDTO {
     private Long id;
     private String foto;
     private String descricao;
-    private String dataHoraEnvio;
+    private LocalDateTime dataHoraEnvio;
     private Long usuarioId;
     private Long comunidadeId;
     private Long tarefaId;

@@ -1,5 +1,7 @@
 package br.cefetmg.pp_competask.service;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +10,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import br.cefetmg.pp_competask.dto.CheckinRequestDTO;
 import br.cefetmg.pp_competask.dto.CheckinResponseDTO;
+import br.cefetmg.pp_competask.dto.PeriodoRanking;
+import br.cefetmg.pp_competask.dto.RankingResponseDTO;
 import br.cefetmg.pp_competask.model.Checkin;
 import br.cefetmg.pp_competask.model.Comunidade;
 import br.cefetmg.pp_competask.model.MembroComunidade;
@@ -92,6 +96,30 @@ public class CheckinService {
 		membroComunidadeRepository.save(membroComunidade);
 
 		return new CheckinResponseDTO(checkinRepository.save(checkin));
+	}
+
+	@Transactional(readOnly = true)
+	public List<RankingResponseDTO> buscarRanking(Long comunidadeId, PeriodoRanking periodo) {
+		LocalDateTime fim = LocalDateTime.now();
+		LocalDateTime inicio = switch (periodo) {
+			case SEMANAL -> fim.minusWeeks(1);
+			case MENSAL -> fim.minusMonths(1);
+			case ANUAL -> fim.minusYears(1);
+		};
+
+		List<Object[]> resultado = checkinRepository.rankingPorPeriodo(comunidadeId, inicio, fim);
+
+		List<RankingResponseDTO> ranking = new ArrayList<>();
+		int posicao = 1;
+		for (Object[] linha : resultado) {
+			RankingResponseDTO dto = new RankingResponseDTO();
+			dto.setUsuarioId((Long) linha[0]);
+			dto.setNomeUsuario((String) linha[1]);
+			dto.setPontos((Long) linha[2]);
+			dto.setPosicao(posicao++);
+			ranking.add(dto);
+		}
+		return ranking;
 	}
 
 	@Transactional

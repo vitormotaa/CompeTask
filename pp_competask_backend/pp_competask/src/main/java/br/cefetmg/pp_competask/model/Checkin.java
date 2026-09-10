@@ -1,5 +1,7 @@
 package br.cefetmg.pp_competask.model;
 
+import java.time.LocalDateTime;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -35,8 +37,8 @@ public class Checkin {
     @Column(length = 255, nullable = false)
     private String fotoPublicId;
 
-    @Column(length = 255, nullable = false)
-    private String dataHoraEnvio;
+    @Column(nullable = false)
+    private LocalDateTime dataHoraEnvio;
 
     @ManyToOne
     @JoinColumn(name = "usuario_id", nullable = false)
