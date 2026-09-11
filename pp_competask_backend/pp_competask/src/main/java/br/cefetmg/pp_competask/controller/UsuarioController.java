@@ -127,7 +127,7 @@ public class UsuarioController {
         }
     }
 
-    @GetMapping("/obterNome")
+    @GetMapping("/obterNome/{id}")
     @Operation(summary = "Obter nome do usuário")
     public String obterNome(@PathVariable Long id){
         return usuarioService.obterNome(id);
