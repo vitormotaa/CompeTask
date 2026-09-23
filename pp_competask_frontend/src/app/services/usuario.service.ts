@@ -32,6 +32,10 @@ export class UsuarioService {
     return this.http.get<boolean>(`${this.API_URL}/checkEmail`, {params});
   }
 
+  obterNome(id: number): Observable<string> {
+    return this.http.get(`${this.API_URL}/obterNome/${id}`, { responseType: 'text' });
+  }
+
   // salvar(usuario: UsuarioModel): boolean {
   //   const usuarios: UsuarioModel[] = JSON.parse(localStorage.getItem('usuarios') || '[]');
   //   const emailNovo = String(usuario.email || '').trim().toLowerCase();

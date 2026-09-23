@@ -9,6 +9,8 @@ import { checkmarkCircleOutline, flameOutline, lockClosedOutline, mailOutline, p
 
 import { UsuarioModel } from '../../models/usuario.model';
 import { UsuarioService } from 'src/app/services/usuario.service';
+import { NotificacaoModel } from '../../models/notificacao.model';
+import { NotificacaoService } from '../../services/notificacao.service';
 
 type AtalhoRodape = {
   label: string;
@@ -31,6 +33,13 @@ export class UsuarioPage {
 
   mensagemAcao = '';
 
+  notificacoes: NotificacaoModel[] = [];
+  notificacoesAberto = false;
+
+  get notificacoesNaoLidas(): number {
+    return this.notificacoes.filter((notificacao) => !notificacao.lida).length;
+  }
+
   atalhosRodape: AtalhoRodape[] = [
     { label: 'Tarefas', icon: 'checkmark-circle-outline', rota: '/tarefas' },
     { label: 'Comunidades', icon: 'people-outline', rota: '/comunidades' },
@@ -38,7 +47,7 @@ export class UsuarioPage {
     { label: 'Usuário', icon: 'person-outline', ativo: true },
   ];
 
-  constructor(private readonly formBuilder: FormBuilder, private readonly router: Router,private usuarioService: UsuarioService) {
+  constructor(private readonly formBuilder: FormBuilder, private readonly router: Router,private usuarioService: UsuarioService, private readonly notificacaoService: NotificacaoService) {
     addIcons({notificationsOutline,personOutline,pencil,notifications,flameOutline,mailOutline,lockClosedOutline,checkmarkCircleOutline,peopleOutline,timerOutline});
 
     this.perfilForm = this.formBuilder.group({
@@ -58,6 +67,34 @@ export class UsuarioPage {
     this.usuario = u;
     this.perfilForm.patchValue({ nome: u.nome, email: u.email });
     this.fotoPreview = u.foto || null;
+    this.carregarNotificacoes();
+  }
+
+  carregarNotificacoes(): void {
+    if (!this.usuario?.id) {
+      return;
+    }
+
+    this.notificacaoService.listar(Number(this.usuario.id)).subscribe({
+      next: (notificacoes) => this.notificacoes = notificacoes,
+      error: () => this.mensagemAcao = 'Nao foi possivel carregar as notificacoes.',
+    });
+  }
+
+  alternarNotificacoes(): void {
+    this.notificacoesAberto = !this.notificacoesAberto;
+  }
+
+  marcarNotificacaoComoLida(notificacao: NotificacaoModel): void {
+    if (notificacao.lida || !this.usuario?.id) {
+      return;
+    }
+
+    this.notificacaoService.marcarComoLida(notificacao.id, Number(this.usuario.id)).subscribe({
+      next: (atualizada) => {
+        notificacao.lida = atualizada.lida;
+      },
+    });
   }
 
   salvarAlteracoes(): void {

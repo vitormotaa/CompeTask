@@ -23,3 +23,19 @@ export type ComunidadeInput = {
   foto: string;
   idUsuarioCriador: number;
 };
+
+export interface RankingModel {
+  usuarioId: number;
+  nomeUsuario: string;
+  pontos: number;
+  posicao: number;
+}
+
+export interface MensagemModel {
+  id: number;
+  usuarioId: number;
+  nomeUsuario: string;
+  comunidadeId: number;
+  conteudo: string;
+  dataHoraEnvio: string;
+}

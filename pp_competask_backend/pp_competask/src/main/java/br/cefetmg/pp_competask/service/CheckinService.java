@@ -44,6 +44,9 @@ public class CheckinService {
 	@Autowired
 	private ImagemService imagemService;
 
+	@Autowired
+	private StreakService streakService;
+
 	@Transactional(readOnly = true)
 	public List<CheckinResponseDTO> buscarCheckinsPorComunidadeId(Long id) {
 		List<Checkin> checkins = checkinRepository.findAllByComunidadeIdComunidade(id);
@@ -94,6 +97,8 @@ public class CheckinService {
 
 		membroComunidade.setPontuacao(membroComunidade.getPontuacao() + 1);
 		membroComunidadeRepository.save(membroComunidade);
+
+		streakService.registrarAtividade(usuario);
 
 		return new CheckinResponseDTO(checkinRepository.save(checkin));
 	}

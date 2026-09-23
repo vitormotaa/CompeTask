@@ -42,6 +42,9 @@
  *
  */
 
+// sockjs-client expects Node's `global`, which doesn't exist in the browser
+(window as any).global = window;
+
 import './zone-flags';
 
 /***************************************************************************************************

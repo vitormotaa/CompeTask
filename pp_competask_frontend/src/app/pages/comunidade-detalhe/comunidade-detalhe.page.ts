@@ -21,15 +21,23 @@ import {
   peopleOutline,
   trophyOutline, calendarOutline, chevronForwardOutline } from 'ionicons/icons';
 
-import { ComunidadesService } from '../../services/comunidades.service';
+import { ComunidadesService, PeriodoRankingBackend } from '../../services/comunidades.service';
 import { TarefaModel } from '../../models/tarefa.model';
 import { TarefasService } from '../../services/tarefas.service';
 import { UsuarioService } from '../../services/usuario.service';
 import { CheckinModel, CheckinsService } from '../../services/checkins.service';
+import { ChatService } from '../../services/chat.service';
+import { MensagemModel, RankingModel } from '../../models/comunidade.model';
 
 type AbaComunidade = 'tarefas' | 'chat' | 'checkins' | 'ranking';
 type PeriodoRanking = 'semanal' | 'mensal' | 'anual';
 type OrdenacaoComunidade = 'status' | 'data' | 'prioridade' | 'alfabetica';
+
+const PERIODOS_BACKEND: Record<PeriodoRanking, PeriodoRankingBackend> = {
+  semanal: 'SEMANAL',
+  mensal: 'MENSAL',
+  anual: 'ANUAL',
+};
 
 @Component({
   selector: 'app-comunidade-detalhe',
@@ -62,9 +70,12 @@ export class ComunidadeDetalhePage {
   mensagemAcao = '';
 
   tarefas: TarefaModel[] = [];
-  readonly mensagens: any[] = [];
+  mensagens: MensagemModel[] = [];
   checkins: CheckinModel[] = [];
-  readonly ranking: any[] = [];
+  ranking: RankingModel[] = [];
+  rankingCarregando = false;
+  private chatConectado = false;
+  private readonly nomesUsuarios = new Map<number, string>();
 
   readonly opcoesOrdenacao: Array<{ chave: OrdenacaoComunidade; label: string }> = [
     { chave: 'status', label: 'Status' },
@@ -92,9 +103,15 @@ export class ComunidadeDetalhePage {
     private readonly comunidadesService: ComunidadesService,
     private readonly tarefasService: TarefasService,
     private readonly usuarioService: UsuarioService,
-    private readonly checkinsService: CheckinsService
+    private readonly checkinsService: CheckinsService,
+    private readonly chatService: ChatService
   ) {
     addIcons({arrowBackOutline,peopleOutline,filterOutline,caretDownOutline,checkmarkCircleOutline,calendarOutline,flagOutline,chevronForwardOutline,addOutline,paperPlaneOutline,cameraOutline,imageOutline,chatbubbleOutline,checkboxOutline,chevronDownOutline,trophyOutline,});
+  }
+
+  ionViewWillLeave(): void {
+    this.chatConectado = false;
+    this.chatService.desconectar();
   }
 
   get textoOrdenacao(): string {
@@ -214,10 +231,18 @@ export class ComunidadeDetalhePage {
     if (aba === 'checkins') {
       this.carregarCheckins();
     }
+    if (aba === 'chat') {
+      this.carregarMensagens();
+      this.conectarChat();
+    }
+    if (aba === 'ranking') {
+      this.carregarRanking();
+    }
   }
 
   selecionarRanking(periodo: PeriodoRanking): void {
     this.rankingAtual = periodo;
+    this.carregarRanking();
   }
 
   abrirNovoCheckin(tarefa?: TarefaModel): void {
@@ -256,7 +281,7 @@ export class ComunidadeDetalhePage {
           descricao: this.montarDescricaoCheckin(),
           foto: imagem.url,
           fotoPublicId: imagem.publicId,
-          dataHoraEnvio: new Date().toISOString(),
+          dataHoraEnvio: this.formatarDataHoraLocal(new Date()),
         }).subscribe({
           next: () => {
             this.checkinEnviando = false;
@@ -273,7 +298,24 @@ export class ComunidadeDetalhePage {
   }
 
   enviarMensagem(): void {
+    const usuarioAtual = this.usuarioService.obterUsuarioSessao();
+    const texto = this.mensagemChat.trim();
+
+    if (!usuarioAtual?.id || !texto) {
+      return;
+    }
+
+    this.chatService.enviar(this.comunidade.idComunidade, Number(usuarioAtual.id), texto);
     this.mensagemChat = '';
+  }
+
+  ehMinhaMensagem(mensagem: MensagemModel): boolean {
+    const usuarioAtual = this.usuarioService.obterUsuarioSessao();
+    return !!usuarioAtual?.id && mensagem.usuarioId === Number(usuarioAtual.id);
+  }
+
+  obterNomeCheckin(checkin: CheckinModel): string {
+    return this.nomesUsuarios.get(checkin.usuarioId) || `Usuário #${checkin.usuarioId}`;
   }
 
   concluirParaTodos(tarefa: TarefaModel, event: Event): void {
@@ -337,11 +379,75 @@ export class ComunidadeDetalhePage {
     this.checkinsService.listarPorComunidade(this.comunidade.idComunidade).subscribe({
       next: (checkins) => {
         this.checkins = checkins;
+        this.carregarNomesUsuarios(checkins);
       },
       error: () => {
         this.mensagemAcao = 'Nao foi possivel carregar os check-ins da comunidade.';
       },
     });
+  }
+
+  private carregarNomesUsuarios(checkins: CheckinModel[]): void {
+    const idsFaltantes = Array.from(new Set(checkins.map((checkin) => checkin.usuarioId)))
+      .filter((id) => !this.nomesUsuarios.has(id));
+
+    idsFaltantes.forEach((id) => {
+      this.usuarioService.obterNome(id).subscribe({
+        next: (nome) => this.nomesUsuarios.set(id, nome),
+        error: () => this.nomesUsuarios.set(id, `Usuário #${id}`),
+      });
+    });
+  }
+
+  private carregarRanking(): void {
+    if (!this.comunidade.idComunidade) {
+      return;
+    }
+
+    this.rankingCarregando = true;
+    this.comunidadesService.buscarRanking(this.comunidade.idComunidade, PERIODOS_BACKEND[this.rankingAtual]).subscribe({
+      next: (ranking) => {
+        this.ranking = ranking;
+        this.rankingCarregando = false;
+      },
+      error: () => {
+        this.mensagemAcao = 'Nao foi possivel carregar o ranking da comunidade.';
+        this.rankingCarregando = false;
+      },
+    });
+  }
+
+  private carregarMensagens(): void {
+    if (!this.comunidade.idComunidade) {
+      return;
+    }
+
+    this.comunidadesService.listarMensagens(this.comunidade.idComunidade).subscribe({
+      next: (mensagens) => {
+        this.mensagens = mensagens;
+      },
+      error: () => {
+        this.mensagemAcao = 'Nao foi possivel carregar o historico do chat.';
+      },
+    });
+  }
+
+  private conectarChat(): void {
+    if (this.chatConectado || !this.comunidade.idComunidade) {
+      return;
+    }
+
+    this.chatConectado = true;
+    this.chatService.conectar(this.comunidade.idComunidade, (mensagem) => {
+      this.mensagens = [...this.mensagens, mensagem];
+    });
+  }
+
+  private formatarDataHoraLocal(data: Date): string {
+    const doisDigitos = (valor: number) => String(valor).padStart(2, '0');
+    const dataFormatada = `${data.getFullYear()}-${doisDigitos(data.getMonth() + 1)}-${doisDigitos(data.getDate())}`;
+    const horaFormatada = `${doisDigitos(data.getHours())}:${doisDigitos(data.getMinutes())}:${doisDigitos(data.getSeconds())}`;
+    return `${dataFormatada}T${horaFormatada}`;
   }
 
   getStatus(tarefa: TarefaModel): string {

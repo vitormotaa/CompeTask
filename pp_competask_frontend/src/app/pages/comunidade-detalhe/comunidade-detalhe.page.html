@@ -95,9 +95,9 @@
         <p class="empty-state" *ngIf="mensagens.length === 0">Nenhuma mensagem por enquanto.</p>
 
         <div class="chat-messages" *ngIf="mensagens.length > 0">
-          <article *ngFor="let mensagem of mensagens" class="chat-bubble" [class.chat-bubble--mine]="mensagem.minha">
-            <strong *ngIf="!mensagem.minha">{{ mensagem.autor }}</strong>
-            <p>{{ mensagem.texto }}</p>
+          <article *ngFor="let mensagem of mensagens" class="chat-bubble" [class.chat-bubble--mine]="ehMinhaMensagem(mensagem)">
+            <strong *ngIf="!ehMinhaMensagem(mensagem)">{{ mensagem.nomeUsuario }}</strong>
+            <p>{{ mensagem.conteudo }}</p>
           </article>
         </div>
 
@@ -118,7 +118,7 @@
           </div>
           <div class="checkin-body">
             <h2>{{ getTituloCheckin(checkin) }}</h2>
-            <p class="checkin-author">Usuário #{{ checkin.usuarioId }} · {{ checkin.dataHoraEnvio | date: 'dd/MM/yyyy HH:mm' }}</p>
+            <p class="checkin-author">{{ obterNomeCheckin(checkin) }} · {{ checkin.dataHoraEnvio | date: 'dd/MM/yyyy HH:mm' }}</p>
             <p class="checkin-description">{{ getDescricaoCheckin(checkin) }}</p>
           </div>
         </article>
@@ -140,12 +140,12 @@
         </div>
 
         <p class="ranking-label">RANKING DA COMUNIDADE</p>
-        <p class="empty-state" *ngIf="ranking.length === 0">Ranking vazio por enquanto.</p>
+        <p class="empty-state" *ngIf="!rankingCarregando && ranking.length === 0">Ranking vazio por enquanto.</p>
 
         <article *ngFor="let pessoa of ranking" class="ranking-row">
           <span class="ranking-position" [class.ranking-position--top]="pessoa.posicao <= 3">{{ pessoa.posicao }}</span>
-          <strong>{{ pessoa.nome }}</strong>
-          <span class="ranking-points"><span *ngIf="pessoa.campeao">#</span> {{ pessoa.pontos }} pts</span>
+          <strong>{{ pessoa.nomeUsuario }}</strong>
+          <span class="ranking-points"><span *ngIf="pessoa.posicao === 1">#</span> {{ pessoa.pontos }} pts</span>
         </article>
       </div>
     </section>

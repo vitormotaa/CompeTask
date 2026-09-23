@@ -1,5 +1,6 @@
 package br.cefetmg.pp_competask.model;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -48,6 +49,10 @@ public class Usuario {
 
     @Column(nullable = false)
     private Integer streak = 0;
+
+    // ultimo dia (inclusive) contabilizado na streak; usado para saber se ja contou hoje ou se a sequencia quebrou
+    @Column(nullable = true)
+    private LocalDate ultimaAtividadeStreak;
 
     @Column(nullable = false)
     private Boolean ativo = true;

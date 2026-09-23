@@ -3,8 +3,10 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
-import { ComunidadeInput, ComunidadeModel } from '../models/comunidade.model';
+import { ComunidadeInput, ComunidadeModel, MensagemModel, RankingModel } from '../models/comunidade.model';
 import { TarefaModel } from '../models/tarefa.model';
+
+export type PeriodoRankingBackend = 'SEMANAL' | 'MENSAL' | 'ANUAL';
 
 @Injectable({
   providedIn: 'root',
@@ -51,6 +53,16 @@ export class ComunidadesService {
     return this.listar().pipe(
       map((comunidades) => comunidades.find((comunidade) => String(comunidade.idComunidade) === id) || null)
     );
+  }
+
+  buscarRanking(idComunidade: number, periodo: PeriodoRankingBackend): Observable<RankingModel[]> {
+    return this.http.get<RankingModel[]>(`${this.API_URL}/${idComunidade}/ranking`, {
+      params: { periodo },
+    });
+  }
+
+  listarMensagens(idComunidade: number): Observable<MensagemModel[]> {
+    return this.http.get<MensagemModel[]>(`${this.API_URL}/${idComunidade}/mensagens`);
   }
 
   inserir(comunidade: ComunidadeInput): Observable<ComunidadeModel> {

@@ -48,6 +48,41 @@
   justify-content: center;
 }
 
+.notificacoes-painel {
+  width: min(100%, 430px);
+  margin: 0 auto 10px;
+  padding: 6px 12px;
+  display: grid;
+  gap: 8px;
+}
+
+.notificacao-item {
+  border-radius: 8px;
+  background: #52008c;
+  color: #ffffff;
+  padding: 10px 12px;
+}
+
+.notificacao-item strong {
+  display: block;
+  font-size: 0.82rem;
+}
+
+.notificacao-item p {
+  margin: 4px 0;
+  font-size: 0.76rem;
+}
+
+.notificacao-item span {
+  font-size: 0.68rem;
+  opacity: 0.8;
+}
+
+.notificacao-item--lida {
+  background: #d9d9e6;
+  color: #52008c;
+}
+
 .usuario-info {
   width: min(100%, 430px);
   margin: 2px auto 6px;

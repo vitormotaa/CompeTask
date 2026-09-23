@@ -2,11 +2,25 @@
   <header class="topo">
     <h1>Usuário</h1>
 
-    <div class="notificacao">
+    <div class="notificacao" (click)="alternarNotificacoes()">
       <ion-icon name="notifications-outline"></ion-icon>
-      <span>5</span>
+      <span *ngIf="notificacoesNaoLidas > 0">{{ notificacoesNaoLidas }}</span>
     </div>
   </header>
+
+  <div class="notificacoes-painel" *ngIf="notificacoesAberto">
+    <p class="empty-state" *ngIf="notificacoes.length === 0">Nenhuma notificacao por enquanto.</p>
+
+    <article
+      *ngFor="let notificacao of notificacoes"
+      class="notificacao-item"
+      [class.notificacao-item--lida]="notificacao.lida"
+      (click)="marcarNotificacaoComoLida(notificacao)">
+      <strong>{{ notificacao.titulo }}</strong>
+      <p>{{ notificacao.mensagem }}</p>
+      <span>{{ notificacao.dataHora | date: 'dd/MM/yyyy HH:mm' }}</span>
+    </article>
+  </div>
 
   <div class="usuario-info">
     <div class="avatar-container">

@@ -41,6 +41,9 @@ public class TarefaService {
     @Autowired
     private CheckinRepository checkinRepository;
 
+    @Autowired
+    private StreakService streakService;
+
     @Transactional(readOnly = true)
     public List<TarefaResponseDTO> buscarTarefasPorUsuarioId(Long id) {
         List<Tarefa> tarefas = tarefaRepository.findAllByUsuarioIdUsuarioAndInComunidadeFalse(id);
@@ -104,6 +107,7 @@ public class TarefaService {
 
             if (dto.getConcluida()) {
                 tarefa.setDataConfeccao(LocalDate.now().toString());
+                streakService.registrarAtividade(tarefa.getUsuario());
             } else {
                 tarefa.setDataConfeccao(null);
             }
@@ -138,6 +142,10 @@ public class TarefaService {
         tarefa.setConcluida(!tarefa.isConcluida());
         tarefa.setDataConfeccao(
                 tarefa.isConcluida() ? LocalDate.now().toString() : null);
+
+        if (tarefa.isConcluida()) {
+            streakService.registrarAtividade(tarefa.getUsuario());
+        }
 
         return new TarefaResponseDTO(tarefaRepository.save(tarefa));
     }
