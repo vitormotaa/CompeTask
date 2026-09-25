@@ -21,7 +21,7 @@ export class UsuarioService {
   inicializar() {
     if (!localStorage['usuarios']) {
       let usuarios: UsuarioModel[] = [
-        { id: new Date().toISOString(), nome: 'balbino', email: 'balbino@email.com', senha: '123456', diasStreak: 3, foto: 'assets/balbino.webp' },
+        { id: new Date().toISOString(), nome: 'balbino', email: 'balbino@email.com', senha: '123456', streak: 3, foto: 'assets/balbino.webp' },
       ];
       localStorage.setItem('usuarios', JSON.stringify(usuarios));
     }
@@ -104,9 +104,17 @@ export class UsuarioService {
     return usuarios.find((u: UsuarioModel) => u.id === id) || null;
   }
 
-  // obterUsuarioPorId(id: number): Observable<UsuarioModel> {
-  //   return this.http.get<UsuarioModel>(`${this.API_URL}/${id}`);
-  // }
+  // busca os dados atuais no backend (ex: streak atualizado por tarefas/check-ins)
+  buscarUsuarioAtual(id: string): Observable<UsuarioModel> {
+    const senhaAtual = this.obterUsuarioSessao()?.senha;
+    return this.http.get<any>(`${this.API_URL}/${id}`).pipe(
+      map((resultado: any) => {
+        const usuarioAtualizado = this.converterParaModelo({ ...resultado, senha: senhaAtual });
+        this.salvarSessao(usuarioAtualizado);
+        return usuarioAtualizado;
+      })
+    );
+  }
 
   obterUsuarioPorEmail(email: string) {
     let usuarios = JSON.parse(localStorage.getItem('usuarios') || '[]');
@@ -132,6 +140,7 @@ export class UsuarioService {
       email: usuario.email,
       senha: usuario.senha,
       foto: usuario.foto,
+      streak: usuario.streak,
     };
   }
 
@@ -142,7 +151,7 @@ export class UsuarioService {
       email: String(usuario?.email ?? ''),
       senha: usuario?.senha,
       foto: usuario?.foto,
-      diasStreak: Number(usuario?.streak ?? usuario?.diasStreak ?? 0),
+      streak: Number(usuario?.streak ?? usuario?.diasStreak ?? 0),
     };
   }
 

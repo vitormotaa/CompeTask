@@ -140,6 +140,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  gap: 4px;
   min-height: 19px;
   margin-top: 6px;
   padding: 0 10px;
@@ -150,6 +151,12 @@
   font-size: 0.66rem;
   font-weight: 600;
 }
+
+.streak ion-icon {
+  color: #ff9500;
+  font-size: 0.85rem;
+}
+
 
 .profile-form {
   width: min(100%, 430px);

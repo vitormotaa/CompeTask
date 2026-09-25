@@ -30,7 +30,6 @@ export class UsuarioPage {
   usuario: UsuarioModel | null = null;
   fotoPreview: string | null = null;
   perfilForm: FormGroup;
-
   mensagemAcao = '';
 
   notificacoes: NotificacaoModel[] = [];
@@ -65,9 +64,16 @@ export class UsuarioPage {
       return
     };
     this.usuario = u;
+    this.usuario.streak = this.usuario.streak || 0;
     this.perfilForm.patchValue({ nome: u.nome, email: u.email });
     this.fotoPreview = u.foto || null;
     this.carregarNotificacoes();
+
+    // atualiza a streak com o valor mais recente do backend
+    this.usuarioService.buscarUsuarioAtual(u.id).subscribe({
+      next: (usuarioAtualizado) => this.usuario = usuarioAtualizado,
+      error: () => {},
+    });
   }
 
   carregarNotificacoes(): void {
@@ -122,7 +128,7 @@ export class UsuarioPage {
       email: String(mudancas.email ?? this.usuario.email),
       senha: mudancas.senha ? String(mudancas.senha) : this.usuario.senha,
       foto: fotoVal !== undefined && fotoVal !== '' ? String(fotoVal) : this.usuario.foto,
-      diasStreak: this.usuario.diasStreak,
+      streak: this.usuario.streak,
     };
 
     this.usuarioService.atualizarUsuarioLocal(usuarioAtualizado).subscribe({

@@ -4,5 +4,5 @@ export interface UsuarioModel {
   email: string;
   senha?: string;
   foto?: string;
-  diasStreak?: number;
+  streak?: number;
 }
