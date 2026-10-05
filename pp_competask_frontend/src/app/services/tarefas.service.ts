@@ -52,8 +52,8 @@ export class TarefasService {
 
 
 	//método de busca de tarefas de acordo com o id do usuario - API
-	buscarTarefasUsuario(id: string): Observable<TarefaModel[]> {
-		return this.http.get<TarefaModel[]>(`${this.API_URL}/usuario/${id}`);
+	buscarTarefasUsuario(): Observable<TarefaModel[]> {
+		return this.http.get<TarefaModel[]>(`${this.API_URL}/minhas`);
 	}
 
 	//não é ligado na api mas é pra salvar as coisas entao - API
@@ -141,16 +141,12 @@ export class TarefasService {
 		return this.http.patch<TarefaModel>(`${this.API_URL}/timer/${id}`, { tempoExecucao });
 	}
 
-	alternarConclusao(tarefa: TarefaModel, usuarioId: string): Observable<TarefaModel> {
-		return this.http.patch<TarefaModel>(`${this.API_URL}/conclusao/${tarefa.id}`, {}, {
-			params: { usuarioId },
-		});
-	}
+alternarConclusao(tarefa: TarefaModel): Observable<TarefaModel> {
+                return this.http.patch<TarefaModel>(`${this.API_URL}/conclusao/${tarefa.id}`, {});
+        }
 
-	concluirParaTodos(tarefa: TarefaModel, usuarioId: string): Observable<TarefaModel> {
-		return this.http.patch<TarefaModel>(`${this.API_URL}/conclusao/${tarefa.id}`, {}, {
-			params: { usuarioId },
-		});
+        concluirParaTodos(tarefa: TarefaModel): Observable<TarefaModel> {
+                return this.http.patch<TarefaModel>(`${this.API_URL}/conclusao/${tarefa.id}`, {});
 	}
 
 	//ta em comentario só por contad do nome, nao quero dar conflito com o metodo de baixo ai

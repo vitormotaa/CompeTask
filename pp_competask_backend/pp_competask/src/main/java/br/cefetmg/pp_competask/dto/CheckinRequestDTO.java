@@ -24,7 +24,6 @@ public class CheckinRequestDTO {
     @NotNull(message = "Data hora envio é obrigatória")
     private LocalDateTime dataHoraEnvio;
 
-    @NotNull(message = "Usuário é obrigatório")
     private Long usuarioId;
 
     @NotNull(message = "Comunidade é obrigatória")

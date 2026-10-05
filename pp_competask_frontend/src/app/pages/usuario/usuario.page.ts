@@ -70,7 +70,7 @@ export class UsuarioPage {
     this.carregarNotificacoes();
 
     // atualiza a streak com o valor mais recente do backend
-    this.usuarioService.buscarUsuarioAtual(u.id).subscribe({
+    this.usuarioService.buscarUsuarioAtual().subscribe({
       next: (usuarioAtualizado) => this.usuario = usuarioAtualizado,
       error: () => {},
     });
@@ -81,7 +81,7 @@ export class UsuarioPage {
       return;
     }
 
-    this.notificacaoService.listar(Number(this.usuario.id)).subscribe({
+    this.notificacaoService.listar().subscribe({
       next: (notificacoes) => this.notificacoes = notificacoes,
       error: () => this.mensagemAcao = 'Nao foi possivel carregar as notificacoes.',
     });
@@ -96,7 +96,7 @@ export class UsuarioPage {
       return;
     }
 
-    this.notificacaoService.marcarComoLida(notificacao.id, Number(this.usuario.id)).subscribe({
+    this.notificacaoService.marcarComoLida(notificacao.id).subscribe({
       next: (atualizada) => {
         notificacao.lida = atualizada.lida;
       },
@@ -155,7 +155,7 @@ export class UsuarioPage {
       return;
     }
     const id = this.usuario.id;
-    this.usuarioService.excluirUsuario(id).subscribe({
+    this.usuarioService.excluirUsuario().subscribe({
       next: () => {
         this.router.navigate(['/login']);
       },

@@ -14,13 +14,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import br.cefetmg.pp_competask.dto.TarefaRequestDTO;
 import br.cefetmg.pp_competask.dto.TarefaResponseDTO;
 import br.cefetmg.pp_competask.dto.TarefaTempoExecucaoPatchDTO;
+import br.cefetmg.pp_competask.security.UsuarioLogado;
 import br.cefetmg.pp_competask.service.TarefaService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -36,11 +36,11 @@ public class TarefaController {
     @Autowired
     private TarefaService tarefaService;
 
-    // listar todas as tarefas por id do usuario
-    @GetMapping("/usuario/{id}")
-    @Operation(summary = "Buscar tarefas do usuário por ID", description = "")
-    public List<TarefaResponseDTO> getAllByUsuarioId(@PathVariable Long id) {
-        return tarefaService.buscarTarefasPorUsuarioId(id);
+    // listar as tarefas do usuário autenticado
+    @GetMapping("/minhas")
+    @Operation(summary = "Buscar tarefas do usuário autenticado", description = "")
+    public List<TarefaResponseDTO> getAllByUsuarioId() {
+        return tarefaService.buscarTarefasPorUsuarioId(UsuarioLogado.getId());
     }
 
     // buscar tarefa por id
@@ -59,6 +59,7 @@ public class TarefaController {
     @Operation(summary = "Criar uma tarefa", description = "")
     public ResponseEntity<TarefaResponseDTO> inserir(@Valid @RequestBody TarefaRequestDTO tarefaRequestDTO) {
         try {
+            tarefaRequestDTO.setUsuarioId(UsuarioLogado.getId());
             TarefaResponseDTO tarefaResponseDTO = tarefaService.inserir(tarefaRequestDTO);
             return ResponseEntity.status(HttpStatus.CREATED).body(tarefaResponseDTO);
         } catch (IllegalArgumentException ex) {
@@ -72,6 +73,7 @@ public class TarefaController {
     public ResponseEntity<TarefaResponseDTO> atualizar(@PathVariable Long id,
             @RequestBody TarefaRequestDTO tarefaRequestDTO) {
         try {
+            tarefaRequestDTO.setUsuarioId(UsuarioLogado.getId());
             TarefaResponseDTO tarefaResponseDTO = tarefaService.atualizar(id, tarefaRequestDTO);
             return ResponseEntity.ok(tarefaResponseDTO);
         } catch (IllegalArgumentException ex) {
@@ -94,10 +96,9 @@ public class TarefaController {
     // alterar estado de concluída da tarefa
     @PatchMapping("/conclusao/{id}")
     @Operation(summary = "Editar tarefa")
-    public ResponseEntity<TarefaResponseDTO> alterarConclusao(@PathVariable Long id,
-            @RequestParam Long usuarioId) {
+    public ResponseEntity<TarefaResponseDTO> alterarConclusao(@PathVariable Long id) {
         try {
-            TarefaResponseDTO tarefaResponseDTO = tarefaService.alterarConclusao(id, usuarioId);
+            TarefaResponseDTO tarefaResponseDTO = tarefaService.alterarConclusao(id, UsuarioLogado.getId());
             return ResponseEntity.ok(tarefaResponseDTO);
         } catch (IllegalArgumentException ex) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage());
@@ -118,6 +119,7 @@ public class TarefaController {
     @Operation(summary = "Criar uma tarefa na comunidade")
     public ResponseEntity<TarefaResponseDTO> inserirNaComunidade(@Valid @RequestBody TarefaRequestDTO tarefaRequestDTO) {
         try {
+            tarefaRequestDTO.setUsuarioId(UsuarioLogado.getId());
             TarefaResponseDTO tarefaResponseDTO = tarefaService.inserirNaComunidade(tarefaRequestDTO);
             return ResponseEntity.status(HttpStatus.CREATED).body(tarefaResponseDTO);
         } catch (IllegalArgumentException ex) {

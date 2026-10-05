@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import br.cefetmg.pp_competask.dto.NotificacaoResponseDTO;
+import br.cefetmg.pp_competask.security.UsuarioLogado;
 import br.cefetmg.pp_competask.service.NotificacaoService;
 
 @RestController
@@ -27,17 +28,16 @@ public class NotificacaoController {
         this.notificacaoService = notificacaoService;
     }
 
-    @GetMapping("/usuario/{usuarioId}")
-    public List<NotificacaoResponseDTO> listar(@PathVariable Long usuarioId,
+    @GetMapping("")
+    public List<NotificacaoResponseDTO> listar(
             @RequestParam(defaultValue = "false") boolean somenteNaoLidas) {
-        return notificacaoService.listar(usuarioId, somenteNaoLidas);
+        return notificacaoService.listar(UsuarioLogado.getId(), somenteNaoLidas);
     }
 
     @PatchMapping("/{id}/lida")
-    public ResponseEntity<NotificacaoResponseDTO> marcarComoLida(@PathVariable Long id,
-            @RequestParam Long usuarioId) {
+    public ResponseEntity<NotificacaoResponseDTO> marcarComoLida(@PathVariable Long id) {
         try {
-            return ResponseEntity.ok(notificacaoService.marcarComoLida(id, usuarioId));
+            return ResponseEntity.ok(notificacaoService.marcarComoLida(id, UsuarioLogado.getId()));
         } catch (IllegalArgumentException ex) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, ex.getMessage());
         }

@@ -11,7 +11,6 @@ import lombok.Setter;
 @NoArgsConstructor
 public class MensagemRequestDTO {
 
-    @NotNull(message = "Usuário é obrigatório")
     private Long usuarioId;
 
     @NotNull(message = "Comunidade é obrigatória")

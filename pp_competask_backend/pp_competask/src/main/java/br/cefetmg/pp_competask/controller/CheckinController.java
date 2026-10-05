@@ -21,6 +21,7 @@ import org.springframework.web.server.ResponseStatusException;
 import br.cefetmg.pp_competask.dto.CheckinRequestDTO;
 import br.cefetmg.pp_competask.dto.CheckinResponseDTO;
 import br.cefetmg.pp_competask.dto.ImagemUploadDTO;
+import br.cefetmg.pp_competask.security.UsuarioLogado;
 import br.cefetmg.pp_competask.service.CheckinService;
 import br.cefetmg.pp_competask.service.ImagemService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -65,6 +66,7 @@ public class CheckinController {
 	@Operation(summary = "Criar check-in")
 	public ResponseEntity<CheckinResponseDTO> inserir(@RequestBody CheckinRequestDTO checkinRequestDTO) {
 		try {
+			checkinRequestDTO.setUsuarioId(UsuarioLogado.getId());
 			validarCamposObrigatorios(checkinRequestDTO);
 			CheckinResponseDTO checkinResponseDTO = checkinService.inserir(checkinRequestDTO);
 			return ResponseEntity.status(HttpStatus.CREATED).body(checkinResponseDTO);

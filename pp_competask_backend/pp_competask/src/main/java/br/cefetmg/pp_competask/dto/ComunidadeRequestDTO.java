@@ -22,7 +22,6 @@ public class ComunidadeRequestDTO {
 
     private String foto;
 
-    @NotNull(message = "ID do usuário é obrigatório")
     private Long idUsuarioCriador;
 
 }

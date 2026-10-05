@@ -11,7 +11,6 @@ import lombok.Setter;
 @NoArgsConstructor
 public class TarefaRequestDTO {
     
-    @NotNull(message = "O usuário é obrigatório")
     private Long usuarioId;
 
     @NotBlank(message = "O título é obrigatório")

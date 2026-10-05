@@ -111,7 +111,7 @@ export class TarefasPage {
       return;
     }
 
-    this.tarefasService.alternarConclusao(tarefa, usuarioAtual.id).subscribe({
+    this.tarefasService.alternarConclusao(tarefa).subscribe({
       next: () => {
         this.carregarTarefas();
       },
@@ -224,7 +224,7 @@ export class TarefasPage {
       return;
     }
 
-    this.tarefasService.buscarTarefasUsuario(usuarioAtual.id).subscribe({
+    this.tarefasService.buscarTarefasUsuario().subscribe({
       next: (resultado: TarefaModel[]) => {
           this.tarefas = resultado;
           this.tarefasService.guardarTarefasLocal(this.tarefas);

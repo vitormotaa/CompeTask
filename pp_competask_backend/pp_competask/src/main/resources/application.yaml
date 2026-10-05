@@ -27,11 +27,16 @@ spring:
       max-file-size: 5MB
       max-request-size: 5MB
       
-  springdoc:
-    swagger-ui:
-      path: /docs
-    api-docs:
-      path: /openapi-specs
+
+springdoc:
+  swagger-ui:
+    path: /docs
+  api-docs:
+    path: /openapi-specs
+
+jwt:
+  secret: ${JWT_SECRET:chave-secreta-de-desenvolvimento-com-mais-de-32-caracteres}
+  expiration: ${JWT_EXPIRATION:3600000}
 
 cloudinary:
   cloud-name: ${CLOUDINARY_CLOUD_NAME}

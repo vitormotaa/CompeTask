@@ -3,6 +3,10 @@ package br.cefetmg.pp_competask.service;
 import java.io.IOException;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.multipart.MultipartFile;
 
 // import java.util.List;
@@ -11,11 +15,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import br.cefetmg.pp_competask.dto.AutentificacaoRequestDTO;
+import br.cefetmg.pp_competask.dto.AutentificacaoResponseDTO;
 import br.cefetmg.pp_competask.dto.ImagemUploadDTO;
 import br.cefetmg.pp_competask.dto.UsuarioRequestDTO;
 import br.cefetmg.pp_competask.dto.UsuarioResponseDTO;
 import br.cefetmg.pp_competask.model.Usuario;
 import br.cefetmg.pp_competask.repository.UsuarioRepository;
+import br.cefetmg.pp_competask.security.JwtService;
 
 @Service
 public class UsuarioService {
@@ -25,6 +31,15 @@ public class UsuarioService {
 
     @Autowired
     private ImagemService imagemService;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private AuthenticationManager authenticationManager;
+
+    @Autowired
+    private JwtService jwtService;
 
     @Transactional
     public UsuarioResponseDTO inserir(UsuarioRequestDTO dto){
@@ -36,7 +51,7 @@ public class UsuarioService {
             usuario.setFoto(dto.getFoto());
             usuario.setNome(dto.getNome());
             usuario.setStreak(0);
-            usuario.setSenha(dto.getSenha());
+            usuario.setSenha(passwordEncoder.encode(dto.getSenha()));
             return new UsuarioResponseDTO(usuarioRepository.save(usuario));
         }
 
@@ -59,23 +74,22 @@ public class UsuarioService {
     public boolean existeEmail(String email) {
         Usuario usuario = usuarioRepository.findByEmail(email);
 
-        if (usuario.getAtivo()){
-            return true;
-        }else{
-            // é aqui que entra a lógica de tipo reativar a conta futuramente 
-            return false;
-        }
+        // usuário desativado conta como inexistente; reativação de conta pode entrar aqui no futuro
+        return usuario != null && usuario.getAtivo();
     }
 
-    @Transactional
-    public UsuarioResponseDTO login(AutentificacaoRequestDTO dto){
-        Usuario usuario = usuarioRepository.findByEmailAndSenha(dto.getEmail(), dto.getSenha());
-
-        if (usuario == null || !usuario.getAtivo()){
+    @Transactional(readOnly = true)
+    public AutentificacaoResponseDTO login(AutentificacaoRequestDTO dto){
+        try {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(dto.getEmail(), dto.getSenha()));
+        } catch (AuthenticationException ex) {
             throw new IllegalArgumentException("Email ou senha inválidos.");
         }
 
-        return new UsuarioResponseDTO(usuario);
+        Usuario usuario = usuarioRepository.findByEmail(dto.getEmail());
+
+        return new AutentificacaoResponseDTO(jwtService.gerarToken(usuario));
     }
 
 
@@ -102,7 +116,9 @@ public class UsuarioService {
 
         usuario.setFoto(dto.getFoto());
         usuario.setNome(dto.getNome());
-        usuario.setSenha(dto.getSenha());
+        if (dto.getSenha() != null && !dto.getSenha().isBlank()) {
+            usuario.setSenha(passwordEncoder.encode(dto.getSenha()));
+        }
 
         return new UsuarioResponseDTO(usuarioRepository.save(usuario));
 

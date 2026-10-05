@@ -122,7 +122,7 @@ export class ComunidadesPage {
 
     this.carregando = true;
     this.mensagemAcao = '';
-    this.comunidadesService.listarPorUsuario(usuarioAtual.id).subscribe({
+    this.comunidadesService.listarPorUsuario().subscribe({
       next: (comunidades) => {
         this.comunidades = comunidades;
         this.mensagemAcao = mensagemSucesso;
@@ -147,7 +147,7 @@ export class ComunidadesPage {
     this.mensagemAcao = '';
     forkJoin({
       publicas: this.comunidadesService.listarPublicas(),
-      doUsuario: this.comunidadesService.listarPorUsuario(usuarioAtual.id),
+      doUsuario: this.comunidadesService.listarPorUsuario(),
     }).subscribe({
       next: ({ publicas, doUsuario }) => {
         const comunidadesDoUsuario = new Set(doUsuario.map((comunidade) => comunidade.idComunidade));
@@ -233,7 +233,7 @@ export class ComunidadesPage {
     }
 
     this.entrandoComunidadeId = comunidade.idComunidade;
-    this.comunidadesService.entrar(comunidade.idComunidade, Number(usuarioAtual.id)).subscribe({
+    this.comunidadesService.entrar(comunidade.idComunidade).subscribe({
       next: () => {
         this.comunidadesPublicas = this.comunidadesPublicas.filter((item) => item.idComunidade !== comunidade.idComunidade);
         this.entrandoComunidadeId = null;

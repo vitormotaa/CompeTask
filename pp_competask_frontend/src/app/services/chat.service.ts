@@ -16,6 +16,7 @@ export class ChatService {
   conectar(comunidadeId: number, aoReceber: (mensagem: MensagemModel) => void): void {
     this.client = new Client({
       webSocketFactory: () => new SockJS(this.WS_URL),
+      connectHeaders: { Authorization: `Bearer ${localStorage.getItem('token') ?? ''}` },
       onConnect: () => {
         this.subscricao = this.client!.subscribe(`/topico/comunidade/${comunidadeId}`, (frame) => {
           aoReceber(JSON.parse(frame.body));

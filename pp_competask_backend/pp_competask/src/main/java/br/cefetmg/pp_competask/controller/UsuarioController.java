@@ -8,7 +8,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -19,8 +18,10 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import br.cefetmg.pp_competask.dto.AutentificacaoRequestDTO;
+import br.cefetmg.pp_competask.dto.AutentificacaoResponseDTO;
 import br.cefetmg.pp_competask.dto.UsuarioRequestDTO;
 import br.cefetmg.pp_competask.dto.UsuarioResponseDTO;
+import br.cefetmg.pp_competask.security.UsuarioLogado;
 import br.cefetmg.pp_competask.service.UsuarioService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -37,11 +38,11 @@ public class UsuarioController {
     private UsuarioService usuarioService;
 
 
-    @GetMapping("/{id}")
-    @Operation(summary = "Buscar usuário por ID")
-    public ResponseEntity<UsuarioResponseDTO> getById(@PathVariable Long id){
+    @GetMapping("/me")
+    @Operation(summary = "Buscar usuário autenticado")
+    public ResponseEntity<UsuarioResponseDTO> getById(){
         try {
-            return ResponseEntity.ok(usuarioService.findById(id));
+            return ResponseEntity.ok(usuarioService.findById(UsuarioLogado.getId()));
         } catch (IllegalStateException ex) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, ex.getMessage());
         }
@@ -57,7 +58,7 @@ public class UsuarioController {
 
     @PostMapping("/login") //deve ser POST com JSON
     @Operation(summary = "Login")
-    public ResponseEntity<UsuarioResponseDTO> login(@RequestBody AutentificacaoRequestDTO autentificacaoRequestDTO){
+    public ResponseEntity<AutentificacaoResponseDTO> login(@RequestBody @Valid AutentificacaoRequestDTO autentificacaoRequestDTO){
         try {
             return ResponseEntity.ok(usuarioService.login(autentificacaoRequestDTO));
         } catch (IllegalArgumentException ex) {
@@ -90,20 +91,20 @@ public class UsuarioController {
     //     }
     // }
 
-    @PatchMapping("/excluir/{id}")
+    @PatchMapping("/me/excluir")
     @Operation(summary = "Alterar atividade do usuário")
-    public ResponseEntity<UsuarioResponseDTO> excluir(@PathVariable Long id){
-        UsuarioResponseDTO usuarioResponseDTO = usuarioService.excluir(id);
+    public ResponseEntity<UsuarioResponseDTO> excluir(){
+        UsuarioResponseDTO usuarioResponseDTO = usuarioService.excluir(UsuarioLogado.getId());
         return ResponseEntity.ok(usuarioResponseDTO);
     }
 
 
 
-    @PutMapping("/{id}")
+    @PutMapping("/me")
     @Operation(summary = "Editar usuário")
-    public ResponseEntity<UsuarioResponseDTO> alterar(@RequestBody UsuarioRequestDTO usuarioRequestDTO, @PathVariable Long id){
+    public ResponseEntity<UsuarioResponseDTO> alterar(@RequestBody UsuarioRequestDTO usuarioRequestDTO){
         try {
-            return ResponseEntity.ok(usuarioService.alterar(id, usuarioRequestDTO));
+            return ResponseEntity.ok(usuarioService.alterar(UsuarioLogado.getId(), usuarioRequestDTO));
         } catch (IllegalStateException ex) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, ex.getMessage());
         } catch (IllegalArgumentException ex) {
@@ -114,12 +115,12 @@ public class UsuarioController {
         }
     }
 
-    @PatchMapping("/foto/{id}")
+    @PatchMapping("/me/foto")
     @Operation(summary = "Atualizar foto do usuário")
-    public ResponseEntity<UsuarioResponseDTO> atualizarFoto(@PathVariable Long id,
+    public ResponseEntity<UsuarioResponseDTO> atualizarFoto(
             @RequestParam(value = "arquivo", required = false) MultipartFile arquivo) {
         try {
-            return ResponseEntity.ok(usuarioService.atualizarFoto(id, arquivo));
+            return ResponseEntity.ok(usuarioService.atualizarFoto(UsuarioLogado.getId(), arquivo));
         } catch (IllegalArgumentException ex) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage());
         } catch (IOException ex) {
@@ -127,9 +128,9 @@ public class UsuarioController {
         }
     }
 
-    @GetMapping("/obterNome/{id}")
-    @Operation(summary = "Obter nome do usuário")
-    public String obterNome(@PathVariable Long id){
-        return usuarioService.obterNome(id);
+    @GetMapping("/me/nome")
+    @Operation(summary = "Obter nome do usuário autenticado")
+    public String obterNome(){
+        return usuarioService.obterNome(UsuarioLogado.getId());
     }
 }

@@ -177,7 +177,7 @@ export class NovaComunidadePage implements OnInit {
       return;
     }
 
-    this.comunidadesService.listarPorUsuario(usuarioAtual.id).subscribe({
+    this.comunidadesService.listarPorUsuario().subscribe({
       next: (comunidades) => {
         const comunidade = comunidades.find((item) => String(item.idComunidade) === this.comunidadeId);
 

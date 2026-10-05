@@ -201,7 +201,7 @@ export class TimerPage implements OnDestroy {
       return;
     }
 
-    this.tarefasService.buscarTarefasUsuario(usuarioAtual.id).subscribe({
+    this.tarefasService.buscarTarefasUsuario().subscribe({
       next: (tarefas) => {
         this.tarefas = tarefas.filter((tarefa) => !tarefa.concluida);
       },

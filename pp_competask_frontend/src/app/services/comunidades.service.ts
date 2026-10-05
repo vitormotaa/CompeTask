@@ -29,22 +29,20 @@ export class ComunidadesService {
     );
   }
 
-  listarPorUsuario(idUsuario: string): Observable<ComunidadeModel[]> {
-    return this.http.get<any[]>(`${this.API_URL}/usuario/${idUsuario}`).pipe(
+  listarPorUsuario(): Observable<ComunidadeModel[]> {
+    return this.http.get<any[]>(`${this.API_URL}/minhas`).pipe(
       map((comunidades) => comunidades.map((comunidade) => this.converterParaModelo(comunidade)))
     );
   }
 
-  entrar(idComunidade: number, usuarioId: number): Observable<ComunidadeModel> {
-    return this.http.post<any>(`${this.API_URL}/entrar/${idComunidade}`, { usuarioId }).pipe(
+  entrar(idComunidade: number): Observable<ComunidadeModel> {
+    return this.http.post<any>(`${this.API_URL}/entrar/${idComunidade}`, {}).pipe(
       map((comunidade) => this.converterParaModelo(comunidade))
     );
   }
 
-  listarTarefas(idComunidade: number, idUsuario: number): Observable<TarefaModel[]> {
-    return this.http.get<TarefaModel[]>(`${this.API_URL}/${idComunidade}/tarefas`, {
-      params: { usuarioId: idUsuario },
-    }).pipe(
+  listarTarefas(idComunidade: number): Observable<TarefaModel[]> {
+    return this.http.get<TarefaModel[]>(`${this.API_URL}/${idComunidade}/tarefas`).pipe(
       map((tarefas) => tarefas.map((tarefa) => ({ ...tarefa, inComunidade: true, comunidadeId: idComunidade })))
     );
   }

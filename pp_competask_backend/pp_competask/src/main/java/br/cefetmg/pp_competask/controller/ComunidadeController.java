@@ -2,7 +2,6 @@ package br.cefetmg.pp_competask.controller;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -27,6 +26,7 @@ import br.cefetmg.pp_competask.dto.MensagemResponseDTO;
 import br.cefetmg.pp_competask.dto.PeriodoRanking;
 import br.cefetmg.pp_competask.dto.RankingResponseDTO;
 import br.cefetmg.pp_competask.dto.TarefaResponseDTO;
+import br.cefetmg.pp_competask.security.UsuarioLogado;
 import br.cefetmg.pp_competask.service.CheckinService;
 import br.cefetmg.pp_competask.service.ComunidadeService;
 import br.cefetmg.pp_competask.service.MensagemService;
@@ -69,10 +69,10 @@ public class ComunidadeController {
     }
 
     // listar comunidades do usuario logado
-    @GetMapping("/usuario/{idUsuario}")
+    @GetMapping("/minhas")
     @Operation(summary = "Buscar todas as comunidades do usuário", description = "")
-    public List<ComunidadeResponseDTO> getAllByUsuario(@PathVariable Long idUsuario) {
-        return comunidadeService.getAllByUsuario(idUsuario);
+    public List<ComunidadeResponseDTO> getAllByUsuario() {
+        return comunidadeService.getAllByUsuario(UsuarioLogado.getId());
     }
 
     // inserir comunidade
@@ -80,6 +80,7 @@ public class ComunidadeController {
     @Operation(summary = "Criar comunidade", description = "")
     public ResponseEntity<ComunidadeResponseDTO> inserir(
             @Valid @RequestBody ComunidadeRequestDTO comunidadeRequestDTO) {
+        comunidadeRequestDTO.setIdUsuarioCriador(UsuarioLogado.getId());
         ComunidadeResponseDTO comunidadeResponseDTO = comunidadeService.inserir(comunidadeRequestDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(comunidadeResponseDTO);
     }
@@ -123,9 +124,8 @@ public class ComunidadeController {
     // listar todas as tarefas por id da comunidade
     @GetMapping("/{id}/tarefas")
     @Operation(summary = "Buscar tarefas da comunidade por ID", description = "")
-    public List<TarefaResponseDTO> getAllByComunidadeId(@PathVariable Long id,
-            @RequestParam Long usuarioId) {
-        return tarefaService.buscarTarefasPorComunidadeId(id, usuarioId);
+    public List<TarefaResponseDTO> getAllByComunidadeId(@PathVariable Long id) {
+        return tarefaService.buscarTarefasPorComunidadeId(id, UsuarioLogado.getId());
     }
 
     // ranking da comunidade por período (semanal, mensal ou anual)
@@ -145,16 +145,8 @@ public class ComunidadeController {
     // entrar em comunidades que o usuário não é dono
     @PostMapping("/entrar/{id}")
     @Operation(summary = "Entrar em comunidades públicas", description = "")
-    public ResponseEntity<ComunidadeResponseDTO> entrarNaComunidade(@PathVariable Long id,
-            @RequestBody Map<String, Long> body) {
-
-        Long usuarioId = body.get("usuarioId");
-
-        if (usuarioId == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "usuarioId é obrigatório");
-        }
-
-        ComunidadeResponseDTO comunidade = comunidadeService.entrarNaComunidade(id, usuarioId);
+    public ResponseEntity<ComunidadeResponseDTO> entrarNaComunidade(@PathVariable Long id) {
+        ComunidadeResponseDTO comunidade = comunidadeService.entrarNaComunidade(id, UsuarioLogado.getId());
         return ResponseEntity.status(HttpStatus.CREATED).body(comunidade);
     }
 

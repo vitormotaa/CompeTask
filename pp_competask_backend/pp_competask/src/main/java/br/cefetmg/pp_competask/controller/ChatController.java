@@ -1,5 +1,7 @@
 package br.cefetmg.pp_competask.controller;
 
+import java.security.Principal;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -9,6 +11,7 @@ import org.springframework.stereotype.Controller;
 
 import br.cefetmg.pp_competask.dto.MensagemRequestDTO;
 import br.cefetmg.pp_competask.dto.MensagemResponseDTO;
+import br.cefetmg.pp_competask.security.UsuarioLogado;
 import br.cefetmg.pp_competask.service.MensagemService;
 
 // controller STOMP: recebe mensagens enviadas para /app/comunidade/{id}/enviar e retransmite para /topico/comunidade/{id}
@@ -20,7 +23,9 @@ public class ChatController {
 
 	@MessageMapping("/comunidade/{id}/enviar")
 	@SendTo("/topico/comunidade/{id}")
-	public MensagemResponseDTO enviar(@DestinationVariable Long id, @Payload MensagemRequestDTO mensagemRequestDTO) {
+	public MensagemResponseDTO enviar(@DestinationVariable Long id, @Payload MensagemRequestDTO mensagemRequestDTO,
+			Principal principal) {
+		mensagemRequestDTO.setUsuarioId(UsuarioLogado.getId(principal));
 		mensagemRequestDTO.setComunidadeId(id);
 		return mensagemService.enviar(mensagemRequestDTO);
 	}

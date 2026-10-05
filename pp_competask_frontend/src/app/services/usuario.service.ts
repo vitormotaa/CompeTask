@@ -3,7 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 
 import { UsuarioModel } from '../models/usuario.model';
 import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { map, switchMap, tap } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root',
@@ -32,8 +32,8 @@ export class UsuarioService {
     return this.http.get<boolean>(`${this.API_URL}/checkEmail`, {params});
   }
 
-  obterNome(id: number): Observable<string> {
-    return this.http.get(`${this.API_URL}/obterNome/${id}`, { responseType: 'text' });
+  obterNome(): Observable<string> {
+    return this.http.get(`${this.API_URL}/me/nome`, { responseType: 'text' });
   }
 
   // salvar(usuario: UsuarioModel): boolean {
@@ -53,22 +53,25 @@ export class UsuarioService {
   //   return true;
   // }
 
+  // o cadastro não devolve token, então autentica em seguida
   salvar(usuario: UsuarioModel): Observable<UsuarioModel> {
     const payload = this.converterParaBackend(usuario);
 
     return this.http.post<any>(this.API_URL, payload).pipe(
-      map((resultado: any) => this.converterParaModelo({ ...resultado, senha: usuario.senha }))
+      switchMap(() => this.login(usuario.email, usuario.senha ?? ''))
     );
   }
 
   login(email: string, senha: string): Observable<UsuarioModel> {
-    return this.http.post<any>(`${this.API_URL}/login`, { email, senha }).pipe(
+    return this.http.post<{ token: string }>(`${this.API_URL}/login`, { email, senha }).pipe(
+      tap((resultado) => localStorage.setItem('token', resultado.token)),
+      switchMap(() => this.http.get<any>(`${this.API_URL}/me`)),
       map((resultado: any) => this.converterParaModelo({ ...resultado, senha }))
     );
   }
 
-  excluirUsuario(id: string): Observable<UsuarioModel> {
-    return this.http.patch<any>(`${this.API_URL}/excluir/${id}`, {}).pipe(
+  excluirUsuario(): Observable<UsuarioModel> {
+    return this.http.patch<any>(`${this.API_URL}/me/excluir`, {}).pipe(
       map((resultado: any) => {
         const usuarioDesativado = this.converterParaModelo(resultado);
         this.excluirSessao();
@@ -87,6 +90,7 @@ export class UsuarioService {
 
   excluirSessao() {
     localStorage.removeItem('usuarioSessao');
+    localStorage.removeItem('token');
   }
 
   obterUsuarioSessao() {
@@ -105,9 +109,9 @@ export class UsuarioService {
   }
 
   // busca os dados atuais no backend (ex: streak atualizado por tarefas/check-ins)
-  buscarUsuarioAtual(id: string): Observable<UsuarioModel> {
+  buscarUsuarioAtual(): Observable<UsuarioModel> {
     const senhaAtual = this.obterUsuarioSessao()?.senha;
-    return this.http.get<any>(`${this.API_URL}/${id}`).pipe(
+    return this.http.get<any>(`${this.API_URL}/me`).pipe(
       map((resultado: any) => {
         const usuarioAtualizado = this.converterParaModelo({ ...resultado, senha: senhaAtual });
         this.salvarSessao(usuarioAtualizado);
@@ -125,7 +129,7 @@ export class UsuarioService {
   atualizarUsuarioLocal(usuario: UsuarioModel): Observable<UsuarioModel> {
     const payload = this.converterParaBackend(usuario);
 
-    return this.http.put<any>(`${this.API_URL}/${usuario.id}`, payload).pipe(
+    return this.http.put<any>(`${this.API_URL}/me`, payload).pipe(
       map((resultado: any) => {
         const usuarioAtualizado = this.converterParaModelo({ ...resultado, senha: usuario.senha });
         this.salvarSessao(usuarioAtualizado);

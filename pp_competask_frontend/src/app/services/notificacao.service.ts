@@ -12,15 +12,13 @@ export class NotificacaoService {
 
   constructor(private readonly http: HttpClient) { }
 
-  listar(usuarioId: number, somenteNaoLidas = false): Observable<NotificacaoModel[]> {
-    return this.http.get<NotificacaoModel[]>(`${this.API_URL}/usuario/${usuarioId}`, {
+  listar(somenteNaoLidas = false): Observable<NotificacaoModel[]> {
+    return this.http.get<NotificacaoModel[]>(this.API_URL, {
       params: { somenteNaoLidas },
     });
   }
 
-  marcarComoLida(id: number, usuarioId: number): Observable<NotificacaoModel> {
-    return this.http.patch<NotificacaoModel>(`${this.API_URL}/${id}/lida`, {}, {
-      params: { usuarioId },
-    });
+  marcarComoLida(id: number): Observable<NotificacaoModel> {
+    return this.http.patch<NotificacaoModel>(`${this.API_URL}/${id}/lida`, {});
   }
 }

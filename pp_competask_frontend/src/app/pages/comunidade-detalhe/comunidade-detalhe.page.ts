@@ -159,7 +159,7 @@ export class ComunidadeDetalhePage {
       return;
     }
 
-    this.comunidadesService.listarPorUsuario(usuarioAtual.id).subscribe({
+    this.comunidadesService.listarPorUsuario().subscribe({
       next: (comunidades) => {
         const comunidade = comunidades.find((item) => String(item.idComunidade) === id) || null;
 
@@ -175,6 +175,7 @@ export class ComunidadeDetalhePage {
           foto: comunidade.foto,
           adm: comunidade.membros.some((membro) => membro.usuarioId === Number(usuarioAtual.id) && membro.adm),
         };
+        comunidade.membros.forEach((membro) => this.nomesUsuarios.set(membro.usuarioId, membro.nomeUsuario));
         this.carregarTarefas(Number(usuarioAtual.id));
         this.carregarCheckins();
       },
@@ -325,7 +326,7 @@ export class ComunidadeDetalhePage {
       return;
     }
 
-    this.tarefasService.concluirParaTodos(tarefa, usuarioAtual.id).subscribe({
+    this.tarefasService.concluirParaTodos(tarefa).subscribe({
       next: (resultado) => {
         tarefa.concluida = resultado.concluida;
         this.carregarTarefas(Number(usuarioAtual.id));
@@ -361,7 +362,7 @@ export class ComunidadeDetalhePage {
   }
 
   private carregarTarefas(idUsuario: number): void {
-    this.comunidadesService.listarTarefas(this.comunidade.idComunidade, idUsuario).subscribe({
+    this.comunidadesService.listarTarefas(this.comunidade.idComunidade).subscribe({
       next: (tarefas) => {
         this.tarefas = tarefas;
       },
@@ -391,12 +392,7 @@ export class ComunidadeDetalhePage {
     const idsFaltantes = Array.from(new Set(checkins.map((checkin) => checkin.usuarioId)))
       .filter((id) => !this.nomesUsuarios.has(id));
 
-    idsFaltantes.forEach((id) => {
-      this.usuarioService.obterNome(id).subscribe({
-        next: (nome) => this.nomesUsuarios.set(id, nome),
-        error: () => this.nomesUsuarios.set(id, `Usuário #${id}`),
-      });
-    });
+    idsFaltantes.forEach((id) => this.nomesUsuarios.set(id, `Usuário #${id}`));
   }
 
   private carregarRanking(): void {
