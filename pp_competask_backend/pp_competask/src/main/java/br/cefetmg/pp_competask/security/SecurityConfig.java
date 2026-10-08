@@ -38,6 +38,9 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
+                // Sem isso, erros 400/404/409 viram 401 no redirecionamento interno para /error
+                .requestMatchers("/error").permitAll()
+
                 // Swagger
                 .requestMatchers("/docs/**", "/openapi-specs/**", "/swagger-ui/**", "/v3/api-docs/**",
                         "/swagger-ui.html").permitAll()
