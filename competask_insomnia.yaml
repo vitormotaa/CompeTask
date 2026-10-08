@@ -1,0 +1,537 @@
+type: collection.insomnia.rest/5.0
+name: CompeTask API
+meta:
+  id: wrk_competask
+  created: 1760000000000
+  modified: 1760000000000
+collection:
+  - name: Usuarios
+    meta:
+      id: fld_usuarios
+      sortKey: 1
+    children:
+      - url: "{{ _.base_url }}/usuarios/checkEmail?email=usuario@teste.com"
+        name: Checar e-mail (publico)
+        meta:
+          id: req_u_checkemail
+          sortKey: 1
+        method: GET
+      - url: "{{ _.base_url }}/usuarios"
+        name: Cadastrar usuario (publico)
+        meta:
+          id: req_u_cadastrar
+          sortKey: 2
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+              "nome": "Usuario Teste",
+              "email": "usuario@teste.com",
+              "senha": "123456"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+      - url: "{{ _.base_url }}/usuarios/login"
+        name: Login usuario (publico) - copiar token para env.token
+        meta:
+          id: req_u_login
+          sortKey: 3
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+              "email": "usuario@teste.com",
+              "senha": "123456"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+      - url: "{{ _.base_url }}/usuarios/login"
+        name: Login administrador (publico) - copiar token para env.token_admin
+        meta:
+          id: req_u_login_admin
+          sortKey: 4
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+              "email": "admin@teste.com",
+              "senha": "123456"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+      - url: "{{ _.base_url }}/usuarios/me"
+        name: Buscar usuario autenticado
+        meta:
+          id: req_u_me
+          sortKey: 5
+        method: GET
+        authentication:
+          type: bearer
+          token: "{{ _.token }}"
+      - url: "{{ _.base_url }}/usuarios/me/nome"
+        name: Obter nome do usuario autenticado
+        meta:
+          id: req_u_nome
+          sortKey: 6
+        method: GET
+        authentication:
+          type: bearer
+          token: "{{ _.token }}"
+      - url: "{{ _.base_url }}/usuarios/me"
+        name: Editar usuario
+        meta:
+          id: req_u_editar
+          sortKey: 7
+        method: PUT
+        body:
+          mimeType: application/json
+          text: |-
+            {
+              "nome": "Usuario Editado",
+              "email": "usuario@teste.com",
+              "senha": "123456"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+        authentication:
+          type: bearer
+          token: "{{ _.token }}"
+      - url: "{{ _.base_url }}/usuarios/me/foto"
+        name: Upload foto do usuario
+        meta:
+          id: req_u_foto
+          sortKey: 8
+        method: PATCH
+        body:
+          mimeType: multipart/form-data
+          params:
+            - name: arquivo
+              type: file
+              fileName: C:\caminho\para\foto.png
+        authentication:
+          type: bearer
+          token: "{{ _.token }}"
+      - url: "{{ _.base_url }}/usuarios/me/excluir"
+        name: Desativar usuario autenticado
+        meta:
+          id: req_u_excluir
+          sortKey: 9
+        method: PATCH
+        authentication:
+          type: bearer
+          token: "{{ _.token }}"
+  - name: Comunidades
+    meta:
+      id: fld_comunidades
+      sortKey: 2
+    children:
+      - url: "{{ _.base_url }}/comunidades"
+        name: Listar todas as comunidades
+        meta:
+          id: req_c_todas
+          sortKey: 1
+        method: GET
+        authentication:
+          type: bearer
+          token: "{{ _.token }}"
+      - url: "{{ _.base_url }}/comunidades/publicas"
+        name: Listar comunidades publicas
+        meta:
+          id: req_c_publicas
+          sortKey: 2
+        method: GET
+        authentication:
+          type: bearer
+          token: "{{ _.token }}"
+      - url: "{{ _.base_url }}/comunidades/minhas"
+        name: Listar minhas comunidades
+        meta:
+          id: req_c_minhas
+          sortKey: 3
+        method: GET
+        authentication:
+          type: bearer
+          token: "{{ _.token }}"
+      - url: "{{ _.base_url }}/comunidades"
+        name: Criar comunidade
+        meta:
+          id: req_c_criar
+          sortKey: 4
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+              "nome": "Comunidade Teste",
+              "descricao": "Descricao da comunidade",
+              "tipoAcesso": "PUBLICA"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+        authentication:
+          type: bearer
+          token: "{{ _.token }}"
+      - url: "{{ _.base_url }}/comunidades/{{ _.comunidade_id }}"
+        name: Editar comunidade
+        meta:
+          id: req_c_editar
+          sortKey: 5
+        method: PUT
+        body:
+          mimeType: application/json
+          text: |-
+            {
+              "nome": "Comunidade Editada",
+              "descricao": "Nova descricao",
+              "tipoAcesso": "PUBLICA"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+        authentication:
+          type: bearer
+          token: "{{ _.token }}"
+      - url: "{{ _.base_url }}/comunidades/foto/{{ _.comunidade_id }}"
+        name: Upload foto da comunidade
+        meta:
+          id: req_c_foto
+          sortKey: 6
+        method: PATCH
+        body:
+          mimeType: multipart/form-data
+          params:
+            - name: arquivo
+              type: file
+              fileName: C:\caminho\para\foto.png
+        authentication:
+          type: bearer
+          token: "{{ _.token }}"
+      - url: "{{ _.base_url }}/comunidades/entrar/{{ _.comunidade_id }}"
+        name: Entrar na comunidade
+        meta:
+          id: req_c_entrar
+          sortKey: 7
+        method: POST
+        authentication:
+          type: bearer
+          token: "{{ _.token }}"
+      - url: "{{ _.base_url }}/comunidades/{{ _.comunidade_id }}/tarefas"
+        name: Listar tarefas da comunidade
+        meta:
+          id: req_c_tarefas
+          sortKey: 8
+        method: GET
+        authentication:
+          type: bearer
+          token: "{{ _.token }}"
+      - url: "{{ _.base_url }}/comunidades/{{ _.comunidade_id }}/ranking?periodo=SEMANAL"
+        name: Ranking da comunidade (SEMANAL, MENSAL ou ANUAL)
+        meta:
+          id: req_c_ranking
+          sortKey: 9
+        method: GET
+        authentication:
+          type: bearer
+          token: "{{ _.token }}"
+      - url: "{{ _.base_url }}/comunidades/{{ _.comunidade_id }}/mensagens"
+        name: Historico de mensagens do chat
+        meta:
+          id: req_c_mensagens
+          sortKey: 10
+        method: GET
+        authentication:
+          type: bearer
+          token: "{{ _.token }}"
+      - url: "{{ _.base_url }}/comunidades/{{ _.comunidade_id }}"
+        name: Excluir comunidade
+        meta:
+          id: req_c_excluir
+          sortKey: 11
+        method: DELETE
+        authentication:
+          type: bearer
+          token: "{{ _.token }}"
+  - name: Tarefas
+    meta:
+      id: fld_tarefas
+      sortKey: 3
+    children:
+      - url: "{{ _.base_url }}/tarefas/minhas"
+        name: Listar minhas tarefas
+        meta:
+          id: req_t_minhas
+          sortKey: 1
+        method: GET
+        authentication:
+          type: bearer
+          token: "{{ _.token }}"
+      - url: "{{ _.base_url }}/tarefas/{{ _.tarefa_id }}"
+        name: Buscar tarefa por ID
+        meta:
+          id: req_t_id
+          sortKey: 2
+        method: GET
+        authentication:
+          type: bearer
+          token: "{{ _.token }}"
+      - url: "{{ _.base_url }}/tarefas"
+        name: Criar tarefa
+        meta:
+          id: req_t_criar
+          sortKey: 3
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+              "titulo": "Estudar Spring Security",
+              "descricao": "Revisar JWT",
+              "prioridade": 1,
+              "dataRealizacao": "2026-10-14",
+              "lembreteData": "2026-10-13",
+              "lembreteHora": "09:00",
+              "concluida": false
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+        authentication:
+          type: bearer
+          token: "{{ _.token }}"
+      - url: "{{ _.base_url }}/tarefas/comunidade"
+        name: Criar tarefa na comunidade
+        meta:
+          id: req_t_criar_com
+          sortKey: 4
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+              "titulo": "Tarefa da comunidade",
+              "descricao": "Descricao",
+              "prioridade": 2,
+              "dataRealizacao": "2026-10-14",
+              "comunidadeId": {{ _.comunidade_id }},
+              "inComunidade": true
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+        authentication:
+          type: bearer
+          token: "{{ _.token }}"
+      - url: "{{ _.base_url }}/tarefas/{{ _.tarefa_id }}"
+        name: Editar tarefa
+        meta:
+          id: req_t_editar
+          sortKey: 5
+        method: PUT
+        body:
+          mimeType: application/json
+          text: |-
+            {
+              "titulo": "Tarefa editada",
+              "descricao": "Nova descricao",
+              "prioridade": 3,
+              "dataRealizacao": "2026-10-15"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+        authentication:
+          type: bearer
+          token: "{{ _.token }}"
+      - url: "{{ _.base_url }}/tarefas/conclusao/{{ _.tarefa_id }}"
+        name: Alternar conclusao da tarefa
+        meta:
+          id: req_t_conclusao
+          sortKey: 6
+        method: PATCH
+        authentication:
+          type: bearer
+          token: "{{ _.token }}"
+      - url: "{{ _.base_url }}/tarefas/timer/{{ _.tarefa_id }}"
+        name: Definir tempo de execucao
+        meta:
+          id: req_t_timer
+          sortKey: 7
+        method: PATCH
+        body:
+          mimeType: application/json
+          text: |-
+            {
+              "tempoExecucao": "00:25:00"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+        authentication:
+          type: bearer
+          token: "{{ _.token }}"
+      - url: "{{ _.base_url }}/tarefas/{{ _.tarefa_id }}"
+        name: Excluir tarefa
+        meta:
+          id: req_t_excluir
+          sortKey: 8
+        method: DELETE
+        authentication:
+          type: bearer
+          token: "{{ _.token }}"
+  - name: Checkins
+    meta:
+      id: fld_checkins
+      sortKey: 4
+    children:
+      - url: "{{ _.base_url }}/checkins/comunidade/{{ _.comunidade_id }}"
+        name: Listar check-ins da comunidade
+        meta:
+          id: req_k_listar
+          sortKey: 1
+        method: GET
+        authentication:
+          type: bearer
+          token: "{{ _.token }}"
+      - url: "{{ _.base_url }}/checkins/imagens"
+        name: Upload de imagem do check-in
+        meta:
+          id: req_k_imagem
+          sortKey: 2
+        method: POST
+        body:
+          mimeType: multipart/form-data
+          params:
+            - name: arquivo
+              type: file
+              fileName: C:\caminho\para\foto.png
+        authentication:
+          type: bearer
+          token: "{{ _.token }}"
+      - url: "{{ _.base_url }}/checkins"
+        name: Criar check-in (usar url e publicId do upload)
+        meta:
+          id: req_k_criar
+          sortKey: 3
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+              "descricao": "Tarefa concluida",
+              "foto": "https://res.cloudinary.com/exemplo/image/upload/competask/foto.png",
+              "fotoPublicId": "competask/foto",
+              "dataHoraEnvio": "2026-10-10T10:00:00",
+              "comunidadeId": {{ _.comunidade_id }},
+              "tarefaId": {{ _.tarefa_id }}
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+        authentication:
+          type: bearer
+          token: "{{ _.token }}"
+      - url: "{{ _.base_url }}/checkins/{{ _.checkin_id }}"
+        name: Excluir check-in
+        meta:
+          id: req_k_excluir
+          sortKey: 4
+        method: DELETE
+        authentication:
+          type: bearer
+          token: "{{ _.token }}"
+  - name: Notificacoes
+    meta:
+      id: fld_notificacoes
+      sortKey: 5
+    children:
+      - url: "{{ _.base_url }}/notificacoes?somenteNaoLidas=false"
+        name: Listar notificacoes
+        meta:
+          id: req_n_listar
+          sortKey: 1
+        method: GET
+        authentication:
+          type: bearer
+          token: "{{ _.token }}"
+      - url: "{{ _.base_url }}/notificacoes/{{ _.notificacao_id }}/lida"
+        name: Marcar notificacao como lida
+        meta:
+          id: req_n_lida
+          sortKey: 2
+        method: PATCH
+        authentication:
+          type: bearer
+          token: "{{ _.token }}"
+  - name: Admin (perfil ADMINISTRADOR)
+    meta:
+      id: fld_admin
+      sortKey: 6
+    children:
+      - url: "{{ _.base_url }}/admin/usuarios"
+        name: Listar todos os usuarios (admin)
+        meta:
+          id: req_a_usuarios
+          sortKey: 1
+        method: GET
+        authentication:
+          type: bearer
+          token: "{{ _.token_admin }}"
+      - url: "{{ _.base_url }}/admin/usuarios"
+        name: Listar usuarios com perfil USUARIO (deve retornar 403)
+        meta:
+          id: req_a_usuarios_403
+          sortKey: 2
+        method: GET
+        authentication:
+          type: bearer
+          token: "{{ _.token }}"
+      - url: "{{ _.base_url }}/admin/usuarios"
+        name: Listar usuarios sem token (deve retornar 401)
+        meta:
+          id: req_a_usuarios_401
+          sortKey: 3
+        method: GET
+      - url: "{{ _.base_url }}/admin/usuarios/{{ _.usuario_id }}/desativar"
+        name: Desativar usuario (admin)
+        meta:
+          id: req_a_desativar
+          sortKey: 4
+        method: PATCH
+        authentication:
+          type: bearer
+          token: "{{ _.token_admin }}"
+      - url: "{{ _.base_url }}/admin/comunidades/{{ _.comunidade_id }}"
+        name: Excluir qualquer comunidade (admin)
+        meta:
+          id: req_a_excluir_com
+          sortKey: 5
+        method: DELETE
+        authentication:
+          type: bearer
+          token: "{{ _.token_admin }}"
+cookieJar:
+  name: Default Jar
+  meta:
+    id: jar_competask
+environments:
+  name: Base Environment
+  meta:
+    id: env_competask
+    isPrivate: false
+  data:
+    base_url: https://competask.onrender.com/api/v1
+    token: ""
+    token_admin: ""
+    comunidade_id: 1
+    tarefa_id: 1
+    checkin_id: 1
+    notificacao_id: 1
+    usuario_id: 1
