@@ -53,9 +53,6 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.POST, "/api/v1/usuarios").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/v1/usuarios/checkEmail").permitAll()
 
-                // DBF: rotas exclusivas do perfil ADMINISTRADOR
-                .requestMatchers("/api/v1/admin/**").hasAuthority("ADMINISTRADOR")
-
                 .anyRequest().authenticated())
             .exceptionHandling(exception -> exception
                 .authenticationEntryPoint((request, response, ex) ->

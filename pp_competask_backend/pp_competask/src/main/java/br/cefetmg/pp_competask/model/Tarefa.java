@@ -19,7 +19,7 @@ import lombok.ToString;
 @Getter
 @ToString
 @NoArgsConstructor
-@AllArgsConstructor
+// @AllArgsConstructor
 @Entity
 @Table(name = "tbtarefa")
 

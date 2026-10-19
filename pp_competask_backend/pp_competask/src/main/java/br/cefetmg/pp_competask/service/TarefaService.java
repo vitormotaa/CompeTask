@@ -20,6 +20,7 @@ import br.cefetmg.pp_competask.model.Usuario;
 import br.cefetmg.pp_competask.repository.CheckinRepository;
 import br.cefetmg.pp_competask.repository.ComunidadeRepository;
 import br.cefetmg.pp_competask.repository.MembroComunidadeRepository;
+import br.cefetmg.pp_competask.repository.NotificacaoRepository;
 import br.cefetmg.pp_competask.repository.TarefaRepository;
 import br.cefetmg.pp_competask.repository.UsuarioRepository;
 
@@ -40,6 +41,9 @@ public class TarefaService {
 
     @Autowired
     private CheckinRepository checkinRepository;
+
+    @Autowired
+    private NotificacaoRepository notificacaoRepository;
 
     @Autowired
     private StreakService streakService;
@@ -107,6 +111,7 @@ public class TarefaService {
 
             if (dto.getConcluida()) {
                 tarefa.setDataConfeccao(LocalDate.now().toString());
+                cancelarLembrete(tarefa);
                 streakService.registrarAtividade(tarefa.getUsuario());
             } else {
                 tarefa.setDataConfeccao(null);
@@ -144,6 +149,7 @@ public class TarefaService {
                 tarefa.isConcluida() ? LocalDate.now().toString() : null);
 
         if (tarefa.isConcluida()) {
+            cancelarLembrete(tarefa);
             streakService.registrarAtividade(tarefa.getUsuario());
         }
 
@@ -171,7 +177,8 @@ public class TarefaService {
                 .orElseThrow(() -> new IllegalArgumentException("Comunidade não encontrada"));
 
         MembroComunidade membroComunidade = membroComunidadeRepository
-                .findByUsuarioIdUsuarioAndComunidadeIdComunidade(dto.getUsuarioId(), dto.getComunidadeId());
+                .findByUsuarioIdUsuarioAndComunidadeIdComunidadeAndAtivoTrue(
+                        dto.getUsuarioId(), dto.getComunidadeId());
 
         if (membroComunidade == null) {
             throw new IllegalArgumentException("Usuário não pertence a esta comunidade.");
@@ -219,11 +226,18 @@ public class TarefaService {
 
     private void validarAdministrador(Long usuarioId, Long comunidadeId) {
         MembroComunidade membro = membroComunidadeRepository
-                .findByUsuarioIdUsuarioAndComunidadeIdComunidade(usuarioId, comunidadeId);
+                .findByUsuarioIdUsuarioAndComunidadeIdComunidadeAndAtivoTrue(usuarioId, comunidadeId);
 
         if (membro == null || !membro.isAdm()) {
             throw new IllegalArgumentException(
                     "Apenas administradores podem editar ou concluir tarefas da comunidade.");
         }
+    }
+
+    private void cancelarLembrete(Tarefa tarefa) {
+        tarefa.setLembreteData(null);
+        tarefa.setLembreteHora(null);
+        tarefa.setLembreteNotificada(false);
+        notificacaoRepository.excluirPendentesPorTarefaId(tarefa.getIdTarefa());
     }
 }

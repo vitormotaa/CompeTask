@@ -27,9 +27,9 @@ import { TarefasService } from '../../services/tarefas.service';
 import { UsuarioService } from '../../services/usuario.service';
 import { CheckinModel, CheckinsService } from '../../services/checkins.service';
 import { ChatService } from '../../services/chat.service';
-import { MensagemModel, RankingModel } from '../../models/comunidade.model';
+import { MensagemModel, MembroComunidadeModel, RankingModel } from '../../models/comunidade.model';
 
-type AbaComunidade = 'tarefas' | 'chat' | 'checkins' | 'ranking';
+type AbaComunidade = 'tarefas' | 'chat' | 'checkins' | 'ranking' | 'membros';
 type PeriodoRanking = 'semanal' | 'mensal' | 'anual';
 type OrdenacaoComunidade = 'status' | 'data' | 'prioridade' | 'alfabetica';
 
@@ -57,8 +57,11 @@ export class ComunidadeDetalhePage {
   fotoPreview = '';
   fotoArquivo: File | null = null;
   checkinEnviando = false;
+  saidaEmAndamento = false;
+  membrosCarregando = false;
   statusMenuAberto = false;
   ordenacaoAtual: OrdenacaoComunidade = 'status';
+  usuarioAtualId = 0;
 
   comunidade = {
     idComunidade: 0,
@@ -71,6 +74,7 @@ export class ComunidadeDetalhePage {
 
   tarefas: TarefaModel[] = [];
   mensagens: MensagemModel[] = [];
+  membros: MembroComunidadeModel[] = [];
   checkins: CheckinModel[] = [];
   ranking: RankingModel[] = [];
   rankingCarregando = false;
@@ -89,6 +93,7 @@ export class ComunidadeDetalhePage {
     { id: 'chat', label: 'Chat', icon: 'chatbubble-outline' },
     { id: 'checkins', label: 'Check-ins', icon: 'camera-outline' },
     { id: 'ranking', label: 'Ranking', icon: 'trophy-outline' },
+    { id: 'membros', label: 'Membros', icon: 'people-outline' },
   ];
 
   readonly periodos: Array<{ id: PeriodoRanking; label: string }> = [
@@ -158,6 +163,7 @@ export class ComunidadeDetalhePage {
       this.mensagemAcao = 'Voce precisa estar logado para ver esta comunidade.';
       return;
     }
+    this.usuarioAtualId = Number(usuarioAtual.id);
 
     this.comunidadesService.listarPorUsuario().subscribe({
       next: (comunidades) => {
@@ -175,6 +181,7 @@ export class ComunidadeDetalhePage {
           foto: comunidade.foto,
           adm: comunidade.membros.some((membro) => membro.usuarioId === Number(usuarioAtual.id) && membro.adm),
         };
+        this.membros = comunidade.membros;
         comunidade.membros.forEach((membro) => this.nomesUsuarios.set(membro.usuarioId, membro.nomeUsuario));
         this.carregarTarefas(Number(usuarioAtual.id));
         this.carregarCheckins();
@@ -238,6 +245,9 @@ export class ComunidadeDetalhePage {
     }
     if (aba === 'ranking') {
       this.carregarRanking();
+    }
+    if (aba === 'membros') {
+      this.carregarMembros();
     }
   }
 
@@ -313,6 +323,33 @@ export class ComunidadeDetalhePage {
   ehMinhaMensagem(mensagem: MensagemModel): boolean {
     const usuarioAtual = this.usuarioService.obterUsuarioSessao();
     return !!usuarioAtual?.id && mensagem.usuarioId === Number(usuarioAtual.id);
+  }
+
+  usuarioAtual(membro: MembroComunidadeModel): boolean {
+    return membro.usuarioId === this.usuarioAtualId;
+  }
+
+  sairDaComunidade(): void {
+    if (this.comunidade.adm || this.saidaEmAndamento) {
+      return;
+    }
+    if (!window.confirm('Tem certeza que deseja sair desta comunidade? Seus check-ins nela serão excluídos.')) {
+      return;
+    }
+
+    this.saidaEmAndamento = true;
+    this.comunidadesService.sair(this.comunidade.idComunidade).subscribe({
+      next: () => {
+        this.chatService.desconectar();
+        this.router.navigate(['/comunidades']);
+      },
+      error: (erro: HttpErrorResponse) => {
+        this.saidaEmAndamento = false;
+        this.mensagemAcao = String(
+          erro.error?.message ?? erro.error?.error ?? 'Nao foi possivel sair da comunidade.'
+        );
+      },
+    });
   }
 
   obterNomeCheckin(checkin: CheckinModel): string {
@@ -424,6 +461,26 @@ export class ComunidadeDetalhePage {
       },
       error: () => {
         this.mensagemAcao = 'Nao foi possivel carregar o historico do chat.';
+      },
+    });
+  }
+
+  private carregarMembros(): void {
+    if (!this.comunidade.idComunidade) {
+      return;
+    }
+
+    this.membrosCarregando = true;
+    this.comunidadesService.listarMembros(this.comunidade.idComunidade).subscribe({
+      next: (membros) => {
+        this.membros = membros;
+        this.comunidade.membros = membros.length;
+        membros.forEach((membro) => this.nomesUsuarios.set(membro.usuarioId, membro.nomeUsuario));
+        this.membrosCarregando = false;
+      },
+      error: () => {
+        this.mensagemAcao = 'Nao foi possivel carregar os membros da comunidade.';
+        this.membrosCarregando = false;
       },
     });
   }

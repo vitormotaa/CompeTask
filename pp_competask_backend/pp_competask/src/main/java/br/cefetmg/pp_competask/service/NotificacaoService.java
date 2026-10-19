@@ -15,6 +15,7 @@ import br.cefetmg.pp_competask.dto.NotificacaoResponseDTO;
 import br.cefetmg.pp_competask.model.MembroComunidade;
 import br.cefetmg.pp_competask.model.Notificacao;
 import br.cefetmg.pp_competask.model.Tarefa;
+import br.cefetmg.pp_competask.repository.CheckinRepository;
 import br.cefetmg.pp_competask.repository.MembroComunidadeRepository;
 import br.cefetmg.pp_competask.repository.NotificacaoRepository;
 import br.cefetmg.pp_competask.repository.TarefaRepository;
@@ -25,12 +26,14 @@ public class NotificacaoService {
     private final NotificacaoRepository notificacaoRepository;
     private final TarefaRepository tarefaRepository;
     private final MembroComunidadeRepository membroComunidadeRepository;
+    private final CheckinRepository checkinRepository;
 
     public NotificacaoService(NotificacaoRepository notificacaoRepository, TarefaRepository tarefaRepository,
-            MembroComunidadeRepository membroComunidadeRepository) {
+            MembroComunidadeRepository membroComunidadeRepository, CheckinRepository checkinRepository) {
         this.notificacaoRepository = notificacaoRepository;
         this.tarefaRepository = tarefaRepository;
         this.membroComunidadeRepository = membroComunidadeRepository;
+        this.checkinRepository = checkinRepository;
     }
 
     @Scheduled(fixedDelayString = "${competask.notificacoes.intervalo-ms:30000}")
@@ -48,8 +51,13 @@ public class NotificacaoService {
                 criarNotificacao(tarefa, tarefa.getUsuario(), lembrete);
             } else {
                 for (MembroComunidade membro : membroComunidadeRepository
-                        .findByComunidadeIdComunidade(tarefa.getComunidade().getIdComunidade())) {
-                    criarNotificacao(tarefa, membro.getUsuario(), lembrete);
+                        .findByComunidadeIdComunidadeAndAtivoTrue(tarefa.getComunidade().getIdComunidade())) {
+                    if (!checkinRepository.existsByUsuarioIdUsuarioAndComunidadeIdComunidadeAndTarefaIdTarefa(
+                            membro.getUsuario().getIdUsuario(),
+                            tarefa.getComunidade().getIdComunidade(),
+                            tarefa.getIdTarefa())) {
+                        criarNotificacao(tarefa, membro.getUsuario(), lembrete);
+                    }
                 }
             }
 

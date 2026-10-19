@@ -4,6 +4,7 @@ import java.util.List;
 
 import br.cefetmg.pp_competask.model.Comunidade;
 import br.cefetmg.pp_competask.model.Comunidade.TipoAcesso;
+import br.cefetmg.pp_competask.model.MembroComunidade;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -26,7 +27,10 @@ public class ComunidadeResponseDTO {
         this.tipoAcesso = comunidade.getTipoAcesso();
         this.foto = comunidade.getFoto();
         if (comunidade.getMembros() != null) {
-            this.membros = comunidade.getMembros().stream().map(MembroComunidadeResponseDTO::new).toList();
+            this.membros = comunidade.getMembros().stream()
+                    .filter(MembroComunidade::isAtivo)
+                    .map(MembroComunidadeResponseDTO::new)
+                    .toList();
         }
     }
 }

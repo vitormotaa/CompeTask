@@ -7,8 +7,6 @@ import java.util.List;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -24,7 +22,7 @@ import lombok.ToString;
 @Getter
 @ToString
 @NoArgsConstructor
-@AllArgsConstructor
+// @AllArgsConstructor
 @Entity
 @Table(name = "tbusuario")
 
@@ -58,11 +56,6 @@ public class Usuario {
 
     @Column(nullable = false)
     private Boolean ativo = true;
-
-    // DBF: o default permite adicionar a coluna com usuários já existentes
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false, columnDefinition = "varchar(255) default 'USUARIO'")
-    private Perfil perfil = Perfil.USUARIO;
 
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL)
     private List<MembroComunidade> comunidadesVinculadas = new ArrayList<>();

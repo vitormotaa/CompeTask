@@ -22,6 +22,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import br.cefetmg.pp_competask.dto.ComunidadeRequestDTO;
 import br.cefetmg.pp_competask.dto.ComunidadeResponseDTO;
+import br.cefetmg.pp_competask.dto.MembroComunidadeResponseDTO;
 import br.cefetmg.pp_competask.dto.MensagemResponseDTO;
 import br.cefetmg.pp_competask.dto.PeriodoRanking;
 import br.cefetmg.pp_competask.dto.RankingResponseDTO;
@@ -73,6 +74,18 @@ public class ComunidadeController {
     @Operation(summary = "Buscar todas as comunidades do usuário", description = "")
     public List<ComunidadeResponseDTO> getAllByUsuario() {
         return comunidadeService.getAllByUsuario(UsuarioLogado.getId());
+    }
+
+    @GetMapping("/{id}/membros")
+    @Operation(summary = "Buscar membros ativos da comunidade")
+    public List<MembroComunidadeResponseDTO> getMembros(@PathVariable Long id) {
+        try {
+            return comunidadeService.listarMembros(id, UsuarioLogado.getId());
+        } catch (IllegalArgumentException ex) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, ex.getMessage());
+        } catch (IllegalStateException ex) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, ex.getMessage());
+        }
     }
 
     // inserir comunidade
@@ -148,6 +161,22 @@ public class ComunidadeController {
     public ResponseEntity<ComunidadeResponseDTO> entrarNaComunidade(@PathVariable Long id) {
         ComunidadeResponseDTO comunidade = comunidadeService.entrarNaComunidade(id, UsuarioLogado.getId());
         return ResponseEntity.status(HttpStatus.CREATED).body(comunidade);
+    }
+
+    @DeleteMapping("/{id}/membros/me")
+    @Operation(summary = "Sair da comunidade")
+    public ResponseEntity<Void> sairDaComunidade(@PathVariable Long id) {
+        try {
+            comunidadeService.sairDaComunidade(id, UsuarioLogado.getId());
+            return ResponseEntity.noContent().build();
+        } catch (IllegalArgumentException ex) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, ex.getMessage());
+        } catch (IllegalStateException ex) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, ex.getMessage());
+        } catch (IOException ex) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
+                    "Não foi possível excluir a imagem do check-in.");
+        }
     }
 
 }

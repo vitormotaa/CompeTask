@@ -20,6 +20,7 @@ import br.cefetmg.pp_competask.model.Usuario;
 import br.cefetmg.pp_competask.repository.CheckinRepository;
 import br.cefetmg.pp_competask.repository.ComunidadeRepository;
 import br.cefetmg.pp_competask.repository.MembroComunidadeRepository;
+import br.cefetmg.pp_competask.repository.NotificacaoRepository;
 import br.cefetmg.pp_competask.repository.TarefaRepository;
 import br.cefetmg.pp_competask.repository.UsuarioRepository;
 
@@ -40,6 +41,9 @@ public class CheckinService {
 
 	@Autowired
 	private MembroComunidadeRepository membroComunidadeRepository;
+
+	@Autowired
+	private NotificacaoRepository notificacaoRepository;
 
 	@Autowired
 	private ImagemService imagemService;
@@ -75,7 +79,8 @@ public class CheckinService {
 		}
 
 		MembroComunidade membroComunidade = membroComunidadeRepository
-				.findByUsuarioIdUsuarioAndComunidadeIdComunidade(dto.getUsuarioId(), dto.getComunidadeId());
+				.findByUsuarioIdUsuarioAndComunidadeIdComunidadeAndAtivoTrue(
+						dto.getUsuarioId(), dto.getComunidadeId());
 
 		if (membroComunidade == null) {
 			throw new IllegalArgumentException("Usuário não pertence a esta comunidade.");
@@ -97,6 +102,7 @@ public class CheckinService {
 
 		membroComunidade.setPontuacao(membroComunidade.getPontuacao() + 1);
 		membroComunidadeRepository.save(membroComunidade);
+		notificacaoRepository.excluirPendentesPorTarefaEUsuario(tarefa.getIdTarefa(), usuario.getIdUsuario());
 
 		streakService.registrarAtividade(usuario);
 
@@ -141,7 +147,7 @@ public class CheckinService {
 			throw new IllegalArgumentException("Membro da comunidade não encontrado.");
 		}
 
-		membroComunidade.setPontuacao(membroComunidade.getPontuacao() - 1);
+		membroComunidade.setPontuacao(Math.max(0, membroComunidade.getPontuacao() - 1));
 		membroComunidadeRepository.save(membroComunidade);
 		imagemService.excluir(checkin.getFotoPublicId());
 		checkinRepository.delete(checkin);

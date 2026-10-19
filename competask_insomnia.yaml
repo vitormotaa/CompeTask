@@ -34,7 +34,7 @@ collection:
           - name: Content-Type
             value: application/json
       - url: "{{ _.base_url }}/usuarios/login"
-        name: Login usuario (publico) - copiar token para env.token
+        name: Login usuario (publico) 
         meta:
           id: req_u_login
           sortKey: 3
@@ -44,22 +44,6 @@ collection:
           text: |-
             {
               "email": "usuario@teste.com",
-              "senha": "123456"
-            }
-        headers:
-          - name: Content-Type
-            value: application/json
-      - url: "{{ _.base_url }}/usuarios/login"
-        name: Login administrador (publico) - copiar token para env.token_admin
-        meta:
-          id: req_u_login_admin
-          sortKey: 4
-        method: POST
-        body:
-          mimeType: application/json
-          text: |-
-            {
-              "email": "admin@teste.com",
               "senha": "123456"
             }
         headers:
@@ -470,53 +454,6 @@ collection:
         authentication:
           type: bearer
           token: "{{ _.token }}"
-  - name: Admin (perfil ADMINISTRADOR)
-    meta:
-      id: fld_admin
-      sortKey: 6
-    children:
-      - url: "{{ _.base_url }}/admin/usuarios"
-        name: Listar todos os usuarios (admin)
-        meta:
-          id: req_a_usuarios
-          sortKey: 1
-        method: GET
-        authentication:
-          type: bearer
-          token: "{{ _.token_admin }}"
-      - url: "{{ _.base_url }}/admin/usuarios"
-        name: Listar usuarios com perfil USUARIO (deve retornar 403)
-        meta:
-          id: req_a_usuarios_403
-          sortKey: 2
-        method: GET
-        authentication:
-          type: bearer
-          token: "{{ _.token }}"
-      - url: "{{ _.base_url }}/admin/usuarios"
-        name: Listar usuarios sem token (deve retornar 401)
-        meta:
-          id: req_a_usuarios_401
-          sortKey: 3
-        method: GET
-      - url: "{{ _.base_url }}/admin/usuarios/{{ _.usuario_id }}/desativar"
-        name: Desativar usuario (admin)
-        meta:
-          id: req_a_desativar
-          sortKey: 4
-        method: PATCH
-        authentication:
-          type: bearer
-          token: "{{ _.token_admin }}"
-      - url: "{{ _.base_url }}/admin/comunidades/{{ _.comunidade_id }}"
-        name: Excluir qualquer comunidade (admin)
-        meta:
-          id: req_a_excluir_com
-          sortKey: 5
-        method: DELETE
-        authentication:
-          type: bearer
-          token: "{{ _.token_admin }}"
 cookieJar:
   name: Default Jar
   meta:
@@ -529,7 +466,6 @@ environments:
   data:
     base_url: https://competask.onrender.com/api/v1
     token: ""
-    token_admin: ""
     comunidade_id: 1
     tarefa_id: 1
     checkin_id: 1

@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
-import { ComunidadeInput, ComunidadeModel, MensagemModel, RankingModel } from '../models/comunidade.model';
+import { ComunidadeInput, ComunidadeModel, MensagemModel, MembroComunidadeModel, RankingModel } from '../models/comunidade.model';
 import { TarefaModel } from '../models/tarefa.model';
 
 export type PeriodoRankingBackend = 'SEMANAL' | 'MENSAL' | 'ANUAL';
@@ -39,6 +39,16 @@ export class ComunidadesService {
     return this.http.post<any>(`${this.API_URL}/entrar/${idComunidade}`, {}).pipe(
       map((comunidade) => this.converterParaModelo(comunidade))
     );
+  }
+
+  listarMembros(idComunidade: number): Observable<MembroComunidadeModel[]> {
+    return this.http.get<any[]>(`${this.API_URL}/${idComunidade}/membros`).pipe(
+      map((membros) => membros.map((membro) => this.converterMembroParaModelo(membro)))
+    );
+  }
+
+  sair(idComunidade: number): Observable<void> {
+    return this.http.delete<void>(`${this.API_URL}/${idComunidade}/membros/me`);
   }
 
   listarTarefas(idComunidade: number): Observable<TarefaModel[]> {
@@ -96,12 +106,18 @@ export class ComunidadesService {
       descricao: String(comunidade?.descricao ?? ''),
       acesso: comunidade?.tipoAcesso === 'PRIVADA' ? 'privado' : 'publico',
       foto: String(comunidade?.foto ?? ''),
-      membros: Array.isArray(comunidade?.membros) ? comunidade.membros.map((membro: any) => ({
-        usuarioId: Number(membro?.usuarioId ?? 0),
-        nomeUsuario: String(membro?.nomeUsuario ?? ''),
-        adm: Boolean(membro?.adm ?? membro?.isAdm ?? false),
-        pontuacao: Number(membro?.pontuacao ?? 0),
-      })) : [],
+      membros: Array.isArray(comunidade?.membros)
+        ? comunidade.membros.map((membro: any) => this.converterMembroParaModelo(membro))
+        : [],
+    };
+  }
+
+  private converterMembroParaModelo(membro: any): MembroComunidadeModel {
+    return {
+      usuarioId: Number(membro?.usuarioId ?? 0),
+      nomeUsuario: String(membro?.nomeUsuario ?? ''),
+      adm: Boolean(membro?.adm ?? membro?.isAdm ?? false),
+      pontuacao: Number(membro?.pontuacao ?? 0),
     };
   }
 }

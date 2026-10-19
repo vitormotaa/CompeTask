@@ -22,7 +22,7 @@ import jakarta.persistence.Table;
 @Setter
 @Getter
 @NoArgsConstructor
-@AllArgsConstructor
+// @AllArgsConstructor
 @ToString
 @Entity
 @Table(name = "tbcomunidade")

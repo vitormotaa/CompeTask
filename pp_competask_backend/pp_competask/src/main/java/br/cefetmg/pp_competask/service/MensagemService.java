@@ -1,7 +1,9 @@
 package br.cefetmg.pp_competask.service;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -35,7 +37,14 @@ public class MensagemService {
 	@Transactional(readOnly = true)
 	public List<MensagemResponseDTO> buscarHistoricoPorComunidadeId(Long comunidadeId) {
 		List<Mensagem> mensagens = mensagemRepository.findAllByComunidadeIdComunidadeOrderByDataHoraEnvioAsc(comunidadeId);
-		return mensagens.stream().map(MensagemResponseDTO::new).toList();
+		Set<Long> membrosAtivos = membroComunidadeRepository.findByComunidadeIdComunidadeAndAtivoTrue(comunidadeId)
+				.stream()
+				.map(membro -> membro.getUsuario().getIdUsuario())
+				.collect(Collectors.toSet());
+		return mensagens.stream()
+				.map(mensagem -> new MensagemResponseDTO(mensagem,
+						!membrosAtivos.contains(mensagem.getUsuario().getIdUsuario())))
+				.toList();
 	}
 
 	@Transactional
@@ -46,7 +55,7 @@ public class MensagemService {
 		Comunidade comunidade = comunidadeRepository.findById(dto.getComunidadeId())
 				.orElseThrow(() -> new IllegalArgumentException("Comunidade não encontrada."));
 
-		boolean membro = membroComunidadeRepository.existsByUsuarioIdUsuarioAndComunidadeIdComunidade(
+		boolean membro = membroComunidadeRepository.existsByUsuarioIdUsuarioAndComunidadeIdComunidadeAndAtivoTrue(
 				dto.getUsuarioId(), dto.getComunidadeId());
 		if (!membro) {
 			throw new IllegalArgumentException("Usuário não pertence a esta comunidade.");
@@ -58,6 +67,6 @@ public class MensagemService {
 		mensagem.setConteudo(dto.getConteudo());
 		mensagem.setDataHoraEnvio(LocalDateTime.now());
 
-		return new MensagemResponseDTO(mensagemRepository.save(mensagem));
+		return new MensagemResponseDTO(mensagemRepository.save(mensagem), false);
 	}
 }

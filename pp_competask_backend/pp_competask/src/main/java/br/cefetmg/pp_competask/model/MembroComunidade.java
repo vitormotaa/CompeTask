@@ -1,5 +1,7 @@
 package br.cefetmg.pp_competask.model;
 
+import java.time.LocalDateTime;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -16,7 +18,7 @@ import lombok.ToString;
 
 @Getter
 @Setter
-@AllArgsConstructor
+// @AllArgsConstructor
 @NoArgsConstructor
 @ToString
 @Entity
@@ -39,4 +41,10 @@ public class MembroComunidade {
 
     @Column(name = "pontuacao", nullable = false)
     private int pontuacao = 0; 
+
+    @Column(nullable = false, columnDefinition = "boolean default true")
+    private boolean ativo = true;
+
+    @Column(nullable = true)
+    private LocalDateTime dataSaida;
 }

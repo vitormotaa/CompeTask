@@ -18,13 +18,19 @@ public class MensagemResponseDTO {
     private Long comunidadeId;
     private String conteudo;
     private LocalDateTime dataHoraEnvio;
+    private boolean autorSaiu;
 
     public MensagemResponseDTO(Mensagem mensagem) {
+        this(mensagem, false);
+    }
+
+    public MensagemResponseDTO(Mensagem mensagem, boolean autorSaiu) {
         this.id = mensagem.getIdMensagem();
         this.usuarioId = mensagem.getUsuario().getIdUsuario();
         this.nomeUsuario = mensagem.getUsuario().getNome();
         this.comunidadeId = mensagem.getComunidade().getIdComunidade();
         this.conteudo = mensagem.getConteudo();
         this.dataHoraEnvio = mensagem.getDataHoraEnvio();
+        this.autorSaiu = autorSaiu;
     }
 }

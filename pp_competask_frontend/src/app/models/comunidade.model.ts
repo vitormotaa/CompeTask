@@ -38,4 +38,5 @@ export interface MensagemModel {
   comunidadeId: number;
   conteudo: string;
   dataHoraEnvio: string;
+  autorSaiu?: boolean;
 }

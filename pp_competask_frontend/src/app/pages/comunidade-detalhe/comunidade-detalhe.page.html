@@ -26,6 +26,29 @@
     <p class="action-message" *ngIf="mensagemAcao">{{ mensagemAcao }}</p>
 
     <section class="community-tab-content" [ngSwitch]="abaAtual">
+      <div *ngSwitchCase="'membros'" class="community-ranking">
+        <p class="empty-state" *ngIf="membrosCarregando">Carregando membros...</p>
+        <p class="empty-state" *ngIf="!membrosCarregando && membros.length === 0">Nenhum membro encontrado.</p>
+
+        <article *ngFor="let membro of membros" class="ranking-row">
+          <span *ngIf="membro.adm" class="ranking-position">A</span>
+          <div>
+            <strong>{{ membro.nomeUsuario }}<span *ngIf="usuarioAtual(membro)"> (Você)</span></strong>
+            <span *ngIf="membro.adm"> · Administrador da comunidade</span>
+          </div>
+          <span>{{ membro.pontuacao }} pts</span>
+        </article>
+
+        <button
+          *ngIf="!usuarioEhAdministrador"
+          type="button"
+          class="checkin-modal__button checkin-modal__button--muted"
+          [disabled]="saidaEmAndamento"
+          (click)="sairDaComunidade()">
+          {{ saidaEmAndamento ? 'Saindo...' : 'Sair da comunidade' }}
+        </button>
+      </div>
+
       <div *ngSwitchCase="'tarefas'" class="community-tasks">
         <div class="task-toolbar">
           <span>{{ tarefas.length }} tarefas</span>
@@ -96,7 +119,10 @@
 
         <div class="chat-messages" *ngIf="mensagens.length > 0">
           <article *ngFor="let mensagem of mensagens" class="chat-bubble" [class.chat-bubble--mine]="ehMinhaMensagem(mensagem)">
-            <strong *ngIf="!ehMinhaMensagem(mensagem)">{{ mensagem.nomeUsuario }}</strong>
+            <strong>
+              {{ mensagem.nomeUsuario }}
+              <small *ngIf="mensagem.autorSaiu">(saiu da comunidade)</small>
+            </strong>
             <p>{{ mensagem.conteudo }}</p>
           </article>
         </div>
