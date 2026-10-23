@@ -51,7 +51,7 @@
 
     <div class="community-modal-backdrop" *ngIf="modalAberto" (click)="fecharModal()"></div>
 
-    <section class="community-modal" *ngIf="modalAberto" role="dialog" aria-modal="true" aria-label="Acoes de comunidades">
+    <section class="community-modal" *ngIf="modalAberto" role="dialog" aria-modal="true" aria-label="Ações de comunidades">
       <header class="community-modal__header">
         <h2>Comunidades</h2>
         <button type="button" class="community-modal__close" (click)="fecharModal()" aria-label="Fechar">
@@ -71,7 +71,7 @@
           <span class="community-modal__icon community-modal__icon--cyan">
             <ion-icon name="globe-outline"></ion-icon>
           </span>
-          <span>Buscar comunidades publicas</span>
+          <span>Buscar comunidades públicas</span>
         </button>
 
         <button type="button" class="community-modal__option" (click)="selecionarAcao('privadas')">
@@ -85,9 +85,9 @@
 
     <div class="community-modal-backdrop" *ngIf="modalPublicasAberto" (click)="fecharModalPublicas()"></div>
 
-    <section class="public-communities-modal" *ngIf="modalPublicasAberto" role="dialog" aria-modal="true" aria-label="Comunidades publicas">
+    <section class="public-communities-modal" *ngIf="modalPublicasAberto" role="dialog" aria-modal="true" aria-label="Comunidades públicas">
       <header class="community-modal__header">
-        <h2>Comunidades publicas</h2>
+        <h2>Comunidades públicas</h2>
         <button type="button" class="community-modal__close" (click)="fecharModalPublicas()" aria-label="Fechar">
           <ion-icon name="close-outline"></ion-icon>
         </button>
@@ -99,7 +99,7 @@
       </label>
 
       <p class="public-communities-modal__empty" *ngIf="comunidadesPublicas.length === 0">
-        Nao ha novas comunidades publicas para voce entrar.
+        Não há novas comunidades públicas para você entrar.
       </p>
 
       <p class="public-communities-modal__empty" *ngIf="comunidadesPublicas.length > 0 && comunidadesPublicasFiltradas.length === 0">
@@ -131,10 +131,10 @@
 
     <section class="private-modal" *ngIf="modalPrivadoAberto" role="dialog" aria-modal="true" aria-label="Entrar em comunidade privada">
       <h2>Entrar em comunidade privada</h2>
-      <p>Informe o codigo e a senha da comunidade.</p>
+      <p>Informe o código e a senha da comunidade.</p>
 
       <label class="private-modal__field">
-        <input type="text" name="codigoPrivado" [(ngModel)]="codigoPrivado" placeholder="Codigo" />
+        <input type="text" name="codigoPrivado" [(ngModel)]="codigoPrivado" placeholder="Código" />
       </label>
 
       <label class="private-modal__field">
@@ -148,7 +148,7 @@
     </section>
   </section>
 
-  <nav class="bottom-nav" aria-label="Navegacao inferior">
+  <nav class="bottom-nav" aria-label="Navegação inferior">
     <button
       *ngFor="let atalho of atalhosRodape"
       type="button"

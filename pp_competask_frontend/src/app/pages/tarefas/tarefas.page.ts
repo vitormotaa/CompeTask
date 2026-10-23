@@ -260,7 +260,7 @@ export class TarefasPage {
   //   });
   // }
 
-  //esse método de cima já existia, tava dando um erro nele por conta dessa atualizadaEm (que na prática nem existe mais), ai eu pedi pro gemini corrigir e ele deu esse método aqui de baixo, vou deixar tudo aqui porque nao sei o funcionamento exato de nada disso
+  //esse método de cima já existia, tava dando um erro nele por conta dessa atualizadaEm (que na prática nem existe mais), ai eu pedi pro gemini corrigir e ele deu esse método aqui de baixo, vou deixar tudo aqui porque não sei o funcionamento exato de nada disso
 
   private ordenarTarefas(tarefas: TarefaModel[]): TarefaModel[] {
     return [...tarefas].sort((a, b) => {

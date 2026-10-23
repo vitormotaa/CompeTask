@@ -31,10 +31,10 @@
         <p class="empty-state" *ngIf="!membrosCarregando && membros.length === 0">Nenhum membro encontrado.</p>
 
         <article *ngFor="let membro of membros" class="ranking-row">
-          <span *ngIf="membro.adm" class="ranking-position">A</span>
+          <span class="ranking-position" [class.ranking-position--admin]="membro.adm">{{ membro.adm ? 'A' : (membro.nomeUsuario || '?').charAt(0).toUpperCase() }}</span>
           <div>
             <strong>{{ membro.nomeUsuario }}<span *ngIf="usuarioAtual(membro)"> (Você)</span></strong>
-            <span *ngIf="membro.adm"> · Administrador da comunidade</span>
+            <small *ngIf="membro.adm">Administrador da comunidade</small>
           </div>
           <span>{{ membro.pontuacao }} pts</span>
         </article>
@@ -181,7 +181,7 @@
 
   <section class="checkin-modal" *ngIf="novoCheckinAberto" role="dialog" aria-modal="true" aria-label="Novo check-in">
     <h2>Novo check-in</h2>
-    <p>Prove que voce concluiu a tarefa.</p>
+    <p>Prove que você concluiu a tarefa.</p>
 
     <label class="photo-drop" for="checkinFotoInput">
       <img *ngIf="fotoPreview" [src]="fotoPreview" alt="Pré-visualização da foto" />
@@ -199,8 +199,8 @@
       </option>
     </select>
 
-    <input type="text" name="checkinTitulo" [(ngModel)]="checkinTitulo" placeholder="Titulo *" required />
-    <textarea name="checkinDescricao" [(ngModel)]="checkinDescricao" placeholder="Descricao"></textarea>
+    <input type="text" name="checkinTitulo" [(ngModel)]="checkinTitulo" placeholder="Título *" required />
+    <textarea name="checkinDescricao" [(ngModel)]="checkinDescricao" placeholder="Descrição"></textarea>
 
     <div class="checkin-modal__actions">
       <button type="button" class="checkin-modal__button checkin-modal__button--muted" (click)="fecharNovoCheckin()">Cancelar</button>
@@ -210,7 +210,7 @@
     </div>
   </section>
 
-  <nav class="community-tabs" aria-label="Navegacao da comunidade">
+  <nav class="community-tabs" aria-label="Navegação da comunidade">
     <button
       *ngFor="let aba of abas"
       type="button"

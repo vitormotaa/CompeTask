@@ -1,11 +1,15 @@
+import { AsyncPipe, NgIf } from '@angular/common';
 import { Component } from '@angular/core';
 import { IonApp, IonRouterOutlet } from '@ionic/angular/standalone';
+
+import { LoadingService } from './services/loading.service';
 
 @Component({
   selector: 'app-root',
   templateUrl: 'app.component.html',
-  imports: [IonApp, IonRouterOutlet],
+  styleUrls: ['app.component.scss'],
+  imports: [IonApp, IonRouterOutlet, NgIf, AsyncPipe],
 })
 export class AppComponent {
-  constructor() {}
+  constructor(readonly loading: LoadingService) {}
 }

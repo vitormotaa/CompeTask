@@ -62,7 +62,7 @@ public class ComunidadeController {
         return comunidadeService.getAll();
     }
 
-    // listar todas as comunidades publicas
+    // listar todas as comunidades públicas
     @GetMapping("/publicas")
     @Operation(summary = "Buscar todas as comunidades públicas", description = "")
     public List<ComunidadeResponseDTO> getAllPublicas() {

@@ -57,7 +57,7 @@ public class TarefaService {
     @Transactional(readOnly = true)
     public TarefaResponseDTO buscarPorId(Long id) {
         Tarefa tarefa = tarefaRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Tarefa nao encontrada."));
+                .orElseThrow(() -> new IllegalArgumentException("Tarefa não encontrada."));
 
         return new TarefaResponseDTO(tarefa);
     }
@@ -65,7 +65,7 @@ public class TarefaService {
     @Transactional
     public TarefaResponseDTO inserir(TarefaRequestDTO dto) {
         Usuario usuario = usuarioRepository.findById(dto.getUsuarioId())
-                .orElseThrow(() -> new IllegalArgumentException("Usuario nao encontrado. Faca login novamente."));
+                .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado. Faça login novamente."));
 
         Tarefa tarefa = new Tarefa();
         tarefa.setUsuario(usuario);
@@ -86,7 +86,7 @@ public class TarefaService {
     @Transactional
     public TarefaResponseDTO atualizar(Long id, TarefaRequestDTO dto) {
         Tarefa tarefa = tarefaRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Tarefa nao encontrada."));
+                .orElseThrow(() -> new IllegalArgumentException("Tarefa não encontrada."));
 
         boolean lembreteAlterado = !Objects.equals(tarefa.getLembreteData(), dto.getLembreteData())
             || !Objects.equals(tarefa.getLembreteHora(), dto.getLembreteHora());
@@ -125,7 +125,7 @@ public class TarefaService {
     public void excluir(Long id) {
         // verificar se existe pra ai mandar excluir
         if (!tarefaRepository.existsById(id)) {
-            throw new IllegalArgumentException("Tarefa nao encontrada.");
+            throw new IllegalArgumentException("Tarefa não encontrada.");
         }
 
         tarefaRepository.deleteById(id);
@@ -134,7 +134,7 @@ public class TarefaService {
     @Transactional
     public TarefaResponseDTO alterarConclusao(Long id, Long usuarioId) {
         Tarefa tarefa = tarefaRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Tarefa nao encontrada."));
+                .orElseThrow(() -> new IllegalArgumentException("Tarefa não encontrada."));
 
         if (tarefa.isInComunidade()) {
             validarAdministrador(usuarioId, tarefa.getComunidade().getIdComunidade());
@@ -159,7 +159,7 @@ public class TarefaService {
     @Transactional
     public TarefaResponseDTO timerTarefa(Long id, String tempoExecucao) {
         if (!tarefaRepository.existsById(id)) {
-            throw new IllegalArgumentException("Tarefa nao encontrada.");
+            throw new IllegalArgumentException("Tarefa não encontrada.");
         }
 
         Tarefa tarefa = tarefaRepository.findById(id).orElse(null);
@@ -171,7 +171,7 @@ public class TarefaService {
     @Transactional
     public TarefaResponseDTO inserirNaComunidade(TarefaRequestDTO dto) {
         Usuario usuario = usuarioRepository.findById(dto.getUsuarioId())
-                .orElseThrow(() -> new IllegalArgumentException("Usuario nao encontrado. Faca login novamente."));
+                .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado. Faça login novamente."));
 
         Comunidade comunidade = comunidadeRepository.findById(dto.getComunidadeId())
                 .orElseThrow(() -> new IllegalArgumentException("Comunidade não encontrada"));

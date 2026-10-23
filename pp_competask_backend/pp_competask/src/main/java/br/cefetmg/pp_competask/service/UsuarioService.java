@@ -43,7 +43,7 @@ public class UsuarioService {
 
     @Transactional
     public UsuarioResponseDTO inserir(UsuarioRequestDTO dto){
-        //se nao existir pode criar, se existir e estiver desativado ai tem que ver os role
+        //se não existir pode criar, se existir e estiver desativado ai tem que ver os role
         if (!usuarioRepository.existsByEmail(dto.getEmail())) {
             Usuario usuario = new Usuario();
             usuario.setAtivo(true);
@@ -96,7 +96,7 @@ public class UsuarioService {
     @Transactional
     public UsuarioResponseDTO excluir(Long id){
         if (!usuarioRepository.existsById(id)) {
-            throw new IllegalArgumentException("Usuario nao encontrado.");
+            throw new IllegalArgumentException("Usuário não encontrado.");
         }
 
         Usuario usuario = usuarioRepository.findById(id).orElse(null);
@@ -108,11 +108,11 @@ public class UsuarioService {
     }
 
 
-    @Transactional // -> nao pode alterar email
+    @Transactional // -> não pode alterar email
     public UsuarioResponseDTO alterar(Long id, UsuarioRequestDTO dto){
-        Usuario usuario = usuarioRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Usuario nao encontrado."));
+        Usuario usuario = usuarioRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado."));
 
-        //ver se usuario ta ativo? meio que nao precisa mas adicionaria uma seguranca a mais
+        //ver se usuario ta ativo? meio que não precisa mas adicionaria uma segurança a mais
 
         usuario.setFoto(dto.getFoto());
         usuario.setNome(dto.getNome());
@@ -127,7 +127,7 @@ public class UsuarioService {
     @Transactional
     public UsuarioResponseDTO atualizarFoto(Long id, MultipartFile arquivo) throws IOException {
         Usuario usuario = usuarioRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Usuario nao encontrado."));
+                .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado."));
 
         ImagemUploadDTO imagem = imagemService.salvar(arquivo);
             if (imagem == null) {

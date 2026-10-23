@@ -116,7 +116,7 @@ export class ComunidadesPage {
 
     if (!usuarioAtual?.id) {
       this.comunidades = [];
-      this.mensagemAcao = 'Voce precisa estar logado para ver suas comunidades.';
+      this.mensagemAcao = 'Você precisa estar logado para ver suas comunidades.';
       return;
     }
 
@@ -129,7 +129,7 @@ export class ComunidadesPage {
         this.carregando = false;
       },
       error: () => {
-        this.mensagemAcao = 'Nao foi possivel carregar as comunidades.';
+        this.mensagemAcao = 'Não foi possível carregar as comunidades.';
         this.carregando = false;
       },
     });
@@ -139,7 +139,7 @@ export class ComunidadesPage {
     const usuarioAtual = this.usuarioService.obterUsuarioSessao();
 
     if (!usuarioAtual?.id) {
-      this.mensagemAcao = 'Voce precisa estar logado para buscar comunidades publicas.';
+      this.mensagemAcao = 'Você precisa estar logado para buscar comunidades públicas.';
       return;
     }
 
@@ -157,7 +157,7 @@ export class ComunidadesPage {
         this.carregando = false;
       },
       error: () => {
-        this.mensagemAcao = 'Nao foi possivel carregar as comunidades publicas.';
+        this.mensagemAcao = 'Não foi possível carregar as comunidades públicas.';
         this.carregando = false;
       },
     });
@@ -205,7 +205,7 @@ export class ComunidadesPage {
 
   entrarComunidadePrivada(): void {
     this.modalPrivadoAberto = false;
-    this.mensagemAcao = 'Entrada em comunidade privada ainda nao esta no backend.';
+    this.mensagemAcao = 'Entrada em comunidade privada ainda não está no backend.';
   }
 
   selecionarAcao(acao: AcaoModalComunidade): void {
@@ -228,7 +228,7 @@ export class ComunidadesPage {
     const usuarioAtual = this.usuarioService.obterUsuarioSessao();
 
     if (!usuarioAtual?.id) {
-      this.mensagemAcao = 'Voce precisa estar logado para entrar em uma comunidade.';
+      this.mensagemAcao = 'Você precisa estar logado para entrar em uma comunidade.';
       return;
     }
 
@@ -238,11 +238,11 @@ export class ComunidadesPage {
         this.comunidadesPublicas = this.comunidadesPublicas.filter((item) => item.idComunidade !== comunidade.idComunidade);
         this.entrandoComunidadeId = null;
         this.fecharModalPublicas();
-        this.carregarComunidades(`Voce entrou em ${comunidade.nome}.`);
+        this.carregarComunidades(`Você entrou em ${comunidade.nome}.`);
       },
       error: () => {
         this.entrandoComunidadeId = null;
-        this.mensagemAcao = 'Nao foi possivel entrar na comunidade.';
+        this.mensagemAcao = 'Não foi possível entrar na comunidade.';
       },
     });
   }
@@ -261,6 +261,6 @@ export class ComunidadesPage {
       return;
     }
 
-    this.mensagemAcao = `${atalho.label} ainda sera ligado ao backend.`;
+    this.mensagemAcao = `${atalho.label} ainda será ligado ao backend.`;
   }
 }

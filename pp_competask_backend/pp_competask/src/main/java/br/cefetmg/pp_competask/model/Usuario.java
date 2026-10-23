@@ -42,7 +42,7 @@ public class Usuario {
     private String senha;
 
     @Column(columnDefinition = "TEXT", nullable = true)
-    private String foto; //na teoria daria pra ja comecar a foto com uma url de imagem padrao (aquele bonequinho la) ai caso o usuario nao bote foto, vai essa padrao e se botar so sobrescreve
+    private String foto; //na teoria daria pra já começar a foto com uma url de imagem padrao (aquele bonequinho la) ai caso o usuario não bote foto, vai essa padrao e se botar só sobrescreve
 
     @Column(length = 255, nullable = true)
     private String fotoPublicId;
@@ -50,7 +50,7 @@ public class Usuario {
     @Column(nullable = false)
     private Integer streak = 0;
 
-    // ultimo dia (inclusive) contabilizado na streak; usado para saber se ja contou hoje ou se a sequencia quebrou
+    // ?ltimo dia (inclusive) contabilizado na streak; usado para saber se já contou hoje ou se a sequencia quebrou
     @Column(nullable = true)
     private LocalDate ultimaAtividadeStreak;
 

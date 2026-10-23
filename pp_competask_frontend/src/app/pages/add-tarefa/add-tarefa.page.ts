@@ -254,7 +254,7 @@ export class TarefaPage {
     const mensagem = this.obterMensagemErro(erro);
     this.mensagemAcao = mensagem;
 
-    if (mensagem.includes('Usuario nao encontrado')) {
+    if (mensagem.includes('Usuário não encontrado')) {
       this.usuarioService.excluirSessao();
       this.router.navigate(['/login']);
     }
@@ -273,6 +273,6 @@ export class TarefaPage {
       return String(erro.message);
     }
 
-    return 'Nao foi possivel salvar a tarefa.';
+    return 'Não foi possível salvar a tarefa.';
   }
 }

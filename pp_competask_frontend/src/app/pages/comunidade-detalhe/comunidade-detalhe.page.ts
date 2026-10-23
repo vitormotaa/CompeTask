@@ -153,14 +153,14 @@ export class ComunidadeDetalhePage {
     const id = this.route.snapshot.paramMap.get('id');
 
     if (!id) {
-      this.mensagemAcao = 'Comunidade nao encontrada.';
+      this.mensagemAcao = 'Comunidade não encontrada.';
       return;
     }
 
     const usuarioAtual = this.usuarioService.obterUsuarioSessao();
 
     if (!usuarioAtual?.id) {
-      this.mensagemAcao = 'Voce precisa estar logado para ver esta comunidade.';
+      this.mensagemAcao = 'Você precisa estar logado para ver esta comunidade.';
       return;
     }
     this.usuarioAtualId = Number(usuarioAtual.id);
@@ -170,7 +170,7 @@ export class ComunidadeDetalhePage {
         const comunidade = comunidades.find((item) => String(item.idComunidade) === id) || null;
 
         if (!comunidade) {
-          this.mensagemAcao = 'Comunidade nao encontrada.';
+          this.mensagemAcao = 'Comunidade não encontrada.';
           return;
         }
 
@@ -187,7 +187,7 @@ export class ComunidadeDetalhePage {
         this.carregarCheckins();
       },
       error: () => {
-        this.mensagemAcao = 'Nao foi possivel carregar a comunidade.';
+        this.mensagemAcao = 'Não foi possível carregar a comunidade.';
       },
     });
   }
@@ -277,7 +277,7 @@ export class ComunidadeDetalhePage {
 
     if (!usuarioAtual?.id || !tarefa || tarefa.concluida || !this.fotoArquivo || !this.checkinTitulo.trim()) {
       this.mensagemAcao = !this.checkinTitulo.trim()
-        ? 'Informe um titulo para o check-in.'
+        ? 'Informe um título para o check-in.'
         : !this.fotoArquivo ? 'Adicione uma foto para fazer o check-in.' : 'Selecione uma tarefa válida.';
       return;
     }
@@ -346,7 +346,7 @@ export class ComunidadeDetalhePage {
       error: (erro: HttpErrorResponse) => {
         this.saidaEmAndamento = false;
         this.mensagemAcao = String(
-          erro.error?.message ?? erro.error?.error ?? 'Nao foi possivel sair da comunidade.'
+          erro.error?.message ?? erro.error?.error ?? 'Não foi possível sair da comunidade.'
         );
       },
     });
@@ -368,7 +368,7 @@ export class ComunidadeDetalhePage {
         tarefa.concluida = resultado.concluida;
         this.carregarTarefas(Number(usuarioAtual.id));
       },
-      error: () => this.mensagemAcao = 'Nao foi possivel alterar a conclusao da tarefa.',
+      error: () => this.mensagemAcao = 'Não foi possível alterar a conclusão da tarefa.',
     });
   }
 
@@ -404,7 +404,7 @@ export class ComunidadeDetalhePage {
         this.tarefas = tarefas;
       },
       error: () => {
-        this.mensagemAcao = 'Nao foi possivel carregar as tarefas da comunidade.';
+        this.mensagemAcao = 'Não foi possível carregar as tarefas da comunidade.';
       },
     });
   }
@@ -420,7 +420,7 @@ export class ComunidadeDetalhePage {
         this.carregarNomesUsuarios(checkins);
       },
       error: () => {
-        this.mensagemAcao = 'Nao foi possivel carregar os check-ins da comunidade.';
+        this.mensagemAcao = 'Não foi possível carregar os check-ins da comunidade.';
       },
     });
   }
@@ -444,7 +444,7 @@ export class ComunidadeDetalhePage {
         this.rankingCarregando = false;
       },
       error: () => {
-        this.mensagemAcao = 'Nao foi possivel carregar o ranking da comunidade.';
+        this.mensagemAcao = 'Não foi possível carregar o ranking da comunidade.';
         this.rankingCarregando = false;
       },
     });
@@ -460,7 +460,7 @@ export class ComunidadeDetalhePage {
         this.mensagens = mensagens;
       },
       error: () => {
-        this.mensagemAcao = 'Nao foi possivel carregar o historico do chat.';
+        this.mensagemAcao = 'Não foi possível carregar o histórico do chat.';
       },
     });
   }
@@ -479,7 +479,7 @@ export class ComunidadeDetalhePage {
         this.membrosCarregando = false;
       },
       error: () => {
-        this.mensagemAcao = 'Nao foi possivel carregar os membros da comunidade.';
+        this.mensagemAcao = 'Não foi possível carregar os membros da comunidade.';
         this.membrosCarregando = false;
       },
     });
@@ -504,7 +504,7 @@ export class ComunidadeDetalhePage {
   }
 
   getStatus(tarefa: TarefaModel): string {
-    return tarefa.concluida ? 'Concluida para todos' : this.tarefaEstaConcluida(tarefa) ? 'Concluida por voce' : 'Em andamento';
+    return tarefa.concluida ? 'Concluída para todos' : this.tarefaEstaConcluida(tarefa) ? 'Concluída por você' : 'Em andamento';
   }
 
   private limparCheckin(): void {
@@ -537,7 +537,7 @@ export class ComunidadeDetalhePage {
     this.checkinEnviando = false;
     const mensagem = typeof erro.error === 'string'
       ? erro.error
-      : String(erro.error?.message ?? erro.error?.error ?? erro.message ?? 'Nao foi possivel realizar o check-in.');
+      : String(erro.error?.message ?? erro.error?.error ?? erro.message ?? 'Não foi possível realizar o check-in.');
     this.mensagemAcao = mensagem;
     this.carregarComunidade();
     if (mensagem.toLowerCase().includes('concluída') || mensagem.toLowerCase().includes('concluida')) {

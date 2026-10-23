@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { Client, StompSubscription } from '@stomp/stompjs';
-import SockJS from 'sockjs-client';
 
 import { MensagemModel } from '../models/comunidade.model';
 
@@ -8,14 +7,15 @@ import { MensagemModel } from '../models/comunidade.model';
   providedIn: 'root',
 })
 export class ChatService {
-  private readonly WS_URL = 'https://competask.onrender.com/ws-chat';
+  // Endpoint WebSocket puro do SockJS: evita a requisição /info, que o CORS bloqueava.
+  private readonly WS_URL = 'wss://competask.onrender.com/ws-chat/websocket';
 
   private client: Client | null = null;
   private subscricao: StompSubscription | null = null;
 
   conectar(comunidadeId: number, aoReceber: (mensagem: MensagemModel) => void): void {
     this.client = new Client({
-      webSocketFactory: () => new SockJS(this.WS_URL),
+      brokerURL: this.WS_URL,
       connectHeaders: { Authorization: `Bearer ${localStorage.getItem('token') ?? ''}` },
       onConnect: () => {
         this.subscricao = this.client!.subscribe(`/topico/comunidade/${comunidadeId}`, (frame) => {

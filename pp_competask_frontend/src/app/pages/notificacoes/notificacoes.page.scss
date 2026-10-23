@@ -1,0 +1,127 @@
+.notificacoes-page {
+  --background: var(--cp-surface-alt);
+  color: var(--cp-ink);
+}
+
+.page-shell {
+  width: min(100%, 430px);
+  min-height: 100%;
+  margin: 0 auto;
+  padding: 16px 20px 30px;
+}
+
+.topo {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.voltar {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border: 1px solid var(--cp-border);
+  border-radius: 50%;
+  background: var(--cp-surface);
+  color: var(--cp-ink);
+  font-size: 1.25rem;
+}
+
+.topo-titulos {
+  display: grid;
+  gap: 2px;
+
+  h1 {
+    margin: 0;
+    font-size: 1.8rem;
+    font-weight: 700;
+    line-height: 1.12;
+    letter-spacing: -0.045em;
+  }
+
+  span {
+    color: var(--cp-muted);
+    font-size: 0.75rem;
+  }
+}
+
+.estado,
+.vazio {
+  color: var(--cp-muted);
+  font-size: 0.86rem;
+  text-align: center;
+}
+
+.estado--erro {
+  color: var(--cp-danger);
+}
+
+.vazio {
+  display: grid;
+  gap: 8px;
+  justify-items: center;
+  margin-top: 60px;
+
+  ion-icon {
+    color: var(--cp-primary);
+    font-size: 2.6rem;
+  }
+}
+
+.lista {
+  overflow: hidden;
+  border: 1px solid var(--cp-border);
+  border-radius: var(--cp-radius);
+  background: var(--cp-surface);
+  box-shadow: var(--cp-shadow);
+}
+
+.item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--cp-border);
+  cursor: pointer;
+
+  &:last-child {
+    border-bottom: 0;
+  }
+
+  &__ponto {
+    flex: 0 0 9px;
+    width: 9px;
+    height: 9px;
+    margin-top: 5px;
+    border-radius: 50%;
+    background: var(--cp-accent);
+  }
+
+  &__texto {
+    min-width: 0;
+
+    strong {
+      display: block;
+      font-size: 0.9rem;
+    }
+
+    p {
+      margin: 3px 0 5px;
+      color: var(--cp-muted);
+      font-size: 0.8rem;
+      line-height: 1.45;
+    }
+
+    small {
+      color: var(--cp-muted);
+      font-size: 0.68rem;
+    }
+  }
+
+  &--lida {
+    padding-left: 35px;
+    background: var(--cp-surface-alt);
+  }
+}

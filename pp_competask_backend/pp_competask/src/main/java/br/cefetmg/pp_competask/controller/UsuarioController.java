@@ -80,7 +80,7 @@ public class UsuarioController {
 
 
 
-    //não precisa existir porque meio que nao deleta só muda um bagulho, vai virar patch
+    //não precisa existir porque meio que não deleta só muda um bagulho, vai virar patch
     // @DeleteMapping("/{id}")
     // @Operation(summary = "Excluir usuário")
     // public ResponseEntity<UsuarioResponseDTO> excluir(@PathVariable Long id){

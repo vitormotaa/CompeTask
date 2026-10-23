@@ -127,7 +127,7 @@ export class TimerPage implements OnDestroy {
     this.pausarCronometro();
     this.registroPendente = this.gerarRegistro();
     this.mensagemModal = '';
-    this.tarefaSelecionadaId = '';
+    this.tarefaSelecionadaId = this.tarefas.length > 0 ? String(this.tarefas[0].id) : '';
     this.modalSalvarAberto = true;
   }
 
@@ -149,14 +149,14 @@ export class TimerPage implements OnDestroy {
 
     const usuarioAtual = this.usuarioService.obterUsuarioSessao();
     if (!usuarioAtual?.id) {
-      this.mensagemAcao = 'Voce precisa estar logado para salvar registro.';
+      this.mensagemAcao = 'Você precisa estar logado para salvar registro.';
       this.router.navigate(['/login']);
       return;
     }
 
     const tarefaSelecionada = this.tarefas.find((tarefa) => String(tarefa.id) === this.tarefaSelecionadaId);
     if (!tarefaSelecionada) {
-      this.mensagemModal = 'A tarefa selecionada nao foi encontrada.';
+      this.mensagemModal = 'A tarefa selecionada não foi encontrada.';
       return;
     }
 
@@ -173,7 +173,7 @@ export class TimerPage implements OnDestroy {
         this.carregarTarefasUsuario();
       },
       error: () => {
-        this.mensagemModal = 'Nao foi possivel salvar o registro agora.';
+        this.mensagemModal = 'Não foi possível salvar o registro agora.';
       },
     });
   }
@@ -188,7 +188,7 @@ export class TimerPage implements OnDestroy {
       return;
     }
 
-    this.mensagemAcao = `${atalho.label} ainda sera ligado ao backend.`;
+    this.mensagemAcao = `${atalho.label} ainda será ligado ao backend.`;
   }
 
   private carregarTarefasUsuario(): void {
@@ -196,7 +196,7 @@ export class TimerPage implements OnDestroy {
 
     if (!usuarioAtual?.id) {
       this.tarefas = [];
-      this.mensagemAcao = 'Voce precisa estar logado para usar o cronometro.';
+      this.mensagemAcao = 'Você precisa estar logado para usar o cronômetro.';
       this.router.navigate(['/login']);
       return;
     }
@@ -207,7 +207,7 @@ export class TimerPage implements OnDestroy {
       },
       error: () => {
         this.tarefas = [];
-        this.mensagemAcao = 'Nao foi possivel carregar suas tarefas.';
+        this.mensagemAcao = 'Não foi possível carregar suas tarefas.';
       },
     });
   }

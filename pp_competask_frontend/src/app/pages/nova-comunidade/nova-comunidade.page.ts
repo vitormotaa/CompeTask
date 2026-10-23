@@ -1,12 +1,15 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { IonButton, IonContent, IonIcon } from '@ionic/angular/standalone';
+import { Capacitor } from '@capacitor/core';
+import { Camera, CameraDirection, CameraResultType, CameraSource } from '@capacitor/camera';
+import { ActionSheetController, IonButton, IonContent, IonIcon } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
   addOutline,
   arrowBackOutline,
+  cameraOutline,
   imageOutline,
   globeOutline,
   keyOutline,
@@ -31,12 +34,21 @@ export class NovaComunidadePage implements OnInit {
   salvando = false;
   form: FormGroup;
 
+  @ViewChild('fileInput') fileInput?: ElementRef<HTMLInputElement>;
+  @ViewChild('cameraInput') cameraInput?: ElementRef<HTMLInputElement>;
+  @ViewChild('videoCamera') videoCamera?: ElementRef<HTMLVideoElement>;
+
+  cameraAberta = false;
+  erroCamera = '';
+  private streamCamera: MediaStream | null = null;
+
   constructor(
     private readonly formBuilder: FormBuilder,
     private readonly route: ActivatedRoute,
     private readonly router: Router,
     private readonly comunidadesService: ComunidadesService,
-    private readonly usuarioService: UsuarioService
+    private readonly usuarioService: UsuarioService,
+    private readonly actionSheetController: ActionSheetController
   ) {
     this.form = this.formBuilder.group({
       nome: ['', Validators.required],
@@ -48,6 +60,7 @@ export class NovaComunidadePage implements OnInit {
     addIcons({
       addOutline,
       arrowBackOutline,
+      cameraOutline,
       globeOutline,
       imageOutline,
       keyOutline,
@@ -94,7 +107,7 @@ export class NovaComunidadePage implements OnInit {
     const usuarioAtual = this.usuarioService.obterUsuarioSessao();
 
     if (!usuarioAtual?.id) {
-      this.mensagemAcao = 'Voce precisa estar logado para salvar uma comunidade.';
+      this.mensagemAcao = 'Você precisa estar logado para salvar uma comunidade.';
       return;
     }
 
@@ -120,7 +133,7 @@ export class NovaComunidadePage implements OnInit {
       },
       error: () => {
         this.salvando = false;
-        this.mensagemAcao = 'Nao foi possivel salvar a comunidade.';
+        this.mensagemAcao = 'Não foi possível salvar a comunidade.';
       },
     });
   }
@@ -145,9 +158,121 @@ export class NovaComunidadePage implements OnInit {
       },
       error: () => {
         this.salvando = false;
-        this.mensagemAcao = 'Nao foi possivel excluir a comunidade.';
+        this.mensagemAcao = 'Não foi possível excluir a comunidade.';
       },
     });
+  }
+
+  async escolherOrigemFoto(): Promise<void> {
+    const sheet = await this.actionSheetController.create({
+      header: 'Imagem da comunidade',
+      buttons: [
+        { text: 'Tirar foto com a câmera', icon: 'camera-outline', handler: () => { void this.abrirCamera(); } },
+        { text: 'Escolher arquivo', icon: 'image-outline', handler: () => this.fileInput?.nativeElement.click() },
+        { text: 'Cancelar', role: 'cancel' },
+      ],
+    });
+    await sheet.present();
+  }
+
+  async abrirCamera(): Promise<void> {
+    this.erroCamera = '';
+
+    if (Capacitor.isNativePlatform()) {
+      await this.tirarFotoNativa();
+      return;
+    }
+
+    if (!navigator.mediaDevices?.getUserMedia) {
+      this.cameraInput?.nativeElement.click();
+      return;
+    }
+
+    this.cameraAberta = true;
+    try {
+      this.streamCamera = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 960 } },
+        audio: false,
+      });
+      const video = this.videoCamera?.nativeElement;
+      if (video) {
+        video.srcObject = this.streamCamera;
+        await video.play().catch(() => undefined);
+      }
+    } catch {
+      this.erroCamera = 'Não foi possível acessar a câmera. Verifique a permissão do navegador.';
+    }
+  }
+
+  private async tirarFotoNativa(): Promise<void> {
+    try {
+      const foto = await Camera.getPhoto({
+        quality: 80,
+        width: 512,
+        height: 512,
+        allowEditing: false,
+        resultType: CameraResultType.DataUrl,
+        source: CameraSource.Camera,
+        direction: CameraDirection.Rear,
+      });
+
+      if (foto.dataUrl) {
+        this.fotoPreview = foto.dataUrl;
+        this.form.patchValue({ foto: foto.dataUrl });
+      }
+    } catch (erro) {
+      const mensagem = String((erro as { message?: string })?.message ?? '').toLowerCase();
+      if (!mensagem.includes('cancel')) {
+        this.mensagemAcao = 'Não foi possível acessar a câmera. Verifique a permissão do aplicativo.';
+      }
+    }
+  }
+
+  capturarFoto(): void {
+    const video = this.videoCamera?.nativeElement;
+    if (!video || !video.videoWidth) {
+      return;
+    }
+
+    const lado = Math.min(video.videoWidth, video.videoHeight);
+    const tamanho = Math.min(lado, 512);
+    const canvas = document.createElement('canvas');
+    canvas.width = tamanho;
+    canvas.height = tamanho;
+    const contexto = canvas.getContext('2d');
+    if (!contexto) {
+      return;
+    }
+
+    contexto.drawImage(
+      video,
+      (video.videoWidth - lado) / 2,
+      (video.videoHeight - lado) / 2,
+      lado,
+      lado,
+      0,
+      0,
+      tamanho,
+      tamanho,
+    );
+
+    const fotoBase64 = canvas.toDataURL('image/jpeg', 0.85);
+    this.fotoPreview = fotoBase64;
+    this.form.patchValue({ foto: fotoBase64 });
+    this.fecharCamera();
+  }
+
+  fecharCamera(): void {
+    this.streamCamera?.getTracks().forEach((faixa) => faixa.stop());
+    this.streamCamera = null;
+    if (this.videoCamera?.nativeElement) {
+      this.videoCamera.nativeElement.srcObject = null;
+    }
+    this.cameraAberta = false;
+  }
+
+  ionViewWillLeave(): void {
+    this.fecharCamera();
   }
 
   selecionarFoto(event: Event): void {
@@ -155,8 +280,6 @@ export class NovaComunidadePage implements OnInit {
     const arquivo = input.files && input.files.length > 0 ? input.files[0] : null;
 
     if (!arquivo) {
-      this.fotoPreview = null;
-      this.form.patchValue({ foto: '' });
       return;
     }
 
@@ -167,13 +290,14 @@ export class NovaComunidadePage implements OnInit {
       this.form.patchValue({ foto: fotoBase64 });
     };
     leitor.readAsDataURL(arquivo);
+    input.value = '';
   }
 
   private carregarComunidade(): void {
     const usuarioAtual = this.usuarioService.obterUsuarioSessao();
 
     if (!usuarioAtual?.id || !this.comunidadeId) {
-      this.mensagemAcao = 'Voce precisa estar logado para editar uma comunidade.';
+      this.mensagemAcao = 'Você precisa estar logado para editar uma comunidade.';
       return;
     }
 
@@ -182,7 +306,7 @@ export class NovaComunidadePage implements OnInit {
         const comunidade = comunidades.find((item) => String(item.idComunidade) === this.comunidadeId);
 
         if (!comunidade) {
-          this.mensagemAcao = 'Comunidade nao encontrada.';
+          this.mensagemAcao = 'Comunidade não encontrada.';
           return;
         }
 
@@ -195,7 +319,7 @@ export class NovaComunidadePage implements OnInit {
         });
       },
       error: () => {
-        this.mensagemAcao = 'Nao foi possivel carregar a comunidade.';
+        this.mensagemAcao = 'Não foi possível carregar a comunidade.';
       },
     });
   }

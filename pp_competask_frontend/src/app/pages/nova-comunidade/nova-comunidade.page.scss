@@ -3,10 +3,10 @@
 }
 
 .community-create-screen {
-  --background: #ffffff;
-  color: #1b214d;
-  --padding-top: 14px;
-  --padding-bottom: 26px;
+  --background: var(--cp-surface, #ffffff);
+  color: var(--cp-ink, #1b214d);
+  --padding-top: 10px;
+  --padding-bottom: calc(26px + var(--cp-safe-bottom));
 }
 
 .screen-glow {
@@ -16,61 +16,62 @@
 .community-create-shell {
   width: min(100%, 430px);
   margin: 0 auto;
-  padding: 0 14px 22px;
+  padding: 0 16px 22px;
 }
 
 .community-create-header {
   display: flex;
   align-items: center;
   gap: 12px;
-  min-height: 42px;
+  min-height: 48px;
   margin-bottom: 16px;
 }
 
 .back-button {
-  width: 34px;
-  height: 34px;
+  width: 38px;
+  height: 38px;
   border: 0;
   border-radius: 50%;
-  background: #25234f;
-  color: #ffffff;
+  background: var(--cp-surface-alt, #f4f6fb);
+  color: var(--cp-ink, #1b214d);
   display: grid;
   place-items: center;
   flex: 0 0 auto;
 }
 
 .back-button ion-icon {
-  font-size: 1rem;
+  font-size: 1.2rem;
 }
 
 .community-create-header h1 {
   margin: 0;
-  color: #23224e;
-  font-size: 1.35rem;
-  letter-spacing: 0;
+  color: var(--cp-ink, #1b214d);
+  font-size: 1.4rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
 }
 
 .image-block {
   display: grid;
   justify-items: center;
   gap: 8px;
-  margin-bottom: 12px;
+  margin-bottom: 16px;
 }
 
 .image-selector {
-  width: 76px;
-  height: 76px;
+  width: 96px;
+  height: 96px;
   border-radius: 50%;
-  border: 1.5px solid #52008c;
-  background: #eaf0f8;
-  color: #52008c;
+  border: 2px dashed var(--cp-primary, #52008c);
+  background: var(--cp-primary-soft, #f1e6fa);
+  color: var(--cp-primary, #52008c);
   display: grid;
   place-items: center;
   overflow: hidden;
 }
 
 .image-selector ion-icon {
-  font-size: 1.45rem;
+  font-size: 1.8rem;
 }
 
 .image-selector img {
@@ -82,8 +83,9 @@
 
 .image-block p {
   margin: 0;
-  color: #5f5a86;
-  font-size: 0.72rem;
+  color: var(--cp-primary, #52008c);
+  font-size: 0.82rem;
+  font-weight: 600;
 }
 
 .community-form {
@@ -93,8 +95,8 @@
 
 .field-label {
   display: block;
-  margin: 8px 2px 0;
-  color: #25234f;
+  margin: 10px 4px 0;
+  color: var(--cp-muted, #6b7194);
   font-size: 0.78rem;
   font-weight: 600;
 }
@@ -105,27 +107,34 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  min-height: 50px;
-  padding: 0 12px;
-  border: 1.5px solid #52008c;
-  border-radius: 8px;
-  background: #eaf0f8;
-  color: #52008c;
+  min-height: 52px;
+  padding: 0 14px;
+  border: 1.5px solid transparent;
+  border-radius: var(--cp-radius-sm, 10px);
+  background: var(--cp-surface-alt, #f4f6fb);
+  color: var(--cp-muted, #6b7194);
+  transition: border-color 160ms ease, background-color 160ms ease;
+}
+
+.input-shell:focus-within,
+.textarea-shell:focus-within,
+.select-shell:focus-within {
+  border-color: var(--cp-primary, #52008c);
+  background: var(--cp-surface, #ffffff);
 }
 
 .textarea-shell {
-  min-height: 104px;
+  min-height: 112px;
   align-items: flex-start;
-  padding-top: 12px;
+  padding-top: 14px;
 }
 
 .input-shell ion-icon,
 .textarea-shell ion-icon,
 .select-shell ion-icon {
   flex: 0 0 auto;
-  font-size: 0.98rem;
-  color: #52008c;
-  margin-top: 2px;
+  font-size: 1.1rem;
+  color: var(--cp-primary, #52008c);
 }
 
 .input-shell input,
@@ -135,13 +144,13 @@
   border: 0;
   outline: none;
   background: transparent;
-  color: #1b214d;
+  color: var(--cp-ink, #1b214d);
   font: inherit;
-  font-size: 0.86rem;
+  font-size: 0.92rem;
 }
 
 .textarea-shell textarea {
-  min-height: 76px;
+  min-height: 82px;
   resize: none;
 }
 
@@ -151,45 +160,104 @@
 
 .input-shell input::placeholder,
 .textarea-shell textarea::placeholder {
-  color: #6d5a90;
+  color: var(--cp-muted, #6b7194);
 }
 
 .hint-text {
-  margin: 2px 2px 4px;
-  color: #5f5a86;
-  font-size: 0.74rem;
+  margin: 4px 4px;
+  color: var(--cp-muted, #6b7194);
+  font-size: 0.78rem;
 }
 
 .action-message {
-  margin: 0 2px 4px;
-  color: #52008c;
-  font-size: 0.84rem;
+  margin: 0 4px 4px;
+  color: var(--cp-primary, #52008c);
+  font-size: 0.86rem;
   font-weight: 600;
 }
 
 .primary-button {
   height: 50px;
   margin-top: 8px;
-  font-weight: 800;
+  font-weight: 700;
   letter-spacing: 0;
-  --background: #12cbc5;
-  --background-activated: #10bcb6;
-  --color: #10194a;
-  --box-shadow: 0 12px 18px rgba(18, 203, 197, 0.3);
-  --border-radius: 8px;
+  text-transform: none;
+  --background: var(--cp-primary, #52008c);
+  --background-activated: #3f006d;
+  --color: #ffffff;
+  --box-shadow: var(--cp-shadow-fab, 0 6px 18px rgba(82, 0, 140, 0.35));
+  --border-radius: 999px;
 }
 
 .danger-button {
   height: 48px;
-  margin-top: 8px;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  --border-color: #ff002d;
-  --color: #ff002d;
-  --background: #162050;
-  --background-activated: #11183f;
+  margin-top: 4px;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+  --border-color: var(--cp-danger, #ff002d);
+  --color: var(--cp-danger, #ff002d);
+  --background: transparent;
+  --background-activated: #fff0f2;
   --box-shadow: none;
-  --border-radius: 8px;
+  --border-radius: 999px;
   --border-style: solid;
-  --border-width: 2px;
+  --border-width: 1.5px;
 }
+
+.camera-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  background: #000;
+
+  &--aberta {
+    display: flex;
+  }
+
+  video {
+    width: min(100%, 430px);
+    max-height: 70vh;
+    object-fit: cover;
+    transform: scaleX(-1);
+  }
+}
+
+.camera-erro {
+  max-width: 340px;
+  margin: 0;
+  color: #fff;
+  text-align: center;
+}
+
+.camera-acoes {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 40px;
+}
+
+.camera-btn {
+  border: 0;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 600;
+
+  &--cancelar {
+    background: transparent;
+  }
+
+  &--capturar {
+    width: 68px;
+    height: 68px;
+    border: 4px solid #fff;
+    border-radius: 50%;
+    background: var(--cp-accent);
+  }
+}
+

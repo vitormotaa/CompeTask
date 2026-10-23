@@ -6,6 +6,9 @@
       </button>
     </header>
 
+    <h1 class="task-form-title">{{ tituloPagina }}</h1>
+    <p class="task-form-subtitle">Organize os detalhes e o prazo da sua tarefa.</p>
+
     <form class="task-form" [formGroup]="form" (ngSubmit)="salvarTarefa()">
       <label class="field-label">Título</label>
       <label class="input-shell task-title" [class.input-shell--invalid]="form.controls['titulo'].touched && form.controls['titulo'].invalid">

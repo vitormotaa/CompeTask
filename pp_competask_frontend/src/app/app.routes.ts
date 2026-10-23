@@ -19,6 +19,10 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/usuario/usuario.page').then((m) => m.UsuarioPage),
   },
   {
+    path: 'notificacoes',
+    loadComponent: () => import('./pages/notificacoes/notificacoes.page').then((m) => m.NotificacoesPage),
+  },
+  {
     path: 'comunidades',
     loadComponent: () => import('./pages/comunidades/comunidades.page').then((m) => m.ComunidadesPage),
   },

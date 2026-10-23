@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Roboto:wght@400;500;700&display=swap');
 
 /*
  * App Global CSS
@@ -43,22 +43,57 @@ body {
 	height: 100%;
 }
 
+/*
+ * Design tokens do CompeTask (visual inspirado em Instagram / WhatsApp / Google Tarefas).
+ * Paleta original mantida: roxo #52008c, turquesa #18d3c7, azul-noite #1b214d.
+ */
 :root {
-	--ion-font-family: 'Roboto', 'Segoe UI', Arial, sans-serif;
+  --cp-safe-bottom: max(env(safe-area-inset-bottom, 0px), var(--safe-area-inset-bottom, 0px));
+	--ion-font-family: 'Inter', 'Roboto', 'Segoe UI', Arial, sans-serif;
+
+	--cp-primary: #52008c;
+	--cp-primary-soft: #f1e6fa;
+	--cp-accent: #18d3c7;
+	--cp-accent-soft: #e0faf8;
+	--cp-ink: #1b214d;
+	--cp-muted: #6b7194;
+	--cp-bg: #ffffff;
+	--cp-surface: #ffffff;
+	--cp-surface-alt: #f4f6fb;
+	--cp-border: #e8ebf3;
+	--cp-danger: #ff002d;
+	--cp-gradient: linear-gradient(135deg, #52008c 0%, #18d3c7 100%);
+
+	--cp-radius-sm: 10px;
+	--cp-radius: 16px;
+	--cp-radius-lg: 24px;
+	--cp-shadow: 0 1px 2px rgba(27, 33, 77, 0.06), 0 4px 14px rgba(27, 33, 77, 0.06);
+	--cp-shadow-fab: 0 6px 18px rgba(82, 0, 140, 0.35);
 }
 
 body {
 	margin: 0;
-	font-family: 'Roboto', 'Segoe UI', Arial, sans-serif;
-	background: #0b0717;
-	color: #f3f0ff;
+	font-family: var(--ion-font-family);
+	background: var(--cp-bg);
+	color: var(--cp-ink);
+	-webkit-font-smoothing: antialiased;
 }
 
 ion-app {
-	font-family: 'Roboto', 'Segoe UI', Arial, sans-serif;
-	color: #f3f0ff;
+	font-family: var(--ion-font-family);
+	color: var(--cp-ink);
 }
 
 * {
 	box-sizing: border-box;
+	-webkit-tap-highlight-color: transparent;
+}
+
+button {
+	font-family: inherit;
+	cursor: pointer;
+}
+
+button:active {
+	opacity: 0.85;
 }

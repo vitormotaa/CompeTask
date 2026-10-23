@@ -1,97 +1,143 @@
-<ion-content [fullscreen]="true" class="usuario-page">
-  <header class="topo">
-    <h1>Usuário</h1>
-
-    <div class="notificacao" (click)="alternarNotificacoes()">
-      <ion-icon name="notifications-outline"></ion-icon>
-      <span *ngIf="notificacoesNaoLidas > 0">{{ notificacoesNaoLidas }}</span>
-    </div>
-  </header>
-
-  <div class="notificacoes-painel" *ngIf="notificacoesAberto">
-    <p class="empty-state" *ngIf="notificacoes.length === 0">Nenhuma notificacao por enquanto.</p>
-
-    <article
-      *ngFor="let notificacao of notificacoes"
-      class="notificacao-item"
-      [class.notificacao-item--lida]="notificacao.lida"
-      (click)="marcarNotificacaoComoLida(notificacao)">
-      <strong>{{ notificacao.titulo }}</strong>
-      <p>{{ notificacao.mensagem }}</p>
-      <span>{{ notificacao.dataHora | date: 'dd/MM/yyyy HH:mm' }}</span>
-    </article>
-  </div>
-
-  <div class="usuario-info">
-    <div class="avatar-container">
-      <div class="avatar">
-        <ng-container *ngIf="fotoPreview; else avatarPadrao">
-          <img [src]="fotoPreview" alt="Foto do usuário" />
-        </ng-container>
-
-        <ng-template #avatarPadrao>
-          <ion-icon name="person-outline"></ion-icon>
-        </ng-template>
+﻿<ion-content [fullscreen]="true" class="usuario-page">
+  <main class="page-shell">
+    <header class="topo">
+      <div class="topo-titulos">
+        <h1>Meu perfil</h1>
       </div>
 
-      <button type="button" class="editar-avatar" (click)="fileInput.click()">
-        <ion-icon name="pencil"></ion-icon>
+      <button
+        type="button"
+        class="notificacao"
+        aria-label="Abrir notificações"
+        (click)="abrirNotificacoes()">
+        <ion-icon name="notifications-outline"></ion-icon>
+        <span *ngIf="notificacoesNaoLidas > 0">{{ notificacoesNaoLidas }}</span>
       </button>
+    </header>
 
-      <input
-        #fileInput
-        type="file"
-        accept="image/*"
-        hidden
-        (change)="selecionarFoto($event)"
-      />
-    </div>
+    <section class="perfil-resumo" aria-label="Resumo do perfil">
+      <div class="avatar-container">
+        <div class="avatar-ring">
+          <div class="avatar">
+            <ng-container *ngIf="fotoPreview; else avatarPadrao">
+              <img [src]="fotoPreview" alt="Foto do usuário" />
+            </ng-container>
 
-    <div class="streak">
-      <ion-icon name="flame-outline"></ion-icon>
-      {{ usuario?.streak }} dias de streak
+            <ng-template #avatarPadrao>
+              <ion-icon name="person-outline"></ion-icon>
+            </ng-template>
+          </div>
+        </div>
+
+        <button type="button" class="editar-avatar" aria-label="Alterar foto do perfil" (click)="escolherOrigemFoto()">
+          <ion-icon name="pencil"></ion-icon>
+        </button>
+
+        <input
+          #fileInput
+          type="file"
+          accept="image/*"
+          hidden
+          (change)="selecionarFoto($event)"
+        />
+        <input
+          #cameraInput
+          type="file"
+          accept="image/*"
+          capture="user"
+          hidden
+          (change)="selecionarFoto($event)"
+        />
+      </div>
+
+      <div class="perfil-identidade">
+        <h2>{{ usuario?.nome || 'Seu perfil' }}</h2>
+        <p>{{ usuario?.email }}</p>
+      </div>
+    </section>
+
+    <section class="perfil-estatisticas" aria-label="Estatísticas do perfil">
+      <div class="estatistica">
+        <strong>{{ usuario?.streak || 0 }}</strong>
+        <span>Dias de streak</span>
+      </div>
+      <div class="estatistica">
+        <strong>{{ notificacoesNaoLidas }}</strong>
+        <span>Notificações não lidas</span>
+      </div>
+    </section>
+
+    <form
+      class="profile-form"
+      [formGroup]="perfilForm"
+      (ngSubmit)="salvarAlteracoes()">
+      <div class="secao-cabecalho">
+        <h3>Configurações</h3>
+        <p>Gerencie seus dados de acesso</p>
+      </div>
+
+      <section class="configuracoes-card" aria-label="Dados do perfil">
+        <label class="campo-linha">
+          <span class="campo-icone"><ion-icon name="person-outline"></ion-icon></span>
+          <span class="campo-conteudo">
+            <span class="campo-titulo">Nome</span>
+            <input class="campo" type="text" formControlName="nome" placeholder="Seu nome" />
+          </span>
+        </label>
+
+        <label class="campo-linha">
+          <span class="campo-icone"><ion-icon name="mail-outline"></ion-icon></span>
+          <span class="campo-conteudo">
+            <span class="campo-titulo">Email</span>
+            <input class="campo" type="email" formControlName="email" placeholder="usuario@email.com" readonly />
+          </span>
+        </label>
+
+        <label class="campo-linha">
+          <span class="campo-icone"><ion-icon name="lock-closed-outline"></ion-icon></span>
+          <span class="campo-conteudo">
+            <span class="campo-titulo">Nova senha</span>
+            <input class="campo" type="password" formControlName="senha" placeholder="••••••••" />
+          </span>
+        </label>
+      </section>
+
+      <small class="texto-ajuda">Deixe a senha em branco para manter a atual.</small>
+
+      <p class="mensagem" *ngIf="mensagemAcao">{{ mensagemAcao }}</p>
+
+      <ion-button expand="block" class="btn-salvar" type="submit">
+        Salvar alterações
+      </ion-button>
+
+      <div class="acoes-conta">
+        <p class="acoes-titulo">Conta</p>
+        <ion-button expand="block" class="btn-sair" type="button" (click)="sairConta()">
+          Sair da conta
+        </ion-button>
+        <ion-button expand="block" class="btn-excluir" type="button" (click)="excluirConta()">
+          Excluir conta
+        </ion-button>
+      </div>
+    </form>
+  </main>
+
+  <div class="camera-overlay" [class.camera-overlay--aberta]="cameraAberta" role="dialog" aria-modal="true" aria-label="Câmera">
+    <video #videoCamera autoplay playsinline muted></video>
+    <p class="camera-erro" *ngIf="erroCamera">{{ erroCamera }}</p>
+    <div class="camera-acoes">
+      <button type="button" class="camera-btn camera-btn--cancelar" (click)="fecharCamera()">Cancelar</button>
+      <button type="button" class="camera-btn camera-btn--capturar" aria-label="Capturar foto" (click)="capturarFoto()"></button>
     </div>
   </div>
 
-  <form
-    class="profile-form"
-    [formGroup]="perfilForm"
-    (ngSubmit)="salvarAlteracoes()"
-  >
-    <label>Nome</label>
-    <input class="campo" type="text" formControlName="nome" placeholder="Usuário" />
-
-    <label>Email</label>
-    <input class="campo" type="email" formControlName="email" placeholder="usuario@email.com" readonly />
-
-    <label>Senha</label>
-    <input class="campo" type="password" formControlName="senha" placeholder="********" />
-
-    <small class="texto-ajuda">Deixe em branco para manter a senha atual.</small>
-
-    <p class="mensagem" *ngIf="mensagemAcao">{{ mensagemAcao }}</p>
-
-    <ion-button expand="block" class="btn-salvar" type="submit">
-      SALVAR USUÁRIO
-    </ion-button>
-
-    <ion-button expand="block" class="btn-sair" type="button" (click)="sairConta()">
-      SAIR DA CONTA
-    </ion-button>
-
-    <ion-button expand="block" class="btn-excluir" type="button" (click)="excluirConta()">
-      EXCLUIR CONTA
-    </ion-button>
-  </form>
-
-  <nav class="bottom-nav">
+  <nav class="bottom-nav" aria-label="Navegação inferior">
     <button
       *ngFor="let atalho of atalhosRodape"
       type="button"
       class="nav-item"
       [class.nav-item--active]="atalho.ativo"
-      (click)="abrirAtalho(atalho)"
-    >
+      (click)="abrirAtalho(atalho)">
       <ion-icon [name]="atalho.icon"></ion-icon>
       <span>{{ atalho.label }}</span>
     </button>

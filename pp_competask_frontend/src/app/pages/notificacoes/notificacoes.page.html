@@ -1,0 +1,36 @@
+<ion-content [fullscreen]="true" class="notificacoes-page">
+  <main class="page-shell">
+    <header class="topo">
+      <button type="button" class="voltar" aria-label="Voltar para o perfil" (click)="voltar()">
+        <ion-icon name="arrow-back-outline"></ion-icon>
+      </button>
+      <div class="topo-titulos">
+        <h1>Notificações</h1>
+        <span *ngIf="notificacoesNaoLidas > 0">{{ notificacoesNaoLidas }} não lida(s)</span>
+      </div>
+    </header>
+
+    <p class="estado" *ngIf="carregando">Carregando notificações...</p>
+    <p class="estado estado--erro" *ngIf="mensagemAcao">{{ mensagemAcao }}</p>
+
+    <div class="vazio" *ngIf="!carregando && !mensagemAcao && notificacoes.length === 0">
+      <ion-icon name="notifications-outline"></ion-icon>
+      <p>Nenhuma notificação por enquanto.</p>
+    </div>
+
+    <section class="lista" *ngIf="notificacoes.length > 0" aria-label="Lista de notificações">
+      <article
+        *ngFor="let notificacao of notificacoes"
+        class="item"
+        [class.item--lida]="notificacao.lida"
+        (click)="marcarComoLida(notificacao)">
+        <span class="item__ponto" *ngIf="!notificacao.lida"></span>
+        <div class="item__texto">
+          <strong>{{ notificacao.titulo }}</strong>
+          <p>{{ notificacao.mensagem }}</p>
+          <small>{{ notificacao.dataHora | date: 'dd/MM/yyyy HH:mm' }}</small>
+        </div>
+      </article>
+    </section>
+  </main>
+</ion-content>

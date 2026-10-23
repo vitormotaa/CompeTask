@@ -93,7 +93,7 @@ public class ComunidadeService {
 
     @Transactional
     public ComunidadeResponseDTO inserir(ComunidadeRequestDTO dto) {
-        // melhorar o retorno, ta so retornando null se nao achar, cade excessao
+        // melhorar o retorno, ta só retornando null se não achar, cadê exceção
         Usuario usuario = usuarioRepository.findById(dto.getIdUsuarioCriador()).orElse(null);
         // cria a comunidade
         Comunidade comunidade = new Comunidade();
@@ -124,7 +124,7 @@ public class ComunidadeService {
         comunidade.setFoto(dto.getFoto());
         comunidade.setTipoAcesso(dto.getTipoAcesso());
         // comunidade.setMembros(null);
-        // por enquanto nao vamos mexer na lista de membros e entrar em comunidade nem
+        // por enquanto não vamos mexer na lista de membros e entrar em comunidade nem
         // nada do tipo
 
         return new ComunidadeResponseDTO(comunidadeRepository.save(comunidade));

@@ -1,8 +1,8 @@
 <ion-content [fullscreen]="true" class="timer-screen">
   <section class="timer-shell">
     <header class="timer-header">
-      <h1>Cronometro</h1>
-      <p>Marque seu foco e salve direto na tarefa.</p>
+      <h1>Cronômetro</h1>
+      <p>Acompanhe seu foco e registre o tempo na tarefa.</p>
     </header>
 
     <section class="dial-wrap">
@@ -44,20 +44,20 @@
     </button>
 
     <h2>Salvar registro?</h2>
-    <p>Deseja salvar este registro nas anotacoes de alguma tarefa?</p>
+    <p>Deseja salvar este registro nas anotações de alguma tarefa?</p>
 
     <div class="record-preview">{{ registroPendente }}</div>
 
     <label class="field-label" for="tarefa-select">Tarefa</label>
     <label class="input-shell" for="tarefa-select">
       <select id="tarefa-select" [(ngModel)]="tarefaSelecionadaId">
-        <option value="">Selecione uma tarefa...</option>
         <option *ngFor="let tarefa of tarefas" [value]="tarefa.id">
           {{ tarefa.titulo }}
         </option>
       </select>
     </label>
 
+    <p class="modal-message" *ngIf="tarefas.length === 0">Você não tem tarefas em andamento para salvar este registro.</p>
     <p class="modal-message" *ngIf="mensagemModal">{{ mensagemModal }}</p>
 
     <div class="save-modal__actions">
@@ -66,7 +66,7 @@
     </div>
   </section>
 
-  <nav class="bottom-nav" aria-label="Navegacao inferior">
+  <nav class="bottom-nav" aria-label="Navegação inferior">
     <button
       *ngFor="let atalho of atalhosRodape"
       type="button"

@@ -37,7 +37,7 @@ public class StreakService {
         usuarioRepository.save(usuario);
     }
 
-    // roda logo apos a virada do dia, zerando a streak de quem nao teve atividade no dia anterior
+    // roda logo após a virada do dia, zerando a streak de quem não teve atividade no dia anterior
     @Scheduled(cron = "${competask.streak.reset-cron:0 5 0 * * *}")
     @Transactional
     public void resetarStreaksInativas() {

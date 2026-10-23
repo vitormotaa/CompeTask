@@ -55,7 +55,7 @@ public class Tarefa {
     @Column(length = 255, nullable = true)
     private String lembreteHora;
 
-    // nullable: linhas antigas nao possuiam esta coluna
+    // nullable: linhas antigas não possuíam esta coluna
     @Column(nullable = true)
     private Boolean lembreteNotificada = false;
 
