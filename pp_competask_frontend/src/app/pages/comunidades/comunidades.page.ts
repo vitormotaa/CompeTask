@@ -46,6 +46,8 @@ export class ComunidadesPage {
   modalPrivadoAberto = false;
   codigoPrivado = '';
   senhaPrivada = '';
+  mensagemModalPrivado = '';
+  entrandoPrivada = false;
   mensagemAcao = '';
   carregando = false;
   entrandoComunidadeId: number | null = null;
@@ -196,7 +198,7 @@ export class ComunidadesPage {
     this.modalPrivadoAberto = true;
     this.codigoPrivado = '';
     this.senhaPrivada = '';
-    this.mensagemAcao = '';
+    this.mensagemModalPrivado = '';
   }
 
   fecharModalPrivado(): void {
@@ -204,8 +206,27 @@ export class ComunidadesPage {
   }
 
   entrarComunidadePrivada(): void {
-    this.modalPrivadoAberto = false;
-    this.mensagemAcao = 'Entrada em comunidade privada ainda não está no backend.';
+    const codigo = this.codigoPrivado.trim().toUpperCase();
+    const senha = this.senhaPrivada.trim().toUpperCase();
+
+    if (!codigo || !senha) {
+      this.mensagemModalPrivado = 'Informe o código e a senha.';
+      return;
+    }
+
+    this.entrandoPrivada = true;
+    this.mensagemModalPrivado = '';
+    this.comunidadesService.entrarPrivada(codigo, senha).subscribe({
+      next: (comunidade) => {
+        this.entrandoPrivada = false;
+        this.fecharModalPrivado();
+        this.carregarComunidades(`Você entrou em ${comunidade.nome}.`);
+      },
+      error: (erro) => {
+        this.entrandoPrivada = false;
+        this.mensagemModalPrivado = erro?.error?.message || 'Código ou senha inválidos.';
+      },
+    });
   }
 
   selecionarAcao(acao: AcaoModalComunidade): void {

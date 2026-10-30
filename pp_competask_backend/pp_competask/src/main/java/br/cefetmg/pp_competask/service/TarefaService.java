@@ -128,6 +128,7 @@ public class TarefaService {
             throw new IllegalArgumentException("Tarefa não encontrada.");
         }
 
+        notificacaoRepository.excluirPorTarefaId(id);
         tarefaRepository.deleteById(id);
     }
 

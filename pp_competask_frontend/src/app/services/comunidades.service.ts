@@ -41,6 +41,18 @@ export class ComunidadesService {
     );
   }
 
+  entrarPrivada(codigo: string, senha: string): Observable<ComunidadeModel> {
+    return this.http.post<any>(`${this.API_URL}/entrar-privada`, { codigo, senha }).pipe(
+      map((comunidade) => this.converterParaModelo(comunidade))
+    );
+  }
+
+  obterAcesso(idComunidade: number | string): Observable<ComunidadeModel> {
+    return this.http.get<any>(`${this.API_URL}/${idComunidade}/acesso`).pipe(
+      map((comunidade) => this.converterParaModelo(comunidade))
+    );
+  }
+
   listarMembros(idComunidade: number): Observable<MembroComunidadeModel[]> {
     return this.http.get<any[]>(`${this.API_URL}/${idComunidade}/membros`).pipe(
       map((membros) => membros.map((membro) => this.converterMembroParaModelo(membro)))
@@ -106,6 +118,8 @@ export class ComunidadesService {
       descricao: String(comunidade?.descricao ?? ''),
       acesso: comunidade?.tipoAcesso === 'PRIVADA' ? 'privado' : 'publico',
       foto: String(comunidade?.foto ?? ''),
+      codigoAcesso: comunidade?.codigoAcesso ?? undefined,
+      senhaAcesso: comunidade?.senhaAcesso ?? undefined,
       membros: Array.isArray(comunidade?.membros)
         ? comunidade.membros.map((membro: any) => this.converterMembroParaModelo(membro))
         : [],

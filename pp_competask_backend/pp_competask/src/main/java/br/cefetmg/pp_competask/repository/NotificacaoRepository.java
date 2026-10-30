@@ -24,6 +24,10 @@ public interface NotificacaoRepository extends JpaRepository<Notificacao, Long> 
     void excluirPendentesPorTarefaId(@Param("tarefaId") Long tarefaId);
 
     @Modifying
+    @Query("DELETE FROM Notificacao n WHERE n.tarefa.idTarefa = :tarefaId")
+    void excluirPorTarefaId(@Param("tarefaId") Long tarefaId);
+
+    @Modifying
     @Query("DELETE FROM Notificacao n WHERE n.tarefa.idTarefa = :tarefaId "
             + "AND n.usuario.idUsuario = :usuarioId AND n.lida = false")
     void excluirPendentesPorTarefaEUsuario(

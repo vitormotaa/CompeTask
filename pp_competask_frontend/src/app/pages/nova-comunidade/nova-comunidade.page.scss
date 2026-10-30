@@ -261,3 +261,30 @@
   }
 }
 
+
+.access-card {
+  margin: 8px 0;
+  padding: 14px;
+  border: 1px solid var(--cp-border, #e8ebf3);
+  border-radius: 16px;
+  background: var(--cp-primary-soft, #f1e6fa);
+}
+
+.access-card h3 {
+  margin: 0 0 8px;
+  color: var(--cp-primary, #52008c);
+  font-size: 0.95rem;
+}
+
+.access-card p {
+  margin: 4px 0;
+  color: var(--cp-ink, #1b214d);
+  font-size: 0.9rem;
+}
+
+.access-card strong {
+  font-family: monospace;
+  font-size: 1.05rem;
+  letter-spacing: 0.08em;
+  user-select: all;
+}

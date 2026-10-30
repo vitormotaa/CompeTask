@@ -478,3 +478,10 @@
   color: var(--cp-primary, #52008c);
   font-weight: 600;
 }
+
+.private-modal .private-modal__error {
+  margin: 0 0 10px;
+  color: #d6002a;
+  font-size: 0.85rem;
+  font-weight: 600;
+}

@@ -238,3 +238,59 @@
 .link-button:active {
   color: var(--cp-primary);
 }
+
+.camera-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  background: #000;
+
+  &--aberta {
+    display: flex;
+  }
+
+  video {
+    width: min(100%, 430px);
+    max-height: 70vh;
+    object-fit: cover;
+    transform: scaleX(-1);
+  }
+}
+
+.camera-erro {
+  max-width: 340px;
+  margin: 0;
+  color: #fff;
+  text-align: center;
+}
+
+.camera-acoes {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 40px;
+}
+
+.camera-btn {
+  border: 0;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 600;
+
+  &--cancelar {
+    background: transparent;
+  }
+
+  &--capturar {
+    width: 68px;
+    height: 68px;
+    border: 4px solid #fff;
+    border-radius: 50%;
+    background: var(--cp-accent, #3880ff);
+  }
+}

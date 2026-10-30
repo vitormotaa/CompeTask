@@ -32,15 +32,16 @@
 
       <label class="field-label">Lembrete</label>
       <div class="reminder-grid">
-        <label class="input-shell">
+        <label class="input-shell" [class.input-shell--invalid]="form.hasError('lembreteIncompleto') && !form.controls['lembreteData'].value">
           <input type="date" formControlName="lembreteData" aria-label="Data do lembrete" />
         </label>
 
-        <label class="input-shell">
+        <label class="input-shell" [class.input-shell--invalid]="form.hasError('lembreteIncompleto') && !form.controls['lembreteHora'].value">
           <input type="time" formControlName="lembreteHora" aria-label="Hora do lembrete" />
         </label>
       </div>
-      <small class="field-help">Você será notificado nesse horário.</small>
+      <small class="field-help" *ngIf="form.hasError('lembreteIncompleto'); else ajudaLembrete" style="color: var(--cp-danger);">Para cadastrar o lembrete, informe a data e a hora.</small>
+      <ng-template #ajudaLembrete><small class="field-help">Você será notificado nesse horário.</small></ng-template>
 
       <ng-container *ngIf="!comunidadeId">
         <label class="field-label">Tempo gasto</label>

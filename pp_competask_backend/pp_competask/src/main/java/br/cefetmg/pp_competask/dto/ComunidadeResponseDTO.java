@@ -18,7 +18,17 @@ public class ComunidadeResponseDTO {
     private String descricao;
     private TipoAcesso tipoAcesso;
     private String foto;
+    private String codigoAcesso;
+    // só é preenchida para o administrador (criação/edição e consulta de acesso)
+    private String senhaAcesso;
     private List<MembroComunidadeResponseDTO> membros;
+
+    public ComunidadeResponseDTO(Comunidade comunidade, boolean incluirSenha) {
+        this(comunidade);
+        if (incluirSenha) {
+            this.senhaAcesso = comunidade.getSenhaAcesso();
+        }
+    }
 
     public ComunidadeResponseDTO(Comunidade comunidade) {
         this.id = comunidade.getIdComunidade();
@@ -26,6 +36,7 @@ public class ComunidadeResponseDTO {
         this.descricao = comunidade.getDescricao();
         this.tipoAcesso = comunidade.getTipoAcesso();
         this.foto = comunidade.getFoto();
+        this.codigoAcesso = comunidade.getCodigoAcesso();
         if (comunidade.getMembros() != null) {
             this.membros = comunidade.getMembros().stream()
                     .filter(MembroComunidade::isAtivo)

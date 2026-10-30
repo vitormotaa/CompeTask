@@ -1,6 +1,9 @@
 package br.cefetmg.pp_competask.service;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
@@ -28,6 +31,9 @@ import br.cefetmg.pp_competask.repository.UsuarioRepository;
 
 @Service
 public class ComunidadeService {
+
+    private static final String ALFABETO_ACESSO = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+    private static final SecureRandom RANDOM = new SecureRandom();
 
     @Autowired
     private ComunidadeRepository comunidadeRepository;
@@ -101,6 +107,7 @@ public class ComunidadeService {
         comunidade.setDescricao(dto.getDescricao());
         comunidade.setTipoAcesso(dto.getTipoAcesso());
         comunidade.setFoto(dto.getFoto());
+        aplicarAcesso(comunidade);
         comunidade = comunidadeRepository.save(comunidade);
         // vincula o usuario e a comunidade na tabela auxiliar
         MembroComunidade membroComunidade = new MembroComunidade();
@@ -112,7 +119,69 @@ public class ComunidadeService {
 
         comunidade.getMembros().add(membroComunidade);
 
-        return new ComunidadeResponseDTO(comunidade);
+        return new ComunidadeResponseDTO(comunidade, true);
+    }
+
+    // gera código/senha para comunidades privadas e limpa-os para as públicas
+    private void aplicarAcesso(Comunidade comunidade) {
+        if (comunidade.getTipoAcesso() == Comunidade.TipoAcesso.PRIVADA) {
+            if (comunidade.getCodigoAcesso() == null) {
+                comunidade.setCodigoAcesso(gerarCodigoUnico());
+            }
+            if (comunidade.getSenhaAcesso() == null) {
+                comunidade.setSenhaAcesso(gerarTextoAleatorio(8));
+            }
+        } else {
+            comunidade.setCodigoAcesso(null);
+            comunidade.setSenhaAcesso(null);
+        }
+    }
+
+    private String gerarCodigoUnico() {
+        String codigo;
+        do {
+            codigo = gerarTextoAleatorio(8);
+        } while (comunidadeRepository.existsByCodigoAcesso(codigo));
+        return codigo;
+    }
+
+    private String gerarTextoAleatorio(int tamanho) {
+        StringBuilder sb = new StringBuilder(tamanho);
+        for (int i = 0; i < tamanho; i++) {
+            sb.append(ALFABETO_ACESSO.charAt(RANDOM.nextInt(ALFABETO_ACESSO.length())));
+        }
+        return sb.toString();
+    }
+
+    @Transactional
+    public ComunidadeResponseDTO obterAcesso(Long idComunidade, Long idUsuario) {
+        Comunidade comunidade = comunidadeRepository.findById(idComunidade)
+                .orElseThrow(() -> new IllegalArgumentException("Comunidade não encontrada."));
+
+        MembroComunidade membro = membroComunidadeRepository
+                .findByUsuarioIdUsuarioAndComunidadeIdComunidadeAndAtivoTrue(idUsuario, idComunidade);
+        if (membro == null || !membro.isAdm()) {
+            throw new IllegalStateException("Apenas o administrador pode consultar o acesso da comunidade.");
+        }
+
+        aplicarAcesso(comunidade);
+        return new ComunidadeResponseDTO(comunidadeRepository.save(comunidade), true);
+    }
+
+    @Transactional
+    public ComunidadeResponseDTO entrarEmComunidadePrivada(String codigo, String senha, Long idUsuario) {
+        Comunidade comunidade = comunidadeRepository.findByCodigoAcesso(codigo.trim())
+                .orElseThrow(() -> new IllegalArgumentException("Código ou senha inválidos."));
+
+        if (comunidade.getTipoAcesso() != Comunidade.TipoAcesso.PRIVADA
+                || comunidade.getSenhaAcesso() == null
+                || !MessageDigest.isEqual(
+                        comunidade.getSenhaAcesso().getBytes(StandardCharsets.UTF_8),
+                        senha.trim().getBytes(StandardCharsets.UTF_8))) {
+            throw new IllegalArgumentException("Código ou senha inválidos.");
+        }
+
+        return vincularUsuario(comunidade, idUsuario);
     }
 
     @Transactional
@@ -123,7 +192,7 @@ public class ComunidadeService {
         comunidade.setDescricao(dto.getDescricao());
         comunidade.setFoto(dto.getFoto());
         comunidade.setTipoAcesso(dto.getTipoAcesso());
-        // comunidade.setMembros(null);
+        aplicarAcesso(comunidade);
         // por enquanto não vamos mexer na lista de membros e entrar em comunidade nem
         // nada do tipo
 
@@ -174,6 +243,16 @@ public class ComunidadeService {
     public ComunidadeResponseDTO entrarNaComunidade(Long idComunidade, Long idUsuario) {
         Comunidade comunidade = comunidadeRepository.findById(idComunidade)
                 .orElseThrow(() -> new IllegalArgumentException("Comunidade não encontrada."));
+
+        if (comunidade.getTipoAcesso() == Comunidade.TipoAcesso.PRIVADA) {
+            throw new IllegalStateException("Comunidade privada: informe o código e a senha para entrar.");
+        }
+
+        return vincularUsuario(comunidade, idUsuario);
+    }
+
+    private ComunidadeResponseDTO vincularUsuario(Comunidade comunidade, Long idUsuario) {
+        Long idComunidade = comunidade.getIdComunidade();
 
         Usuario usuario = usuarioRepository.findById(idUsuario)
                 .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado."));

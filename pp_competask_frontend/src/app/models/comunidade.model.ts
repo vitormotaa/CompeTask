@@ -13,6 +13,8 @@ export interface ComunidadeModel {
   descricao: string;
   acesso: AcessoComunidade;
   foto: string;
+  codigoAcesso?: string;
+  senhaAcesso?: string;
   membros: MembroComunidadeModel[];
 }
 

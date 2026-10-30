@@ -134,16 +134,18 @@
       <p>Informe o código e a senha da comunidade.</p>
 
       <label class="private-modal__field">
-        <input type="text" name="codigoPrivado" [(ngModel)]="codigoPrivado" placeholder="Código" />
+        <input type="text" name="codigoPrivado" [(ngModel)]="codigoPrivado" placeholder="Código" autocomplete="off" autocapitalize="characters" />
       </label>
 
       <label class="private-modal__field">
-        <input type="password" name="senhaPrivada" [(ngModel)]="senhaPrivada" placeholder="Senha" />
+        <input type="password" name="senhaPrivada" [(ngModel)]="senhaPrivada" placeholder="Senha" autocomplete="off" autocapitalize="characters" />
       </label>
+
+      <p class="private-modal__error" *ngIf="mensagemModalPrivado">{{ mensagemModalPrivado }}</p>
 
       <div class="private-modal__actions">
         <button type="button" class="private-modal__button private-modal__button--muted" (click)="fecharModalPrivado()">Cancelar</button>
-        <button type="button" class="private-modal__button private-modal__button--primary" (click)="entrarComunidadePrivada()">Entrar</button>
+        <button type="button" class="private-modal__button private-modal__button--primary" [disabled]="entrandoPrivada" (click)="entrarComunidadePrivada()">{{ entrandoPrivada ? 'Entrando...' : 'Entrar' }}</button>
       </div>
     </section>
   </section>

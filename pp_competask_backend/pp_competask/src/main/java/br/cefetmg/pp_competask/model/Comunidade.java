@@ -42,6 +42,13 @@ public class Comunidade {
     @Column(name = "acesso", nullable = false, length = 20)
     private TipoAcesso tipoAcesso; 
 
+    // preenchidos apenas em comunidades privadas
+    @Column(name = "codigo_acesso", length = 20, nullable = true, unique = true)
+    private String codigoAcesso;
+
+    @Column(name = "senha_acesso", length = 255, nullable = true)
+    private String senhaAcesso;
+
     @Column(columnDefinition = "TEXT", nullable = true)
     private String foto;
 

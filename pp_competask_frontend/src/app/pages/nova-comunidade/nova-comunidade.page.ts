@@ -32,6 +32,8 @@ export class NovaComunidadePage implements OnInit {
   fotoPreview: string | null = null;
   mensagemAcao = '';
   salvando = false;
+  codigoAcesso = '';
+  senhaAcesso = '';
   form: FormGroup;
 
   @ViewChild('fileInput') fileInput?: ElementRef<HTMLInputElement>;
@@ -317,6 +319,24 @@ export class NovaComunidadePage implements OnInit {
           acesso: comunidade.acesso,
           foto: comunidade.foto,
         });
+
+        const souAdm = comunidade.membros.some((m) => m.usuarioId === Number(usuarioAtual.id) && m.adm);
+        if (!souAdm) {
+          this.router.navigate(['/comunidades', this.comunidadeId]);
+          return;
+        }
+
+        if (comunidade.acesso === 'privado') {
+          this.comunidadesService.obterAcesso(this.comunidadeId!).subscribe({
+            next: (acesso) => {
+              this.codigoAcesso = acesso.codigoAcesso ?? '';
+              this.senhaAcesso = acesso.senhaAcesso ?? '';
+            },
+            error: () => {
+              this.mensagemAcao = 'Não foi possível carregar o código e a senha da comunidade.';
+            },
+          });
+        }
       },
       error: () => {
         this.mensagemAcao = 'Não foi possível carregar a comunidade.';

@@ -61,6 +61,12 @@
       </label>
 
       <p class="hint-text">Ao criar, você entra como administrador da comunidade.</p>
+
+      <section class="access-card" *ngIf="comunidadeId && codigoAcesso && form.value.acesso === 'privado'" aria-label="Acesso da comunidade privada">
+        <h3>Acesso da comunidade privada</h3>
+        <p>Código: <strong>{{ codigoAcesso }}</strong></p>
+        <p>Senha: <strong>{{ senhaAcesso }}</strong></p>
+      </section>
       <p class="action-message" *ngIf="mensagemAcao">{{ mensagemAcao }}</p>
 
       <ion-button class="primary-button" type="submit" expand="block" [disabled]="salvando">

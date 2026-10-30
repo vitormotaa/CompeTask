@@ -22,6 +22,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import br.cefetmg.pp_competask.dto.ComunidadeRequestDTO;
 import br.cefetmg.pp_competask.dto.ComunidadeResponseDTO;
+import br.cefetmg.pp_competask.dto.EntrarComunidadePrivadaRequestDTO;
 import br.cefetmg.pp_competask.dto.MembroComunidadeResponseDTO;
 import br.cefetmg.pp_competask.dto.MensagemResponseDTO;
 import br.cefetmg.pp_competask.dto.PeriodoRanking;
@@ -159,8 +160,37 @@ public class ComunidadeController {
     @PostMapping("/entrar/{id}")
     @Operation(summary = "Entrar em comunidades públicas", description = "")
     public ResponseEntity<ComunidadeResponseDTO> entrarNaComunidade(@PathVariable Long id) {
-        ComunidadeResponseDTO comunidade = comunidadeService.entrarNaComunidade(id, UsuarioLogado.getId());
-        return ResponseEntity.status(HttpStatus.CREATED).body(comunidade);
+        try {
+            ComunidadeResponseDTO comunidade = comunidadeService.entrarNaComunidade(id, UsuarioLogado.getId());
+            return ResponseEntity.status(HttpStatus.CREATED).body(comunidade);
+        } catch (IllegalStateException ex) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, ex.getMessage());
+        }
+    }
+
+    @PostMapping("/entrar-privada")
+    @Operation(summary = "Entrar em comunidade privada com código e senha", description = "")
+    public ResponseEntity<ComunidadeResponseDTO> entrarEmComunidadePrivada(
+            @Valid @RequestBody EntrarComunidadePrivadaRequestDTO dto) {
+        try {
+            ComunidadeResponseDTO comunidade = comunidadeService.entrarEmComunidadePrivada(
+                    dto.getCodigo(), dto.getSenha(), UsuarioLogado.getId());
+            return ResponseEntity.status(HttpStatus.CREATED).body(comunidade);
+        } catch (IllegalArgumentException ex) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage());
+        }
+    }
+
+    @GetMapping("/{id}/acesso")
+    @Operation(summary = "Consultar código e senha da comunidade privada (apenas administrador)", description = "")
+    public ComunidadeResponseDTO obterAcesso(@PathVariable Long id) {
+        try {
+            return comunidadeService.obterAcesso(id, UsuarioLogado.getId());
+        } catch (IllegalArgumentException ex) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, ex.getMessage());
+        } catch (IllegalStateException ex) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, ex.getMessage());
+        }
     }
 
     @DeleteMapping("/{id}/membros/me")

@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, ReactiveFormsModule, ValidationErrors, Validators, AbstractControl } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { IonButton, IonContent, IonIcon } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
@@ -20,6 +20,12 @@ import {
 import { TarefaModel } from '../../models/tarefa.model';
 import { TarefasService } from '../../services/tarefas.service';
 import { UsuarioService } from '../../services/usuario.service';
+
+function lembreteCompletoValidator(grupo: AbstractControl): ValidationErrors | null {
+  const data = String(grupo.get('lembreteData')?.value ?? '').trim();
+  const hora = String(grupo.get('lembreteHora')?.value ?? '').trim();
+  return !data !== !hora ? { lembreteIncompleto: true } : null;
+}
 
 type AtalhoRodape = {
   label: string;
@@ -47,7 +53,7 @@ export class TarefaPage {
     lembreteData: [''],
     lembreteHora: [''],
     tempoExecucao: [''],
-  });
+  }, { validators: [lembreteCompletoValidator] });
 
   atalhosRodape: AtalhoRodape[] = [
     { label: 'Tarefas', icon: 'checkmark-circle-outline', rota: '/tarefas', ativo: true },
