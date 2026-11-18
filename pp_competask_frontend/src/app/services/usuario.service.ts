@@ -4,6 +4,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { UsuarioModel } from '../models/usuario.model';
 import { Observable } from 'rxjs';
 import { map, switchMap, tap } from 'rxjs/operators';
+import { LembreteEventosService } from './lembrete-eventos.service';
 
 @Injectable({
   providedIn: 'root',
@@ -16,7 +17,7 @@ export class UsuarioService {
   private readonly API_URL = 'https://competask.onrender.com/api/v1/usuarios';
 
 
-  constructor(private http: HttpClient){ }
+  constructor(private http: HttpClient, private readonly lembreteEventos: LembreteEventosService){ }
 
   inicializar() {
     if (!localStorage['usuarios']) {
@@ -86,11 +87,13 @@ export class UsuarioService {
       localStorage.setItem('usuarioSessao', JSON.stringify({}));
     }
     localStorage.setItem('usuarioSessao', JSON.stringify(this.converterParaModelo(usuario)));
+    this.lembreteEventos.notificar();
   }
 
   excluirSessao() {
     localStorage.removeItem('usuarioSessao');
     localStorage.removeItem('token');
+    this.lembreteEventos.notificar();
   }
 
   obterUsuarioSessao() {

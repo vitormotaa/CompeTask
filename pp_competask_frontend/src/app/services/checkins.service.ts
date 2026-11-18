@@ -1,6 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { tap } from 'rxjs/operators';
+import { LembreteEventosService } from './lembrete-eventos.service';
 
 export type ImagemUpload = {
   url: string;
@@ -33,7 +35,7 @@ export type CheckinModel = {
 export class CheckinsService {
   private readonly API_URL = 'https://competask.onrender.com/api/v1/checkins';
 
-  constructor(private readonly http: HttpClient) { }
+  constructor(private readonly http: HttpClient, private readonly lembreteEventos: LembreteEventosService) { }
 
   enviarImagem(arquivo: File): Observable<ImagemUpload> {
     const formData = new FormData();
@@ -46,6 +48,8 @@ export class CheckinsService {
   }
 
   criar(checkin: CheckinInput): Observable<unknown> {
-    return this.http.post(this.API_URL, checkin);
+    return this.http.post(this.API_URL, checkin).pipe(
+      tap(() => this.lembreteEventos.notificar({ tarefaId: String(checkin.tarefaId) })),
+    );
   }
 }

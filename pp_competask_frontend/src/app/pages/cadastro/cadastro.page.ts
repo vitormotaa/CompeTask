@@ -10,21 +10,21 @@ import { addIcons } from 'ionicons';
 import { mailOutline, lockClosedOutline, eyeOutline, eyeOffOutline, personOutline, cameraOutline, imageOutline } from 'ionicons/icons';
 import { UsuarioModel } from 'src/app/models/usuario.model';
 import { ToastController } from '@ionic/angular';
+import { AjustarFotoComponent } from '../../components/ajustar-foto/ajustar-foto.component';
 
 @Component({
   selector: 'app-cadastro',
   templateUrl: './cadastro.page.html',
   styleUrls: ['./cadastro.page.scss'],
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, IonContent, IonIcon, IonButton],
+  imports: [CommonModule, ReactiveFormsModule, IonContent, IonIcon, IonButton, AjustarFotoComponent],
 })
 export class CadastroPage {
 
   cadastroForm: FormGroup;
   fotoPreview: string | null = null;
+  fotoParaAjustar: string | null = null;
 
-  // arquivo selecionado (usado para upload via FormData ou validações)
-  fotoArquivo: File | null = null;
   private readonly MAX_BYTES = 1 * 1024 * 1024; // 1 MB
 
   senhaVisivel = false;
@@ -58,24 +58,24 @@ export class CadastroPage {
   capturarFoto(): void {
     const video = this.videoCamera?.nativeElement;
     if (!video || !video.videoWidth) {
+      this.erroCamera = 'A câmera ainda não está pronta para capturar a foto.';
       return;
     }
 
-    const lado = Math.min(video.videoWidth, video.videoHeight);
-    const tamanho = Math.min(lado, 512);
+    const escala = Math.min(1, 1280 / Math.max(video.videoWidth, video.videoHeight));
     const canvas = document.createElement('canvas');
-    canvas.width = tamanho;
-    canvas.height = tamanho;
+    canvas.width = Math.round(video.videoWidth * escala);
+    canvas.height = Math.round(video.videoHeight * escala);
     const contexto = canvas.getContext('2d');
     if (!contexto) {
+      this.erroCamera = 'Não foi possível capturar a foto.';
       return;
     }
 
-    contexto.drawImage(video, (video.videoWidth - lado) / 2, (video.videoHeight - lado) / 2, lado, lado, 0, 0, tamanho, tamanho);
+    contexto.drawImage(video, 0, 0, canvas.width, canvas.height);
 
     const fotoBase64 = canvas.toDataURL('image/jpeg', 0.85);
-    this.fotoPreview = fotoBase64;
-    this.cadastroForm.patchValue({ foto: fotoBase64 });
+    this.fotoParaAjustar = fotoBase64;
     this.fecharCamera();
   }
 
@@ -90,6 +90,7 @@ export class CadastroPage {
 
   ionViewWillLeave(): void {
     this.fecharCamera();
+    this.fotoParaAjustar = null;
   }
 
   async escolherOrigemFoto(): Promise<void> {
@@ -133,8 +134,7 @@ export class CadastroPage {
     try {
       const foto = await Camera.getPhoto({
         quality: 80,
-        width: 512,
-        height: 512,
+        width: 1280,
         allowEditing: false,
         resultType: CameraResultType.DataUrl,
         source: CameraSource.Camera,
@@ -142,8 +142,7 @@ export class CadastroPage {
       });
 
       if (foto.dataUrl) {
-        this.fotoPreview = foto.dataUrl;
-        this.cadastroForm.patchValue({ foto: foto.dataUrl });
+        this.fotoParaAjustar = foto.dataUrl;
       }
     } catch (erro) {
       const mensagem = String((erro as { message?: string })?.message ?? '').toLowerCase();
@@ -210,29 +209,33 @@ export class CadastroPage {
     const arquivo = input.files && input.files.length > 0 ? input.files[0] : null;
 
     if (!arquivo) {
-      this.fotoPreview = null;
-      this.fotoArquivo = null;
-      this.cadastroForm.patchValue({ foto: '' });
       return;
     }
 
     // validar tamanho
     if (arquivo.size > this.MAX_BYTES) {
       this.exibirMensagem('Imagem muito grande. Máx 1 MB.');
-      this.fotoArquivo = null;
       input.value = '';
       return;
     }
 
-    // tudo OK: armazenar File e gerar preview (sem gravar base64 no form)
-    this.fotoArquivo = arquivo;
     const leitor = new FileReader();
     leitor.onload = () => {
-      const fotoBase64 = String(leitor.result || '');
-      this.fotoPreview = fotoBase64;
-      this.cadastroForm.patchValue({ foto: fotoBase64 });
+      if (typeof leitor.result === 'string') {
+        this.fotoParaAjustar = leitor.result;
+      } else {
+        this.exibirMensagem('Não foi possível ler a imagem selecionada.');
+      }
     };
+    leitor.onerror = () => this.exibirMensagem('Não foi possível ler a imagem selecionada.');
     leitor.readAsDataURL(arquivo);
+    input.value = '';
+  }
+
+  aplicarFoto(foto: string): void {
+    this.fotoPreview = foto;
+    this.cadastroForm.patchValue({ foto });
+    this.fotoParaAjustar = null;
   }
 
   async exibirMensagem(texto: string) {

@@ -3,6 +3,7 @@ import { Component } from '@angular/core';
 import { IonApp, IonRouterOutlet } from '@ionic/angular/standalone';
 
 import { LoadingService } from './services/loading.service';
+import { LembreteLocalService } from './services/lembrete-local.service';
 
 @Component({
   selector: 'app-root',
@@ -11,5 +12,7 @@ import { LoadingService } from './services/loading.service';
   imports: [IonApp, IonRouterOutlet, NgIf, AsyncPipe],
 })
 export class AppComponent {
-  constructor(readonly loading: LoadingService) {}
+  constructor(readonly loading: LoadingService, lembretes: LembreteLocalService) {
+    lembretes.iniciar();
+  }
 }

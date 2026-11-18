@@ -13,6 +13,7 @@ import { UsuarioModel } from '../../models/usuario.model';
 import { UsuarioService } from 'src/app/services/usuario.service';
 import { NotificacaoModel } from '../../models/notificacao.model';
 import { NotificacaoService } from '../../services/notificacao.service';
+import { AjustarFotoComponent } from '../../components/ajustar-foto/ajustar-foto.component';
 
 type AtalhoRodape = {
   label: string;
@@ -26,11 +27,12 @@ type AtalhoRodape = {
   templateUrl: './usuario.page.html',
   styleUrls: ['./usuario.page.scss'],
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, IonContent, IonIcon, IonButton],
+  imports: [CommonModule, ReactiveFormsModule, IonContent, IonIcon, IonButton, AjustarFotoComponent],
 })
 export class UsuarioPage {
   usuario: UsuarioModel | null = null;
   fotoPreview: string | null = null;
+  fotoParaAjustar: string | null = null;
   perfilForm: FormGroup;
   mensagemAcao = '';
 
@@ -67,7 +69,6 @@ export class UsuarioPage {
 
     this.perfilForm = this.formBuilder.group({
       'nome': ['', Validators.compose([Validators.required])],
-      'email': ['', Validators.compose([Validators.required, Validators.email])],
       'senha': [''],
       'foto': ['']
     });
@@ -81,7 +82,7 @@ export class UsuarioPage {
     };
     this.usuario = u;
     this.usuario.streak = this.usuario.streak || 0;
-    this.perfilForm.patchValue({ nome: u.nome, email: u.email });
+    this.perfilForm.patchValue({ nome: u.nome });
     this.fotoPreview = u.foto || null;
     this.carregarNotificacoes();
 
@@ -152,8 +153,7 @@ export class UsuarioPage {
     try {
       const foto = await Camera.getPhoto({
         quality: 80,
-        width: 512,
-        height: 512,
+        width: 1280,
         allowEditing: false,
         resultType: CameraResultType.DataUrl,
         source: CameraSource.Camera,
@@ -161,8 +161,7 @@ export class UsuarioPage {
       });
 
       if (foto.dataUrl) {
-        this.fotoPreview = foto.dataUrl;
-        this.perfilForm.patchValue({ foto: foto.dataUrl });
+        this.fotoParaAjustar = foto.dataUrl;
       }
     } catch (erro) {
       const mensagem = String((erro as { message?: string })?.message ?? '').toLowerCase();
@@ -175,34 +174,24 @@ export class UsuarioPage {
   capturarFoto(): void {
     const video = this.videoCamera?.nativeElement;
     if (!video || !video.videoWidth) {
+      this.erroCamera = 'A câmera ainda não está pronta para capturar a foto.';
       return;
     }
 
-    const lado = Math.min(video.videoWidth, video.videoHeight);
-    const tamanho = Math.min(lado, 512);
+    const escala = Math.min(1, 1280 / Math.max(video.videoWidth, video.videoHeight));
     const canvas = document.createElement('canvas');
-    canvas.width = tamanho;
-    canvas.height = tamanho;
+    canvas.width = Math.round(video.videoWidth * escala);
+    canvas.height = Math.round(video.videoHeight * escala);
     const contexto = canvas.getContext('2d');
     if (!contexto) {
+      this.erroCamera = 'Não foi possível capturar a foto.';
       return;
     }
 
-    contexto.drawImage(
-      video,
-      (video.videoWidth - lado) / 2,
-      (video.videoHeight - lado) / 2,
-      lado,
-      lado,
-      0,
-      0,
-      tamanho,
-      tamanho,
-    );
+    contexto.drawImage(video, 0, 0, canvas.width, canvas.height);
 
     const fotoBase64 = canvas.toDataURL('image/jpeg', 0.85);
-    this.fotoPreview = fotoBase64;
-    this.perfilForm.patchValue({ foto: fotoBase64 });
+    this.fotoParaAjustar = fotoBase64;
     this.fecharCamera();
   }
 
@@ -217,6 +206,7 @@ export class UsuarioPage {
 
   ionViewWillLeave(): void {
     this.fecharCamera();
+    this.fotoParaAjustar = null;
   }
 
   private async mostrarToast(mensagem: string): Promise<void> {
@@ -252,7 +242,7 @@ export class UsuarioPage {
     const usuarioAtualizado: UsuarioModel = {
       ...this.usuario,
       nome: String(mudancas.nome ?? this.usuario.nome),
-      email: String(mudancas.email ?? this.usuario.email),
+      email: this.usuario.email,
       senha: mudancas.senha ? String(mudancas.senha) : this.usuario.senha,
       foto: fotoVal !== undefined && fotoVal !== '' ? String(fotoVal) : this.usuario.foto,
       streak: this.usuario.streak,
@@ -263,7 +253,6 @@ export class UsuarioPage {
         this.usuario = resultado;
         this.perfilForm.patchValue({
           nome: resultado.nome,
-          email: resultado.email,
           senha: '',
           foto: ''
         });
@@ -321,12 +310,21 @@ export class UsuarioPage {
 
     const leitor = new FileReader();
     leitor.onload = () => {
-      const fotoBase64 = String(leitor.result || '');
-      this.fotoPreview = fotoBase64;
-      this.perfilForm.patchValue({ foto: fotoBase64 });
+      if (typeof leitor.result === 'string') {
+        this.fotoParaAjustar = leitor.result;
+      } else {
+        this.mensagemAcao = 'Não foi possível ler a imagem selecionada.';
+      }
     };
+    leitor.onerror = () => this.mensagemAcao = 'Não foi possível ler a imagem selecionada.';
     leitor.readAsDataURL(arquivo);
     input.value = '';
+  }
+
+  aplicarFoto(foto: string): void {
+    this.fotoPreview = foto;
+    this.perfilForm.patchValue({ foto });
+    this.fotoParaAjustar = null;
   }
 
   private obterMensagemErroSalvar(erro: HttpErrorResponse): string {

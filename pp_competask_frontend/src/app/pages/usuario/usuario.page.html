@@ -89,7 +89,7 @@
           <span class="campo-icone"><ion-icon name="mail-outline"></ion-icon></span>
           <span class="campo-conteudo">
             <span class="campo-titulo">Email</span>
-            <input class="campo" type="email" formControlName="email" placeholder="usuario@email.com" readonly />
+            <input class="campo" type="email" [placeholder]="usuario?.email || 'usuario@email.com'" disabled />
           </span>
         </label>
 
@@ -130,6 +130,9 @@
       <button type="button" class="camera-btn camera-btn--capturar" aria-label="Capturar foto" (click)="capturarFoto()"></button>
     </div>
   </div>
+
+  <app-ajustar-foto *ngIf="fotoParaAjustar" [src]="fotoParaAjustar"
+    (confirmar)="aplicarFoto($event)" (cancelar)="fotoParaAjustar = null"></app-ajustar-foto>
 
   <nav class="bottom-nav" aria-label="Navegação inferior">
     <button

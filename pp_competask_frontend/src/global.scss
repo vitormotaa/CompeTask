@@ -97,3 +97,46 @@ button {
 button:active {
 	opacity: 0.85;
 }
+
+.mes-navegacao {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+.mes-navegacao h2 { margin: 0; color: var(--cp-ink, #1b214d); font-size: 0.95rem; text-transform: capitalize; }
+.mes-navegacao button {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  border: 1px solid var(--cp-border, #e8e4ec);
+  border-radius: 50%;
+  background: var(--cp-surface, #fff);
+  color: var(--cp-primary, #52008c);
+  font-size: 1.1rem;
+}
+
+.abas-dia {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 2px 2px 10px;
+}
+
+.abas-dia button {
+  flex: 0 0 auto;
+  padding: 9px 14px;
+  border: 1px solid var(--cp-border);
+  border-radius: 999px;
+  background: var(--cp-surface);
+  color: var(--cp-muted);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.abas-dia button[aria-pressed='true'] {
+  border-color: var(--cp-primary);
+  background: var(--cp-primary);
+  color: #fff;
+}

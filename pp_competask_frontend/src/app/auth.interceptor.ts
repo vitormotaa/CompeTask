@@ -2,10 +2,12 @@ import { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { catchError, throwError } from 'rxjs';
+import { LembreteEventosService } from './services/lembrete-eventos.service';
 
 // Lê o localStorage direto: injetar UsuarioService aqui criaria dependência circular com HttpClient.
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const router = inject(Router);
+  const lembreteEventos = inject(LembreteEventosService);
   const token = localStorage.getItem('token');
   const ehApi = req.url.includes('/api/v1/');
 
@@ -20,6 +22,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
       if (erro instanceof HttpErrorResponse && erro.status === 401 && ehApi && !ehLogin) {
         localStorage.removeItem('token');
         localStorage.removeItem('usuarioSessao');
+        lembreteEventos.notificar();
         router.navigate(['/login']);
       }
 

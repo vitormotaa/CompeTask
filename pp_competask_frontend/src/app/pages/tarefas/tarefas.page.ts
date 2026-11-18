@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, ElementRef, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { IonContent, IonIcon } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
@@ -7,6 +7,7 @@ import {
   addOutline,
   caretDownOutline,
   checkmarkCircleOutline,
+  chevronBackOutline,
   chevronForwardOutline,
   calendarOutline,
   flagOutline,
@@ -19,6 +20,8 @@ import {
 import { TarefaModel } from '../../models/tarefa.model';
 import { UsuarioService } from '../../services/usuario.service';
 import { TarefasService } from '../../services/tarefas.service';
+import { agruparPorMes, chaveDoDia, GrupoDia, identificarGrupoDia } from '../../utils/agrupar-por-dia';
+import { centralizarAbaSelecionada } from '../../utils/abas-dia';
 
 type AtalhoRodape = {
   label: string;
@@ -35,10 +38,14 @@ type AtalhoRodape = {
   imports: [CommonModule, IonContent, IonIcon],
 })
 export class TarefasPage {
+  @ViewChild('abasDias') abasDias?: ElementRef<HTMLElement>;
   tarefas: TarefaModel[] = [];
   mensagemAcao = '';
   statusMenuAberto = false;
   concluidasAbertas = false;
+  diaSelecionado: string | null = null;
+  mesVisivel = new Date();
+  readonly identificarGrupoDia = identificarGrupoDia;
   ordenacaoAtual: 'status' | 'data' | 'prioridade' | 'alfabetica' = 'status';
 
   readonly opcoesOrdenacao = [
@@ -65,6 +72,7 @@ export class TarefasPage {
       calendarOutline,
       caretDownOutline,
       checkmarkCircleOutline,
+      chevronBackOutline,
       chevronForwardOutline,
       flagOutline,
       filterOutline,
@@ -75,6 +83,10 @@ export class TarefasPage {
   }
 
   ionViewWillEnter(): void {
+    const hoje = new Date();
+    this.mesVisivel = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
+    this.diaSelecionado = chaveDoDia(hoje);
+    this.centralizarDiaSelecionado();
     this.carregarTarefas();
   }
 
@@ -86,8 +98,36 @@ export class TarefasPage {
     return this.ordenarTarefas(this.tarefas.filter((tarefa) => tarefa.concluida));
   }
 
-  get totalConcluidas(): number {
-    return this.tarefas.filter((tarefa) => tarefa.concluida).length;
+  get gruposDias(): GrupoDia<TarefaModel>[] {
+    return agruparPorMes(
+      [...this.tarefasPendentes, ...this.tarefasConcluidas],
+      (tarefa) => this.parseData(tarefa.dataRealizacao),
+      this.mesVisivel,
+    );
+  }
+
+  get tituloMes(): string {
+    return this.mesVisivel.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
+  }
+
+  mudarMes(diferenca: number): void {
+    this.mesVisivel = new Date(this.mesVisivel.getFullYear(), this.mesVisivel.getMonth() + diferenca, 1);
+    this.diaSelecionado = chaveDoDia(this.mesVisivel);
+    this.centralizarDiaSelecionado();
+  }
+
+  get grupoSelecionado(): GrupoDia<TarefaModel> | null {
+    const grupos = this.gruposDias;
+    return grupos.find((grupo) => grupo.chave === this.diaSelecionado)
+      ?? grupos.find((grupo) => grupo.chave === chaveDoDia(new Date())) ?? grupos[0] ?? null;
+  }
+
+  get pendentesDoDia(): TarefaModel[] {
+    return this.grupoSelecionado?.itens.filter((tarefa) => !tarefa.concluida) ?? [];
+  }
+
+  get concluidasDoDia(): TarefaModel[] {
+    return this.grupoSelecionado?.itens.filter((tarefa) => tarefa.concluida) ?? [];
   }
 
   get textoOrdenacao(): string {
@@ -228,11 +268,16 @@ export class TarefasPage {
       next: (resultado: TarefaModel[]) => {
           this.tarefas = resultado;
           this.tarefasService.guardarTarefasLocal(this.tarefas);
+          this.centralizarDiaSelecionado();
       },
       error:  () => {
           console.log("deu erro aqui na hora de puxar as tarefas do usuario do banco")
       }
     });
+  }
+
+  private centralizarDiaSelecionado(): void {
+    centralizarAbaSelecionada(() => this.abasDias?.nativeElement);
   }
 
   // private ordenarTarefas(tarefas: TarefaModel[]): TarefaModel[] {

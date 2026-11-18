@@ -1,0 +1,39 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10001;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  background: rgba(0, 0, 0, 0.7);
+}
+
+.editor {
+  width: min(100%, 390px);
+  max-height: 100%;
+  overflow: auto;
+  padding: 20px;
+  border-radius: var(--cp-radius, 16px);
+  background: var(--cp-surface, #fff);
+  color: var(--cp-ink, #1b214d);
+}
+
+h2 { margin: 0; font-size: 1.2rem; }
+p { color: var(--cp-muted, #74758a); font-size: 0.85rem; }
+.preview {
+  position: relative;
+  width: min(220px, 70vw);
+  aspect-ratio: 1;
+  margin: 16px auto;
+  overflow: hidden;
+  border-radius: 50%;
+  background: var(--cp-primary-soft, #f2eafa);
+}
+.preview img { position: absolute; max-width: none; }
+label { display: grid; gap: 4px; margin-top: 12px; font-size: 0.8rem; font-weight: 600; }
+input { width: 100%; accent-color: var(--cp-primary, #52008c); }
+.erro { color: var(--cp-danger, #ff002d); }
+.acoes { display: flex; justify-content: flex-end; gap: 12px; margin-top: 20px; }
+button { padding: 10px 16px; border: 0; border-radius: 999px; font: inherit; }
+.confirmar { background: var(--cp-primary, #52008c); color: #fff; }
+button:disabled { opacity: 0.5; }

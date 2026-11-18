@@ -1,7 +1,9 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpContext } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { map, tap } from 'rxjs/operators';
+import { SINCRONIZACAO_EM_SEGUNDO_PLANO } from '../loading.interceptor';
+import { LembreteEventosService } from './lembrete-eventos.service';
 
 import { ComunidadeInput, ComunidadeModel, MensagemModel, MembroComunidadeModel, RankingModel } from '../models/comunidade.model';
 import { TarefaModel } from '../models/tarefa.model';
@@ -15,7 +17,7 @@ export class ComunidadesService {
   // private readonly API_URL = 'http://localhost:8080/api/v1/comunidades';
   private readonly API_URL = 'https://competask.onrender.com/api/v1/comunidades';
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, private readonly lembreteEventos: LembreteEventosService) { }
 
   listar(): Observable<ComunidadeModel[]> {
     return this.http.get<any[]>(this.API_URL).pipe(
@@ -29,21 +31,25 @@ export class ComunidadesService {
     );
   }
 
-  listarPorUsuario(): Observable<ComunidadeModel[]> {
-    return this.http.get<any[]>(`${this.API_URL}/minhas`).pipe(
+  listarPorUsuario(emSegundoPlano = false): Observable<ComunidadeModel[]> {
+    return this.http.get<any[]>(`${this.API_URL}/minhas`, {
+      context: new HttpContext().set(SINCRONIZACAO_EM_SEGUNDO_PLANO, emSegundoPlano),
+    }).pipe(
       map((comunidades) => comunidades.map((comunidade) => this.converterParaModelo(comunidade)))
     );
   }
 
   entrar(idComunidade: number): Observable<ComunidadeModel> {
     return this.http.post<any>(`${this.API_URL}/entrar/${idComunidade}`, {}).pipe(
-      map((comunidade) => this.converterParaModelo(comunidade))
+      map((comunidade) => this.converterParaModelo(comunidade)),
+      tap(() => this.lembreteEventos.notificar()),
     );
   }
 
   entrarPrivada(codigo: string, senha: string): Observable<ComunidadeModel> {
     return this.http.post<any>(`${this.API_URL}/entrar-privada`, { codigo, senha }).pipe(
-      map((comunidade) => this.converterParaModelo(comunidade))
+      map((comunidade) => this.converterParaModelo(comunidade)),
+      tap(() => this.lembreteEventos.notificar()),
     );
   }
 
@@ -60,11 +66,15 @@ export class ComunidadesService {
   }
 
   sair(idComunidade: number): Observable<void> {
-    return this.http.delete<void>(`${this.API_URL}/${idComunidade}/membros/me`);
+    return this.http.delete<void>(`${this.API_URL}/${idComunidade}/membros/me`).pipe(
+      tap(() => this.lembreteEventos.notificar({ comunidadeId: String(idComunidade) })),
+    );
   }
 
-  listarTarefas(idComunidade: number): Observable<TarefaModel[]> {
-    return this.http.get<TarefaModel[]>(`${this.API_URL}/${idComunidade}/tarefas`).pipe(
+  listarTarefas(idComunidade: number, emSegundoPlano = false): Observable<TarefaModel[]> {
+    return this.http.get<TarefaModel[]>(`${this.API_URL}/${idComunidade}/tarefas`, {
+      context: new HttpContext().set(SINCRONIZACAO_EM_SEGUNDO_PLANO, emSegundoPlano),
+    }).pipe(
       map((tarefas) => tarefas.map((tarefa) => ({ ...tarefa, inComunidade: true, comunidadeId: idComunidade })))
     );
   }
@@ -98,7 +108,7 @@ export class ComunidadesService {
   }
 
   excluir(id: string): Observable<void> {
-    return this.http.delete<void>(`${this.API_URL}/${id}`);
+    return this.http.delete<void>(`${this.API_URL}/${id}`).pipe(tap(() => this.lembreteEventos.notificar({ comunidadeId: id })));
   }
 
   private converterParaBackend(comunidade: ComunidadeInput) {

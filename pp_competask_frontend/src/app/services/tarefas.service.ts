@@ -2,7 +2,10 @@ import { Injectable } from '@angular/core';
 
 import { TarefaModel } from '../models/tarefa.model';
 import { Observable } from 'rxjs';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpContext } from '@angular/common/http';
+import { tap } from 'rxjs/operators';
+import { SINCRONIZACAO_EM_SEGUNDO_PLANO } from '../loading.interceptor';
+import { LembreteEventosService } from './lembrete-eventos.service';
 
 type NovaTarefaInput = {
 	titulo: string;
@@ -30,7 +33,7 @@ export class TarefasService {
 	// private readonly API_URL = 'http://localhost:8080/api/v1/tarefas';
 	private readonly API_URL = 'https://competask.onrender.com/api/v1/tarefas';
 
-	constructor(private http: HttpClient) { }
+	constructor(private http: HttpClient, private readonly lembreteEventos: LembreteEventosService) { }
 
 	obterTodas(): TarefaModel[] {
 		const tarefasJson = localStorage.getItem(this.storageKey);
@@ -52,8 +55,10 @@ export class TarefasService {
 
 
 	//método de busca de tarefas de acordo com o id do usuario - API
-	buscarTarefasUsuario(): Observable<TarefaModel[]> {
-		return this.http.get<TarefaModel[]>(`${this.API_URL}/minhas`);
+	buscarTarefasUsuario(emSegundoPlano = false): Observable<TarefaModel[]> {
+		return this.http.get<TarefaModel[]>(`${this.API_URL}/minhas`, {
+			context: new HttpContext().set(SINCRONIZACAO_EM_SEGUNDO_PLANO, emSegundoPlano),
+		});
 	}
 
 	//não é ligado na api mas é pra salvar as coisas entao - API
@@ -99,11 +104,11 @@ export class TarefasService {
 	//método de inserção de tarefa no banco (criar tarefa) - API
 
 	inserir(tarefa: TarefaRequestInput): Observable<TarefaModel> {
-		return this.http.post<TarefaModel>(this.API_URL, tarefa);
+		return this.http.post<TarefaModel>(this.API_URL, tarefa).pipe(tap((resultado) => this.lembreteEventos.notificar({ tarefaId: String(resultado.id) })));
 	}
 
 	inserirNaComunidade(tarefa: TarefaRequestInput): Observable<TarefaModel> {
-		return this.http.post<TarefaModel>(`${this.API_URL}/comunidade`, tarefa);
+		return this.http.post<TarefaModel>(`${this.API_URL}/comunidade`, tarefa).pipe(tap((resultado) => this.lembreteEventos.notificar({ tarefaId: String(resultado.id) })));
 	}
 
 	//método que existia previamente e deixei por ele usar esses trem de input e type (que tem la em cima do codigo)
@@ -134,7 +139,7 @@ export class TarefasService {
 
 	//O CORRETO É USAR PATCH, MAS O BACK TA COM PUT E NAO FAÇO A MAIS VAGA IDEIA DE COMO MUDAR ISSO
 	atualizar(id: string, tarefa: AtualizarTarefaInput): Observable<TarefaModel>{
-		return this.http.put<TarefaModel>(`${this.API_URL}/${id}`, tarefa);
+		return this.http.put<TarefaModel>(`${this.API_URL}/${id}`, tarefa).pipe(tap(() => this.lembreteEventos.notificar({ tarefaId: id })));
 	}
 
 	atualizarTempoExecucao(id: string, tempoExecucao: string): Observable<TarefaModel> {
@@ -142,11 +147,11 @@ export class TarefasService {
 	}
 
 alternarConclusao(tarefa: TarefaModel): Observable<TarefaModel> {
-                return this.http.patch<TarefaModel>(`${this.API_URL}/conclusao/${tarefa.id}`, {});
+                return this.http.patch<TarefaModel>(`${this.API_URL}/conclusao/${tarefa.id}`, {}).pipe(tap(() => this.lembreteEventos.notificar({ tarefaId: String(tarefa.id) })));
         }
 
         concluirParaTodos(tarefa: TarefaModel): Observable<TarefaModel> {
-                return this.http.patch<TarefaModel>(`${this.API_URL}/conclusao/${tarefa.id}`, {});
+                return this.http.patch<TarefaModel>(`${this.API_URL}/conclusao/${tarefa.id}`, {}).pipe(tap(() => this.lembreteEventos.notificar({ tarefaId: String(tarefa.id) })));
 	}
 
 	//ta em comentario só por contad do nome, não quero dar conflito com o método de baixo ai
@@ -165,7 +170,7 @@ alternarConclusao(tarefa: TarefaModel): Observable<TarefaModel> {
 
 	//método de exclusão de tarefa do usuario no banco - API
 	excluir(id: string): Observable<void> {
-		return this.http.delete<void>(`${this.API_URL}/${id}`);
+		return this.http.delete<void>(`${this.API_URL}/${id}`).pipe(tap(() => this.lembreteEventos.notificar({ tarefaId: id })));
 	}
 
 	private salvarTodas(tarefas: TarefaModel[]): void {

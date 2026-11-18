@@ -19,13 +19,14 @@
 
 .tasks-header {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
   margin-bottom: 22px;
 }
 
-.status-wrap { position: relative; flex: 0 0 auto; }
+.status-wrap { position: relative; flex: 0 0 auto; margin-left: auto; }
 
 .tasks-header h1 {
   margin: 0;
@@ -34,6 +35,7 @@
   line-height: 1.12;
   letter-spacing: -0.045em;
   font-weight: 700;
+  white-space: nowrap;
 }
 
 .tasks-header p {

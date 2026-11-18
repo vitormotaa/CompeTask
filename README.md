@@ -85,6 +85,20 @@ O vínculo de membro passou a armazenar estado ativo (`ativo`, com valor padrão
 
 Código localizado em `pp_competask_frontend`.
 
+### Tela inicial de tarefas
+
+Ao abrir as páginas de tarefas e notificações, a data atual é selecionada, mesmo que não haja itens para esse dia. Todos os dias do mês aparecem nas abas; as setas permitem acessar outros meses.
+
+### Notificações locais no Android
+
+Os lembretes futuros das tarefas pessoais e das comunidades são sincronizados e agendados no celular ao abrir ou retornar ao aplicativo, e após alterações locais em tarefas, participação ou check-ins. O aplicativo solicita permissão para notificações quando necessário. Ao sair da conta, os lembretes agendados dela são cancelados.
+
+Como o agendamento é local, mudanças feitas em outro aparelho só são refletidas após o aplicativo ser aberto e sincronizado com a internet. O Android pode atrasar lembretes conforme as configurações de bateria e de alarmes exatos. O aviso na tela depende também das configurações de notificações do aparelho.
+
+O aplicativo Android usa o nome **CompeTask** e ícones derivados da logo para o aplicativo e os lembretes.
+O ícone pequeno da notificação é monocromático, conforme o Android; a logo colorida também é incluída e sua exibição depende da versão e das configurações do aparelho. Notificações já exibidas não são atualizadas.
+Após instalar as dependências, execute `npx cap sync android` em `pp_competask_frontend` e gere novamente o aplicativo Android.
+
 ### Aba de membros
 
 A tela de detalhe da comunidade agora tem a aba **Membros**. Ela:

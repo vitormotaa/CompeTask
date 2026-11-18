@@ -13,14 +13,29 @@
     <p class="estado" *ngIf="carregando">Carregando notificações...</p>
     <p class="estado estado--erro" *ngIf="mensagemAcao">{{ mensagemAcao }}</p>
 
-    <div class="vazio" *ngIf="!carregando && !mensagemAcao && notificacoes.length === 0">
-      <ion-icon name="notifications-outline"></ion-icon>
-      <p>Nenhuma notificação por enquanto.</p>
+    <div class="mes-navegacao">
+      <button type="button" aria-label="Mês anterior" (click)="mudarMes(-1)">
+        <ion-icon name="chevron-back-outline"></ion-icon>
+      </button>
+      <h2>{{ tituloMes }}</h2>
+      <button type="button" aria-label="Próximo mês" (click)="mudarMes(1)">
+        <ion-icon name="chevron-forward-outline"></ion-icon>
+      </button>
     </div>
+    <nav #abasDias class="abas-dia" *ngIf="grupoSelecionado as selecionado" aria-label="Dias das notificações">
+      <button *ngFor="let grupo of gruposNotificacoes; trackBy: identificarGrupoDia" type="button"
+        [attr.aria-pressed]="grupo.chave === selecionado.chave"
+        (click)="diaSelecionado = grupo.chave">{{ grupo.titulo }}</button>
+    </nav>
 
-    <section class="lista" *ngIf="notificacoes.length > 0" aria-label="Lista de notificações">
+    <section *ngIf="grupoSelecionado as grupo" aria-label="Notificações do dia">
+      <div class="vazio" *ngIf="!carregando && !mensagemAcao && grupo.itens.length === 0">
+        <ion-icon name="notifications-outline"></ion-icon>
+        <p>{{ notificacoes.length === 0 ? 'Nenhuma notificação por enquanto.' : 'Nenhuma notificação para este dia.' }}</p>
+      </div>
+      <div class="lista" *ngIf="grupo.itens.length > 0">
       <article
-        *ngFor="let notificacao of notificacoes"
+        *ngFor="let notificacao of grupo.itens"
         class="item"
         [class.item--lida]="notificacao.lida"
         (click)="marcarComoLida(notificacao)">
@@ -28,9 +43,11 @@
         <div class="item__texto">
           <strong>{{ notificacao.titulo }}</strong>
           <p>{{ notificacao.mensagem }}</p>
-          <small>{{ notificacao.dataHora | date: 'dd/MM/yyyy HH:mm' }}</small>
+          <small *ngIf="grupo.chave; else dataIndisponivel">{{ notificacao.dataHora | date: 'dd/MM/yyyy HH:mm' }}</small>
+          <ng-template #dataIndisponivel><small>Data indisponível</small></ng-template>
         </div>
       </article>
+      </div>
     </section>
   </main>
 </ion-content>
