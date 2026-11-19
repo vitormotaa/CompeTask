@@ -23,7 +23,7 @@
 .communities-header h1 {
   margin: 14px 0 14px;
   color: var(--cp-ink, #1b214d);
-  font-size: 1.8rem;
+  font-size: var(--cp-page-title-size);
   line-height: 1.12;
   letter-spacing: -0.045em;
   font-weight: 700;

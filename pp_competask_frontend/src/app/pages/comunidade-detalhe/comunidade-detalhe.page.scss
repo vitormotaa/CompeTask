@@ -72,7 +72,7 @@
   overflow: hidden;
   margin: 0;
   color: var(--cp-ink, #1b214d);
-  font-size: 1.15rem;
+  font-size: var(--cp-page-title-size);
   font-weight: 700;
   line-height: 1.2;
   text-overflow: ellipsis;

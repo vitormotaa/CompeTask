@@ -102,14 +102,15 @@ describe('LembreteLocalService', () => {
     expect(tarefas.buscarTarefasUsuario).not.toHaveBeenCalled();
   });
 
-  it('preserva agendamentos existentes e avisa quando a sincronização falha', async () => {
+  it('preserva agendamentos e registra a falha sem exibir aviso', async () => {
     notificacoes.getPending.and.resolveTo({ notifications: [pendente(4, '1')] });
     tarefas.buscarTarefasUsuario.and.returnValue(throwError(() => new Error('Rede indisponível')));
-    spyOn(console, 'error');
+    const erro = spyOn(console, 'error');
     await servico.solicitarSincronizacao();
     expect(notificacoes.cancel).not.toHaveBeenCalled();
     expect(notificacoes.schedule).not.toHaveBeenCalled();
-    expect(toast.create).toHaveBeenCalled();
+    expect(erro).toHaveBeenCalled();
+    expect(toast.create).not.toHaveBeenCalled();
   });
 
   it('cancela o lembrete alterado mesmo se a sincronização posterior falhar', async () => {
@@ -118,7 +119,7 @@ describe('LembreteLocalService', () => {
     spyOn(console, 'error');
     await servico.solicitarSincronizacao({ tarefaId: '1' });
     expect(notificacoes.cancel).toHaveBeenCalledOnceWith({ notifications: [{ id: 4 }] });
-    expect(toast.create).toHaveBeenCalled();
+    expect(toast.create).not.toHaveBeenCalled();
   });
 
   it('cancela lembretes da comunidade após a saída mesmo se a sincronização falhar', async () => {
@@ -133,19 +134,23 @@ describe('LembreteLocalService', () => {
     expect(notificacoes.cancel).toHaveBeenCalledOnceWith({ notifications: [{ id: 4 }] });
   });
 
-  it('informa quando a permissão está negada', async () => {
+  it('registra a permissão negada sem exibir aviso', async () => {
+    const aviso = spyOn(console, 'warn');
     notificacoes.checkPermissions.and.resolveTo({ display: 'denied' });
     await servico.solicitarSincronizacao();
     expect(notificacoes.schedule).not.toHaveBeenCalled();
-    expect(toast.create).toHaveBeenCalled();
+    expect(aviso).toHaveBeenCalled();
+    expect(toast.create).not.toHaveBeenCalled();
   });
 
-  it('avisa e agenda sem hora exata quando o Android não permite alarmes exatos', async () => {
+  it('agenda sem hora exata e sem aviso na tela quando o Android não permite alarmes exatos', async () => {
+    const aviso = spyOn(console, 'warn');
     notificacoes.checkExactNotificationSetting.and.resolveTo({ exact_alarm: 'denied' });
     await servico.solicitarSincronizacao();
     const agendada = notificacoes.schedule.calls.mostRecent().args[0].notifications[0];
     expect(agendada.isExactNotification).toBeFalse();
-    expect(toast.create).toHaveBeenCalled();
+    expect(aviso).toHaveBeenCalled();
+    expect(toast.create).not.toHaveBeenCalled();
   });
 
   it('agenda em versões do Android que não suportam canais de notificação', async () => {
@@ -173,6 +178,6 @@ describe('LembreteLocalService', () => {
     spyOn(console, 'error');
     await servico.solicitarSincronizacao();
     expect(pushNativo.cancelarReservas).toHaveBeenCalledOnceWith({ chaves: ['1|1|2099-12-01T10:30:00'] });
-    expect(toast.create).toHaveBeenCalled();
+    expect(toast.create).not.toHaveBeenCalled();
   });
 });

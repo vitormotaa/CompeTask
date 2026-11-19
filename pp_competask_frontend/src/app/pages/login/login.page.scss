@@ -67,7 +67,7 @@
 .hero-copy h1 {
   margin: 0 0 9px;
   color: var(--cp-ink);
-  font-size: 1.65rem;
+  font-size: var(--cp-page-title-size);
   font-weight: 700;
   line-height: 1.2;
   letter-spacing: -0.04em;
@@ -83,6 +83,13 @@
 .auth-form {
   display: grid;
   gap: 14px;
+}
+
+.form-error {
+  margin: -6px 2px 0;
+  color: #a00024;
+  font-size: 0.82rem;
+  line-height: 1.4;
 }
 
 .input-shell {

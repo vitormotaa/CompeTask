@@ -3,7 +3,6 @@ import { Router } from '@angular/router';
 import { App } from '@capacitor/app';
 import { Capacitor } from '@capacitor/core';
 import { LocalNotifications, LocalNotificationsPlugin, LocalNotificationSchema, PendingLocalNotificationSchema } from '@capacitor/local-notifications';
-import { ToastController } from '@ionic/angular/standalone';
 import { firstValueFrom, forkJoin, of } from 'rxjs';
 
 import { TarefaModel } from '../models/tarefa.model';
@@ -33,7 +32,6 @@ export class LembreteLocalService {
   private readonly comunidades = inject(ComunidadesService);
   private readonly usuarios = inject(UsuarioService);
   private readonly eventos = inject(LembreteEventosService);
-  private readonly toast = inject(ToastController);
   private readonly router = inject(Router);
   private readonly zona = inject(NgZone);
   private readonly notificacoes = inject(NOTIFICACOES_LOCAIS);
@@ -123,7 +121,7 @@ export class LembreteLocalService {
       if (permissao.display !== 'granted') {
         if (!this.avisouPermissao) {
           this.avisouPermissao = true;
-          await this.mostrarAviso('Ative as notificações nas configurações do celular para receber lembretes.');
+          console.warn('Permissão de notificações locais não concedida.');
         }
         return;
       }
@@ -195,14 +193,7 @@ export class LembreteLocalService {
       }
       if ((!horarioExato || resultado.warning) && !this.avisouHorario) {
         this.avisouHorario = true;
-        const aviso = await this.toast.create({
-          message: 'O Android pode atrasar lembretes. Ative alarmes e lembretes exatos nas configurações.',
-          duration: 8000, position: 'top', color: 'warning',
-          buttons: [{ text: 'Configurar', handler: () => {
-            void this.notificacoes.changeExactNotificationSetting().catch((erro: unknown) => this.relatarErro(erro));
-          } }],
-        });
-        await aviso.present();
+        console.warn('O Android pode atrasar lembretes porque os alarmes exatos não estão disponíveis.');
       }
       const idsAtivos = new Set(notificacoes.map((item) => item.id));
       const obsoletos = atuais.filter((item) => !idsAtivos.has(item.id));
@@ -210,7 +201,7 @@ export class LembreteLocalService {
     } else if (atuais.length) {
       await this.notificacoes.cancel({ notifications: atuais.map(({ id }) => ({ id })) });
     }
-    if (dadosInvalidos) await this.mostrarAviso('Alguns lembretes têm data ou horário inválido e não foram agendados.');
+    if (dadosInvalidos) console.warn('Alguns lembretes têm data ou horário inválido e não foram agendados.');
   }
 
   private obterDados(item: PendingLocalNotificationSchema): { usuarioId: string; tarefaId: string; comunidadeId?: string } | null {
@@ -235,13 +226,7 @@ export class LembreteLocalService {
       ? resultado : null;
   }
 
-  private async mostrarAviso(mensagem: string): Promise<void> {
-    const aviso = await this.toast.create({ message: mensagem, duration: 5000, position: 'top', color: 'warning' });
-    await aviso.present();
-  }
-
-  private async relatarErro(erro: unknown): Promise<void> {
+  private relatarErro(erro: unknown): void {
     console.error('Não foi possível sincronizar os lembretes no celular.', erro);
-    await this.mostrarAviso('Não foi possível sincronizar os lembretes no celular. Abra o aplicativo novamente para tentar.');
   }
 }

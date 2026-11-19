@@ -40,7 +40,10 @@ describe('Cabeçalho das tarefas', () => {
         expect(titulo.scrollWidth).toBeLessThanOrEqual(titulo.clientWidth);
         expect(botaoRect.right).toBeLessThanOrEqual(cabecalho.right + 1);
         expect(botaoRect.left).toBeGreaterThanOrEqual(cabecalho.left - 1);
-        expect(botaoRect.left >= identidade.right || botaoRect.top >= identidade.bottom).toBeTrue();
+        expect(botaoRect.left).toBeGreaterThanOrEqual(identidade.right - 1);
+        expect(botaoRect.top).toBeLessThan(identidade.bottom);
+        const rotulo = botao.querySelector<HTMLElement>('span')!;
+        expect(rotulo.scrollWidth).toBeLessThanOrEqual(rotulo.clientWidth);
       }
     }
     shell.remove();

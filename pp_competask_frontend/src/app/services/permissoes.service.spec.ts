@@ -12,6 +12,8 @@ describe('PermissoesService', () => {
 
   beforeEach(() => {
     localStorage.removeItem('permissoesIniciaisSolicitadas');
+    localStorage.removeItem('permissaoInicialCameraSolicitada');
+    localStorage.removeItem('permissaoInicialNotificacoesSolicitada');
     spyOn(Capacitor, 'getPlatform').and.returnValue('android');
     toast = jasmine.createSpyObj<ToastController>('ToastController', ['create']);
     const aviso = jasmine.createSpyObj<HTMLIonToastElement>('aviso', ['present']);
@@ -22,7 +24,11 @@ describe('PermissoesService', () => {
     service = new PermissoesService(toast, camera, notificacoes);
   });
 
-  afterEach(() => localStorage.removeItem('permissoesIniciaisSolicitadas'));
+  afterEach(() => {
+    localStorage.removeItem('permissoesIniciaisSolicitadas');
+    localStorage.removeItem('permissaoInicialCameraSolicitada');
+    localStorage.removeItem('permissaoInicialNotificacoesSolicitada');
+  });
 
   it('solicita câmera e notificações apenas na primeira abertura', async () => {
     camera.checkPermissions.and.resolveTo({ camera: 'prompt', photos: 'granted' });
@@ -37,11 +43,43 @@ describe('PermissoesService', () => {
     expect(notificacoes.requestPermissions).toHaveBeenCalledTimes(1);
   });
 
-  it('informa permissões negadas sem repeti-las na abertura seguinte', async () => {
+  it('informa apenas a permissão negada da câmera', async () => {
     camera.checkPermissions.and.resolveTo({ camera: 'denied', photos: 'granted' });
-    notificacoes.checkPermissions.and.resolveTo({ display: 'denied' });
+    notificacoes.checkPermissions.and.resolveTo({ display: 'granted' });
     await service.solicitarIniciais();
     expect(toast.create).toHaveBeenCalledTimes(1);
+    expect(toast.create.calls.mostRecent().args[0]?.message).toContain('câmera');
     expect(localStorage.getItem('permissoesIniciaisSolicitadas')).toBe('1');
+  });
+
+  it('registra a permissão de notificações negada sem exibir aviso', async () => {
+    camera.checkPermissions.and.resolveTo({ camera: 'granted', photos: 'granted' });
+    notificacoes.checkPermissions.and.resolveTo({ display: 'denied' });
+    const aviso = spyOn(console, 'warn');
+    await service.solicitarIniciais();
+    expect(aviso).toHaveBeenCalled();
+    expect(toast.create).not.toHaveBeenCalled();
+    expect(localStorage.getItem('permissoesIniciaisSolicitadas')).toBe('1');
+  });
+
+  it('registra falhas na permissão de notificações sem exibir aviso', async () => {
+    camera.checkPermissions.and.resolveTo({ camera: 'granted', photos: 'granted' });
+    notificacoes.checkPermissions.and.rejectWith(new Error('Falha'));
+    const erro = spyOn(console, 'error');
+    await service.solicitarIniciais();
+    expect(erro).toHaveBeenCalled();
+    expect(toast.create).not.toHaveBeenCalled();
+    expect(localStorage.getItem('permissoesIniciaisSolicitadas')).toBeNull();
+  });
+
+  it('não repete a solicitação de notificações quando só a câmera falha', async () => {
+    camera.checkPermissions.and.rejectWith(new Error('Câmera indisponível'));
+    notificacoes.checkPermissions.and.resolveTo({ display: 'prompt' });
+    notificacoes.requestPermissions.and.resolveTo({ display: 'denied' });
+    spyOn(console, 'error');
+    spyOn(console, 'warn');
+    await service.solicitarIniciais();
+    await service.solicitarIniciais();
+    expect(notificacoes.requestPermissions).toHaveBeenCalledTimes(1);
   });
 });

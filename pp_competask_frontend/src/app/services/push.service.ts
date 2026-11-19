@@ -4,7 +4,6 @@ import { Router } from '@angular/router';
 import { App, AppPlugin } from '@capacitor/app';
 import { Capacitor } from '@capacitor/core';
 import { PushNotifications, PushNotificationsPlugin } from '@capacitor/push-notifications';
-import { ToastController } from '@ionic/angular/standalone';
 import { firstValueFrom } from 'rxjs';
 import { LembreteEventosService } from './lembrete-eventos.service';
 import { LEMBRETE_PUSH_NATIVE, LembretePushNative } from './lembrete-push-native';
@@ -32,7 +31,6 @@ export class PushService {
     private readonly http: HttpClient,
     private readonly usuarios: UsuarioService,
     private readonly eventos: LembreteEventosService,
-    private readonly toast: ToastController,
     private readonly zona: NgZone,
     private readonly router: Router,
     @Inject(NOTIFICACOES_PUSH) private readonly push: PushNotificationsPlugin,
@@ -71,7 +69,7 @@ export class PushService {
       this.eventos.alteracoes$.subscribe(() => this.solicitarAtualizacao());
       this.solicitarAtualizacao(true);
     } catch (erro: unknown) {
-      await this.relatarErro(erro);
+      this.relatarErro(erro);
     }
   }
 
@@ -95,11 +93,6 @@ export class PushService {
           }));
         } catch (erro: unknown) {
           console.error('Não foi possível desvincular o dispositivo do usuário anterior.', erro);
-          void this.toast.create({
-            message: 'Não foi possível desvincular as notificações remotas no servidor.',
-            duration: 6000, position: 'top', color: 'warning',
-          }).then((aviso) => aviso.present())
-            .catch((falha: unknown) => console.error('Não foi possível exibir o aviso.', falha));
         }
       }
       if (!usuarioId) {
@@ -123,13 +116,8 @@ export class PushService {
     this.tokenAcesso = localStorage.getItem('token') ?? '';
   }
 
-  private async relatarErro(erro: unknown): Promise<void> {
+  private relatarErro(erro: unknown): void {
     console.error('Não foi possível configurar as notificações Firebase.', erro);
-    const aviso = await this.toast.create({
-      message: 'Não foi possível configurar notificações remotas. Os lembretes locais continuam disponíveis.',
-      duration: 6000, position: 'top', color: 'warning',
-    });
-    await aviso.present();
   }
 }
 

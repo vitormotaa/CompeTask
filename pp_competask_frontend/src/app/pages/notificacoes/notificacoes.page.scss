@@ -35,7 +35,7 @@
 
   h1 {
     margin: 0;
-    font-size: 1.8rem;
+    font-size: var(--cp-page-title-size);
     font-weight: 700;
     line-height: 1.12;
     letter-spacing: -0.045em;
@@ -105,6 +105,7 @@
 
     strong {
       display: block;
+      color: var(--cp-ink, #1b214d);
       font-size: 0.9rem;
     }
 

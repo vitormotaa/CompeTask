@@ -3,7 +3,6 @@ import { Component } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { ToastController } from '@ionic/angular';
 import { IonButton, IonContent, IonIcon } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { mailOutline, lockClosedOutline, eyeOutline, eyeOffOutline } from 'ionicons/icons';
@@ -22,8 +21,9 @@ export class LoginPage {
   loginForm: FormGroup;
 
   senhaVisivel = false;
+  mensagemErro = '';
 
-  constructor(private readonly formBuilder: FormBuilder, private readonly router: Router, private usuarioService: UsuarioService, private toastController: ToastController) {
+  constructor(private readonly formBuilder: FormBuilder, private readonly router: Router, private usuarioService: UsuarioService) {
     addIcons({
       'mail-outline': mailOutline,
       'lock-closed-outline': lockClosedOutline,
@@ -38,6 +38,7 @@ export class LoginPage {
   }
 
   async entrar() {
+    this.mensagemErro = '';
     if (this.loginForm.invalid) {
       this.loginForm.markAllAsTouched();
       return;
@@ -51,19 +52,14 @@ export class LoginPage {
         this.usuarioService.salvarSessao(resultado);
         this.router.navigate(['/tarefas']);
       },
-      error: async (erro: HttpErrorResponse) => {
-        const mensagem = this.obterMensagemErroLogin(erro);
-        const toast = await this.toastController.create({
-          message: mensagem,
-          duration: 2000,
-          color: 'danger'
-        });
-        await toast.present();
+      error: (erro: HttpErrorResponse) => {
+        this.mensagemErro = this.obterMensagemErroLogin(erro);
       }
     });
   }
 
   ionViewWillEnter(){
+      this.mensagemErro = '';
       this.loginForm.reset();
       this.loginForm.markAsPristine(); // indica que o formulário não foi modificado desde seu estado inicial — remove o estado dirty que poderia disparar validações visuais.
       this.loginForm.markAsUntouched(); //marca todos os controles como não tocados — remove o estado touched para que mensagens de erro baseadas em toque não apareçam imediatamente.
@@ -82,11 +78,10 @@ export class LoginPage {
     }
 
   private obterMensagemErroLogin(erro: HttpErrorResponse): string {
-    const mensagemDoBackend =
-      typeof erro.error === 'string'
-        ? erro.error
-        : erro.error?.message || erro.message;
-
-    return mensagemDoBackend || 'Falha no login';
+    if (erro.status === 401) return 'E-mail ou senha incorretos. Confira seus dados e tente novamente.';
+    if (erro.status === 0) return 'Não foi possível conectar. Verifique sua internet e tente novamente.';
+    if (erro.status === 429) return 'Muitas tentativas de acesso. Aguarde um pouco e tente novamente.';
+    if (erro.status >= 500) return 'O serviço está indisponível no momento. Tente novamente em alguns instantes.';
+    return 'Não foi possível entrar agora. Confira seus dados e tente novamente.';
   }
 }

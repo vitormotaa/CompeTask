@@ -17,6 +17,7 @@ describe('PushService', () => {
   let usuarios: jasmine.SpyObj<UsuarioService>;
   let eventos: LembreteEventosService;
   let http: HttpTestingController;
+  let toast: jasmine.SpyObj<ToastController>;
 
   beforeEach(() => {
     spyOn(Capacitor, 'getPlatform').and.returnValue('android');
@@ -26,6 +27,7 @@ describe('PushService', () => {
     nativo = jasmine.createSpyObj<LembretePushNative>('LembretePush', ['addListener', 'definirUsuario']);
     usuarios = jasmine.createSpyObj<UsuarioService>('UsuarioService', ['obterUsuarioSessao']);
     eventos = new LembreteEventosService();
+    toast = jasmine.createSpyObj<ToastController>('Toast', ['create']);
     const handle: PluginListenerHandle = { remove: () => Promise.resolve() };
     const app = jasmine.createSpyObj<AppPlugin>('App', ['addListener']);
     app.addListener.and.resolveTo(handle);
@@ -45,7 +47,7 @@ describe('PushService', () => {
         { provide: APP_PUSH, useValue: app },
         { provide: UsuarioService, useValue: usuarios },
         { provide: LembreteEventosService, useValue: eventos },
-        { provide: ToastController, useValue: jasmine.createSpyObj<ToastController>('Toast', ['create']) },
+        { provide: ToastController, useValue: toast },
         { provide: Router, useValue: jasmine.createSpyObj<Router>('Router', ['navigate']) },
       ],
     });
@@ -87,6 +89,41 @@ describe('PushService', () => {
     expect(exclusao.request.headers.get('Authorization')).toBe('Bearer token-renovado');
     exclusao.flush(null, { status: 204, statusText: 'No Content' });
     flushMicrotasks();
+    expect(push.unregister).toHaveBeenCalled();
+  }));
+
+  it('registra falhas do Firebase sem exibir aviso na tela', fakeAsync(() => {
+    const erro = spyOn(console, 'error');
+    push.register.and.rejectWith(new Error('Falha no Firebase'));
+    TestBed.inject(PushService).iniciar();
+    flushMicrotasks();
+    expect(erro).toHaveBeenCalled();
+    expect(toast.create).not.toHaveBeenCalled();
+  }));
+
+  it('não mostra aviso se falhar o desvínculo das notificações ao sair', fakeAsync(() => {
+    const erro = spyOn(console, 'error');
+    TestBed.inject(PushService).iniciar();
+    flushMicrotasks();
+    const chamadas: readonly (readonly unknown[])[] = push.addListener.calls.allArgs();
+    const callback = chamadas.find(([evento]) => evento === 'registration')?.[1];
+    if (typeof callback !== 'function') {
+      fail('O listener de registro não foi instalado.');
+      return;
+    }
+    callback({ value: 'token-firebase' });
+    flushMicrotasks();
+    http.expectOne((req) => req.method === 'POST' && req.url.endsWith('/notificacoes/dispositivos'))
+      .flush(null, { status: 204, statusText: 'No Content' });
+    flushMicrotasks();
+    usuarios.obterUsuarioSessao.and.returnValue(null);
+    eventos.notificar();
+    flushMicrotasks();
+    http.expectOne((req) => req.method === 'DELETE' && req.url.endsWith('/notificacoes/dispositivos'))
+      .flush(null, { status: 500, statusText: 'Server Error' });
+    flushMicrotasks();
+    expect(erro).toHaveBeenCalled();
+    expect(toast.create).not.toHaveBeenCalled();
     expect(push.unregister).toHaveBeenCalled();
   }));
 });

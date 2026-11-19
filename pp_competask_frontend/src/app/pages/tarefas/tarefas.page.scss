@@ -19,23 +19,26 @@
 
 .tasks-header {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
+  gap: 8px;
   margin-bottom: 22px;
 }
 
-.status-wrap { position: relative; flex: 0 0 auto; margin-left: auto; }
+.tasks-header > div:first-child { flex: 1 1 auto; min-width: 0; }
+.status-wrap { position: relative; flex: 0 1 auto; min-width: 0; max-width: 52%; margin-left: auto; }
 
 .tasks-header h1 {
   margin: 0;
   color: var(--cp-ink, #1b214d);
-  font-size: 1.8rem;
+  font-size: var(--cp-page-title-size);
   line-height: 1.12;
   letter-spacing: -0.045em;
   font-weight: 700;
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .tasks-header p {
@@ -47,21 +50,23 @@
 .status-pill {
   display: inline-flex;
   align-items: center;
-  gap: 7px;
+  gap: 4px;
   min-height: 38px;
-  padding: 0 12px;
+  max-width: 100%;
+  padding: 0 8px;
   border: 1px solid var(--cp-border, #e8e4ec);
   border-radius: 999px;
   background: var(--cp-surface, #fff);
   color: var(--cp-ink, #1b214d);
   font: inherit;
-  font-size: 0.79rem;
+  font-size: 0.74rem;
   font-weight: 600;
   transition: background-color 160ms ease, transform 160ms ease;
 }
 
 .status-pill:active, .status-menu__item:active { transform: scale(0.97); }
-.status-pill ion-icon { color: var(--cp-primary, #52008c); font-size: 1rem; }
+.status-pill ion-icon { flex: 0 0 auto; color: var(--cp-primary, #52008c); font-size: 0.9rem; }
+.status-pill span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .status-pill__chevron { transition: transform 180ms ease; }
 .status-pill__chevron--open { transform: rotate(180deg); }
 

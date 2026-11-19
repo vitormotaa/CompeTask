@@ -97,7 +97,7 @@ Na primeira abertura no Android, o aplicativo solicita as permissões de câmera
 
 Os lembretes também usam **Firebase Cloud Messaging** no Android. O aplicativo registra o aparelho para a conta autenticada e o backend envia mensagens quando processa lembretes. Os agendamentos locais continuam funcionando offline; o aplicativo mantém um registro de entrega para evitar apresentar o mesmo lembrete tanto pelo Firebase quanto localmente.
 
-O envio remoto é tentado novamente por até uma hora em caso de falha. Notificações lidas, lembretes excluídos e dispositivos desvinculados não são reenviados. O Firebase e o Android não garantem entrega imediata: falta de internet, otimizações de bateria ou o aplicativo ter sido forçado a parar podem atrasar ou impedir o push. Se o agendamento local falhar enquanto o push estiver sendo processado, um lembrete pode não ser exibido; o aplicativo informa falhas de agendamento.
+O envio remoto é tentado novamente por até uma hora em caso de falha. Notificações lidas, lembretes excluídos e dispositivos desvinculados não são reenviados. O Firebase e o Android não garantem entrega imediata: falta de internet, otimizações de bateria ou o aplicativo ter sido forçado a parar podem atrasar ou impedir o push. Se o agendamento local falhar enquanto o push estiver sendo processado, um lembrete pode não ser exibido; falhas são registradas no log, sem aviso na tela.
 
 Para configurar:
 

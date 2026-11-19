@@ -13,16 +13,30 @@
     <form class="auth-form" [formGroup]="loginForm" (ngSubmit)="entrar()">
       <label class="input-shell" [class.input-shell--invalid]="loginForm.controls['email'].touched && loginForm.controls['email'].invalid">
         <ion-icon name="mail-outline"></ion-icon>
-        <input type="email" formControlName="email" placeholder="E-mail" autocomplete="email" />
+        <input type="email" formControlName="email" placeholder="E-mail" autocomplete="email"
+          [attr.aria-invalid]="loginForm.controls['email'].touched && loginForm.controls['email'].invalid"
+          [attr.aria-describedby]="loginForm.controls['email'].touched && loginForm.controls['email'].invalid ? 'email-erro' : null"
+          (input)="mensagemErro = ''" />
       </label>
+      <p *ngIf="loginForm.controls['email'].touched && loginForm.controls['email'].invalid" id="email-erro" class="form-error" role="alert">
+        {{ loginForm.controls['email'].hasError('required') ? 'Informe seu e-mail para entrar.' : 'Confira se o e-mail está correto.' }}
+      </p>
 
       <label class="input-shell" [class.input-shell--invalid]="loginForm.controls['senha'].touched && loginForm.controls['senha'].invalid">
         <ion-icon name="lock-closed-outline"></ion-icon>
-        <input [type]="senhaVisivel ? 'text' : 'password'" formControlName="senha" placeholder="Senha" autocomplete="current-password" />
+        <input [type]="senhaVisivel ? 'text' : 'password'" formControlName="senha" placeholder="Senha" autocomplete="current-password"
+          [attr.aria-invalid]="loginForm.controls['senha'].touched && loginForm.controls['senha'].invalid"
+          [attr.aria-describedby]="loginForm.controls['senha'].touched && loginForm.controls['senha'].invalid ? 'senha-erro' : null"
+          (input)="mensagemErro = ''" />
         <button type="button" class="input-action" (click)="alternarSenhaVisibilidade()" aria-label="Alternar visibilidade da senha">
           <ion-icon [name]="senhaVisivel ? 'eye-off-outline' : 'eye-outline'"></ion-icon>
         </button>
       </label>
+      <p *ngIf="loginForm.controls['senha'].touched && loginForm.controls['senha'].invalid" id="senha-erro" class="form-error" role="alert">
+        {{ loginForm.controls['senha'].hasError('required') ? 'Informe sua senha para entrar.' : 'A senha deve ter pelo menos 6 caracteres.' }}
+      </p>
+
+      <p *ngIf="mensagemErro" class="form-error" role="alert">{{ mensagemErro }}</p>
 
       <ion-button class="primary-button" type="submit" expand="block">ENTRAR</ion-button>
     </form>

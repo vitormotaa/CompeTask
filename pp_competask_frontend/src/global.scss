@@ -49,6 +49,7 @@ body {
  */
 :root {
   --cp-safe-bottom: max(env(safe-area-inset-bottom, 0px), var(--safe-area-inset-bottom, 0px));
+	--cp-page-title-size: clamp(1.2rem, 4.2vw, 1.25rem);
 	--ion-font-family: 'Inter', 'Roboto', 'Segoe UI', Arial, sans-serif;
 
 	--cp-primary: #52008c;

@@ -15,7 +15,7 @@
 }
 .back-button:active { transform: scale(0.93); background: var(--cp-primary-soft, #f2eafa); }
 .back-button ion-icon { font-size: 1.25rem; }
-.task-form-title { margin: 0 0 4px; color: var(--cp-ink, #1b214d); font-size: 1.75rem; line-height: 1.14; letter-spacing: -0.04em; font-weight: 700; }
+.task-form-title { margin: 0 0 4px; color: var(--cp-ink, #1b214d); font-size: var(--cp-page-title-size); line-height: 1.14; letter-spacing: -0.04em; font-weight: 700; }
 .task-form-subtitle { margin: 0 0 22px; color: var(--cp-muted, #74758a); font-size: 0.86rem; }
 .task-form { display: grid; gap: 7px; }
 .field-label { display: block; margin: 11px 0 1px; color: var(--cp-ink, #1b214d); font-size: 0.82rem; font-weight: 600; }

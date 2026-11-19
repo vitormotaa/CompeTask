@@ -46,7 +46,7 @@
 .community-create-header h1 {
   margin: 0;
   color: var(--cp-ink, #1b214d);
-  font-size: 1.4rem;
+  font-size: var(--cp-page-title-size);
   font-weight: 700;
   letter-spacing: -0.03em;
 }

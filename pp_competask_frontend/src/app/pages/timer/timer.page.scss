@@ -2,7 +2,7 @@
 .timer-screen { --background: var(--cp-surface-alt, #f8f7fa); --padding-top: 16px; --padding-bottom: calc(108px + var(--cp-safe-bottom)); color: var(--cp-ink, #1b214d); }
 .timer-shell { width: min(100%, 430px); min-height: 100%; margin: 0 auto; padding: 6px 18px 28px; }
 .timer-header { padding-top: 6px; }
-.timer-header h1 { margin: 0 0 6px; color: var(--cp-ink, #1b214d); font-size: 1.8rem; line-height: 1.12; letter-spacing: -0.04em; font-weight: 700; }
+.timer-header h1 { margin: 0 0 6px; color: var(--cp-ink, #1b214d); font-size: var(--cp-page-title-size); line-height: 1.12; letter-spacing: -0.04em; font-weight: 700; }
 .timer-header p { margin: 0; color: var(--cp-muted, #74758a); font-size: 0.86rem; }
 .dial-wrap { display: grid; place-items: center; margin: 42px 0 32px; }
 .dial {
