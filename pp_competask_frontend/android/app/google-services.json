@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "838201571949",
+    "project_id": "competask-oficial",
+    "storage_bucket": "competask-oficial.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:838201571949:android:bf73032579e2c94ac2dd64",
+        "android_client_info": {
+          "package_name": "io.ionic.starter"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyApcTvzZ_oJ8SGcEqIS84q8Yi2uvV6OY3I"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,6 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { LocalNotificationsPlugin } from '@capacitor/local-notifications';
+import { Capacitor } from '@capacitor/core';
 import { ToastController } from '@ionic/angular/standalone';
 import { of, throwError } from 'rxjs';
 import { TarefaModel } from '../models/tarefa.model';
@@ -9,6 +10,7 @@ import { LembreteEventosService } from './lembrete-eventos.service';
 import { LembreteLocalService, NOTIFICACOES_LOCAIS } from './lembrete-local.service';
 import { TarefasService } from './tarefas.service';
 import { UsuarioService } from './usuario.service';
+import { LEMBRETE_PUSH_NATIVE, LembretePushNative } from './lembrete-push-native';
 
 describe('LembreteLocalService', () => {
   let servico: LembreteLocalService;
@@ -17,6 +19,7 @@ describe('LembreteLocalService', () => {
   let usuarios: jasmine.SpyObj<UsuarioService>;
   let toast: jasmine.SpyObj<ToastController>;
   let notificacoes: jasmine.SpyObj<LocalNotificationsPlugin>;
+  let pushNativo: jasmine.SpyObj<LembretePushNative>;
 
   const tarefa: TarefaModel = {
     id: '1', usuarioId: '1', titulo: 'Estudar', descricao: '', prioridade: 1,
@@ -37,6 +40,7 @@ describe('LembreteLocalService', () => {
       'getPending', 'cancel', 'checkPermissions', 'requestPermissions', 'createChannel',
       'checkExactNotificationSetting', 'schedule',
     ]);
+    pushNativo = jasmine.createSpyObj<LembretePushNative>('LembretePush', ['reservar', 'cancelarReservas']);
     const elemento = jasmine.createSpyObj<HTMLIonToastElement>('toast', ['present']);
     elemento.present.and.resolveTo();
     toast.create.and.resolveTo(elemento);
@@ -52,6 +56,7 @@ describe('LembreteLocalService', () => {
         { provide: ToastController, useValue: toast },
         { provide: Router, useValue: jasmine.createSpyObj<Router>('Router', ['navigate']) },
         { provide: NOTIFICACOES_LOCAIS, useValue: notificacoes },
+        { provide: LEMBRETE_PUSH_NATIVE, useValue: pushNativo },
       ],
     });
     servico = TestBed.inject(LembreteLocalService);
@@ -147,5 +152,27 @@ describe('LembreteLocalService', () => {
     notificacoes.createChannel.and.rejectWith({ code: 'UNAVAILABLE' });
     await servico.solicitarSincronizacao();
     expect(notificacoes.schedule).toHaveBeenCalled();
+  });
+
+  it('não agenda localmente um lembrete que já chegou pelo Firebase', async () => {
+    spyOn(Capacitor, 'getPlatform').and.returnValue('android');
+    pushNativo.reservar.and.resolveTo({ permitidos: [], novos: [] });
+    await servico.solicitarSincronizacao();
+    expect(pushNativo.reservar).toHaveBeenCalledWith({
+      usuarioId: '1',
+      lembretes: [{ tarefaId: '1', horario: '2099-12-01T10:30:00', instante: new Date(2099, 11, 1, 10, 30).getTime() }],
+    });
+    expect(notificacoes.schedule.calls.mostRecent().args[0].notifications).toEqual([]);
+  });
+
+  it('desfaz as novas reservas se falhar o agendamento local', async () => {
+    spyOn(Capacitor, 'getPlatform').and.returnValue('android');
+    pushNativo.reservar.and.resolveTo({ permitidos: ['1|1|2099-12-01T10:30:00'], novos: ['1|1|2099-12-01T10:30:00'] });
+    pushNativo.cancelarReservas.and.resolveTo();
+    notificacoes.schedule.and.rejectWith(new Error('Falha ao agendar'));
+    spyOn(console, 'error');
+    await servico.solicitarSincronizacao();
+    expect(pushNativo.cancelarReservas).toHaveBeenCalledOnceWith({ chaves: ['1|1|2099-12-01T10:30:00'] });
+    expect(toast.create).toHaveBeenCalled();
   });
 });

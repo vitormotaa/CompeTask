@@ -95,7 +95,17 @@ Os lembretes futuros das tarefas pessoais e das comunidades são sincronizados e
 
 Na primeira abertura no Android, o aplicativo solicita as permissões de câmera e notificações. Permissões negadas podem ser alteradas nas configurações do aparelho. A galeria usa o seletor de imagens do sistema.
 
-**Firebase Cloud Messaging ainda não está integrado.** Os lembretes continuam sendo locais; a configuração de um projeto Firebase, o envio no backend e a prevenção de duplicatas com os lembretes offline ainda precisam ser implementados.
+Os lembretes também usam **Firebase Cloud Messaging** no Android. O aplicativo registra o aparelho para a conta autenticada e o backend envia mensagens quando processa lembretes. Os agendamentos locais continuam funcionando offline; o aplicativo mantém um registro de entrega para evitar apresentar o mesmo lembrete tanto pelo Firebase quanto localmente.
+
+O envio remoto é tentado novamente por até uma hora em caso de falha. Notificações lidas, lembretes excluídos e dispositivos desvinculados não são reenviados. O Firebase e o Android não garantem entrega imediata: falta de internet, otimizações de bateria ou o aplicativo ter sido forçado a parar podem atrasar ou impedir o push. Se o agendamento local falhar enquanto o push estiver sendo processado, um lembrete pode não ser exibido; o aplicativo informa falhas de agendamento.
+
+Para configurar:
+
+1. Cadastre o pacote Android `io.ionic.starter` no projeto Firebase e coloque o `google-services.json` em `pp_competask_frontend/android/app/`.
+2. No backend, configure `GOOGLE_APPLICATION_CREDENTIALS` com o caminho da chave privada da conta de serviço. No Render, use um arquivo secreto e a variável de ambiente correspondente. **Nunca coloque essa chave no repositório ou no aplicativo.**
+3. Implante o backend e gere novamente o app Android após `npm run build` e `npx cap sync android`. Faça login e permita notificações no aparelho para registrar o dispositivo.
+
+O backend usa o fuso horário do servidor para processar os lembretes; configure-o para corresponder ao horário usado no aplicativo. Se todos usarem o horário de Brasília, por exemplo, configure `TZ=America/Sao_Paulo` no Render. O modelo atual não armazena fusos horários diferentes por usuário. As tabelas `tbdispositivo_push` e `tbpush_pendente` são criadas com `ddl-auto: update`; ambientes com migração própria devem criá-las antes da implantação.
 
 Como o agendamento é local, mudanças feitas em outro aparelho só são refletidas após o aplicativo ser aberto e sincronizado com a internet. O Android pode atrasar lembretes conforme as configurações de bateria e de alarmes exatos. O aviso na tela depende também das configurações de notificações do aparelho.
 

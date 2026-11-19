@@ -43,6 +43,7 @@ export class SessaoService {
 
   sair(): void {
     const refreshToken = localStorage.getItem('refreshToken');
+    this.eventos.notificarSaida();
     this.limpar();
     if (refreshToken) {
       this.http.post<void>(`${this.url}/sair`, { refreshToken }).subscribe({

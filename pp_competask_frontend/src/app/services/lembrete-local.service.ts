@@ -11,6 +11,7 @@ import { ComunidadesService } from './comunidades.service';
 import { LembreteEventosService } from './lembrete-eventos.service';
 import { TarefasService } from './tarefas.service';
 import { UsuarioService } from './usuario.service';
+import { chaveLembrete, horarioLembrete, LEMBRETE_PUSH_NATIVE } from './lembrete-push-native';
 
 const TIPO_LEMBRETE = 'competask-lembrete';
 const CANAL_LEMBRETES = 'lembretes';
@@ -36,6 +37,7 @@ export class LembreteLocalService {
   private readonly router = inject(Router);
   private readonly zona = inject(NgZone);
   private readonly notificacoes = inject(NOTIFICACOES_LOCAIS);
+  private readonly pushNativo = inject(LEMBRETE_PUSH_NATIVE);
 
   iniciar(): void {
     if (this.iniciou || Capacitor.getPlatform() !== 'android') return;
@@ -139,7 +141,24 @@ export class LembreteLocalService {
       const usados = new Set(pendentes.map((item) => item.id));
       const anteriores = new Map(atuais.map((item) => [this.obterDados(item)?.tarefaId, item.id]));
       let proximoId = 1;
-      const notificacoes: LocalNotificationSchema[] = agendaveis.map(({ tarefa, data }) => {
+      let permitidos: Set<string> | null = null;
+      let novasReservas: string[] = [];
+      if (Capacitor.getPlatform() === 'android') {
+        const reserva = await this.pushNativo.reservar({
+          usuarioId,
+          lembretes: agendaveis.map(({ tarefa, data }) => ({
+            tarefaId: String(tarefa.id),
+            horario: horarioLembrete(tarefa.lembreteData, tarefa.lembreteHora),
+            instante: data.getTime(),
+          })),
+        });
+        permitidos = new Set(reserva.permitidos);
+        novasReservas = reserva.novos;
+      }
+      const notificacoes: LocalNotificationSchema[] = agendaveis.filter(({ tarefa }) =>
+        !permitidos || permitidos.has(chaveLembrete(usuarioId, String(tarefa.id),
+          horarioLembrete(tarefa.lembreteData, tarefa.lembreteHora)))
+      ).map(({ tarefa, data }) => {
         const tarefaId = String(tarefa.id);
         let id = anteriores.get(tarefaId);
         if (id === undefined) {
@@ -163,8 +182,17 @@ export class LembreteLocalService {
           },
         };
       });
-      if (revisao !== this.revisao) return;
-      const resultado = await this.notificacoes.schedule({ notifications: notificacoes });
+      if (revisao !== this.revisao) {
+        if (novasReservas.length) await this.pushNativo.cancelarReservas({ chaves: novasReservas });
+        return;
+      }
+      let resultado: Awaited<ReturnType<LocalNotificationsPlugin['schedule']>>;
+      try {
+        resultado = await this.notificacoes.schedule({ notifications: notificacoes });
+      } catch (erro: unknown) {
+        if (novasReservas.length) await this.pushNativo.cancelarReservas({ chaves: novasReservas });
+        throw erro;
+      }
       if ((!horarioExato || resultado.warning) && !this.avisouHorario) {
         this.avisouHorario = true;
         const aviso = await this.toast.create({

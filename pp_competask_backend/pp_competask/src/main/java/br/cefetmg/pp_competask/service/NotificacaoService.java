@@ -27,13 +27,16 @@ public class NotificacaoService {
     private final TarefaRepository tarefaRepository;
     private final MembroComunidadeRepository membroComunidadeRepository;
     private final CheckinRepository checkinRepository;
+    private final PushService push;
 
     public NotificacaoService(NotificacaoRepository notificacaoRepository, TarefaRepository tarefaRepository,
-            MembroComunidadeRepository membroComunidadeRepository, CheckinRepository checkinRepository) {
+            MembroComunidadeRepository membroComunidadeRepository, CheckinRepository checkinRepository,
+            PushService push) {
         this.notificacaoRepository = notificacaoRepository;
         this.tarefaRepository = tarefaRepository;
         this.membroComunidadeRepository = membroComunidadeRepository;
         this.checkinRepository = checkinRepository;
+        this.push = push;
     }
 
     @Scheduled(fixedDelayString = "${competask.notificacoes.intervalo-ms:30000}")
@@ -93,6 +96,7 @@ public class NotificacaoService {
         notificacao.setDataHora(dataHora);
         notificacao.setLida(false);
         notificacaoRepository.save(notificacao);
+        push.enfileirar(usuario.getIdUsuario(), tarefa.getIdTarefa(), dataHora);
     }
 
     private LocalDateTime converterDataHora(Tarefa tarefa) {

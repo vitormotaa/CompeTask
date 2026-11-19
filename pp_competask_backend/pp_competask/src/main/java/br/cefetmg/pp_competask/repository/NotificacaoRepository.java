@@ -1,6 +1,7 @@
 package br.cefetmg.pp_competask.repository;
 
 import java.util.List;
+import java.time.LocalDateTime;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -18,6 +19,9 @@ public interface NotificacaoRepository extends JpaRepository<Notificacao, Long> 
     List<Notificacao> findAllByUsuarioIdUsuarioAndLidaFalseOrderByDataHoraDesc(Long usuarioId);
 
     java.util.Optional<Notificacao> findByIdNotificacaoAndUsuarioIdUsuario(Long idNotificacao, Long usuarioId);
+
+    boolean existsByUsuarioIdUsuarioAndTarefaIdTarefaAndDataHoraAndLidaFalse(
+            Long usuarioId, Long tarefaId, LocalDateTime dataHora);
 
     @Modifying
     @Query("DELETE FROM Notificacao n WHERE n.tarefa.idTarefa = :tarefaId AND n.lida = false")
