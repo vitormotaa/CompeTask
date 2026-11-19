@@ -161,7 +161,7 @@ export class CadastroPage {
     this.usuarioService.salvar(this.cadastroForm.value).subscribe({
       next: (resultado: UsuarioModel) => {
         this.usuarioService.salvarSessao(resultado);
-        this.router.navigate(['/login']);
+        this.router.navigate(['/tarefas']);
       },
       error: (erro) => {
         if (erro.status === 400 && erro.error?.message === 'E-mail já cadastrado.') {

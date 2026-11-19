@@ -93,11 +93,21 @@ Ao abrir as páginas de tarefas e notificações, a data atual é selecionada, m
 
 Os lembretes futuros das tarefas pessoais e das comunidades são sincronizados e agendados no celular ao abrir ou retornar ao aplicativo, e após alterações locais em tarefas, participação ou check-ins. O aplicativo solicita permissão para notificações quando necessário. Ao sair da conta, os lembretes agendados dela são cancelados.
 
+Na primeira abertura no Android, o aplicativo solicita as permissões de câmera e notificações. Permissões negadas podem ser alteradas nas configurações do aparelho. A galeria usa o seletor de imagens do sistema.
+
+**Firebase Cloud Messaging ainda não está integrado.** Os lembretes continuam sendo locais; a configuração de um projeto Firebase, o envio no backend e a prevenção de duplicatas com os lembretes offline ainda precisam ser implementados.
+
 Como o agendamento é local, mudanças feitas em outro aparelho só são refletidas após o aplicativo ser aberto e sincronizado com a internet. O Android pode atrasar lembretes conforme as configurações de bateria e de alarmes exatos. O aviso na tela depende também das configurações de notificações do aparelho.
 
 O aplicativo Android usa o nome **CompeTask** e ícones derivados da logo para o aplicativo e os lembretes.
 O ícone pequeno da notificação é monocromático, conforme o Android; a logo colorida também é incluída e sua exibição depende da versão e das configurações do aparelho. Notificações já exibidas não são atualizadas.
 Após instalar as dependências, execute `npx cap sync android` em `pp_competask_frontend` e gere novamente o aplicativo Android.
+
+### Sessão
+
+O aplicativo restaura a sessão ao abrir quando o token de acesso está válido. Depois que ele expira, o backend renova o acesso usando um token de sessão válido por 30 dias, sem armazenar a senha no aparelho. A saída remove a sessão local e tenta revogá-la no servidor; se estiver offline, a revogação no servidor não é garantida. Uma sessão expirada exige novo login.
+
+É necessário implantar o backend atualizado antes do aplicativo. A tabela `tbsessao` é criada pelo Hibernate com `ddl-auto: update`; ambientes com migrações próprias precisam criá-la antes da implantação. Logins anteriores à atualização precisam ser feitos novamente para receber um token de renovação.
 
 ### Aba de membros
 

@@ -41,6 +41,9 @@ public class UsuarioService {
     @Autowired
     private JwtService jwtService;
 
+    @Autowired
+    private SessaoService sessaoService;
+
     @Transactional
     public UsuarioResponseDTO inserir(UsuarioRequestDTO dto){
         //se não existir pode criar, se existir e estiver desativado ai tem que ver os role
@@ -78,7 +81,7 @@ public class UsuarioService {
         return usuario != null && usuario.getAtivo();
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public AutentificacaoResponseDTO login(AutentificacaoRequestDTO dto){
         try {
             authenticationManager.authenticate(
@@ -89,7 +92,7 @@ public class UsuarioService {
 
         Usuario usuario = usuarioRepository.findByEmail(dto.getEmail());
 
-        return new AutentificacaoResponseDTO(jwtService.gerarToken(usuario));
+        return new AutentificacaoResponseDTO(jwtService.gerarToken(usuario), sessaoService.criar(usuario));
     }
 
 

@@ -4,6 +4,7 @@ import { IonApp, IonRouterOutlet } from '@ionic/angular/standalone';
 
 import { LoadingService } from './services/loading.service';
 import { LembreteLocalService } from './services/lembrete-local.service';
+import { PermissoesService } from './services/permissoes.service';
 
 @Component({
   selector: 'app-root',
@@ -12,7 +13,7 @@ import { LembreteLocalService } from './services/lembrete-local.service';
   imports: [IonApp, IonRouterOutlet, NgIf, AsyncPipe],
 })
 export class AppComponent {
-  constructor(readonly loading: LoadingService, lembretes: LembreteLocalService) {
-    lembretes.iniciar();
+  constructor(readonly loading: LoadingService, lembretes: LembreteLocalService, permissoes: PermissoesService) {
+    void permissoes.solicitarIniciais().finally(() => lembretes.iniciar());
   }
 }

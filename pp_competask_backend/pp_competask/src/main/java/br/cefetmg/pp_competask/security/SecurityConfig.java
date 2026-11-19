@@ -50,6 +50,7 @@ public class SecurityConfig {
 
                 // Login, cadastro e verificação de e-mail
                 .requestMatchers(HttpMethod.POST, "/api/v1/usuarios/login").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/v1/usuarios/sessao/renovar", "/api/v1/usuarios/sessao/sair").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/v1/usuarios").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/v1/usuarios/checkEmail").permitAll()
 

@@ -234,16 +234,11 @@ export class UsuarioPage {
     const mudancas = this.perfilForm.value;
     const fotoVal = mudancas.foto;
 
-    if (!mudancas.senha && !this.usuario.senha) {
-      this.mensagemAcao = 'Informe sua senha para salvar as alterações.';
-      return;
-    }
-
     const usuarioAtualizado: UsuarioModel = {
       ...this.usuario,
       nome: String(mudancas.nome ?? this.usuario.nome),
       email: this.usuario.email,
-      senha: mudancas.senha ? String(mudancas.senha) : this.usuario.senha,
+      senha: mudancas.senha ? String(mudancas.senha) : undefined,
       foto: fotoVal !== undefined && fotoVal !== '' ? String(fotoVal) : this.usuario.foto,
       streak: this.usuario.streak,
     };

@@ -5,6 +5,7 @@ import { UsuarioModel } from '../models/usuario.model';
 import { Observable } from 'rxjs';
 import { map, switchMap, tap } from 'rxjs/operators';
 import { LembreteEventosService } from './lembrete-eventos.service';
+import { SessaoService } from './sessao.service';
 
 @Injectable({
   providedIn: 'root',
@@ -17,7 +18,8 @@ export class UsuarioService {
   private readonly API_URL = 'https://competask.onrender.com/api/v1/usuarios';
 
 
-  constructor(private http: HttpClient, private readonly lembreteEventos: LembreteEventosService){ }
+  constructor(private http: HttpClient, private readonly lembreteEventos: LembreteEventosService,
+    private readonly sessao: SessaoService){ }
 
   inicializar() {
     if (!localStorage['usuarios']) {
@@ -64,10 +66,14 @@ export class UsuarioService {
   }
 
   login(email: string, senha: string): Observable<UsuarioModel> {
-    return this.http.post<{ token: string }>(`${this.API_URL}/login`, { email, senha }).pipe(
-      tap((resultado) => localStorage.setItem('token', resultado.token)),
+    return this.http.post<{ token: string; refreshToken?: string }>(`${this.API_URL}/login`, { email, senha }).pipe(
+      tap((resultado) => {
+        localStorage.setItem('token', resultado.token);
+        if (resultado.refreshToken) localStorage.setItem('refreshToken', resultado.refreshToken);
+        else localStorage.removeItem('refreshToken');
+      }),
       switchMap(() => this.http.get<any>(`${this.API_URL}/me`)),
-      map((resultado: any) => this.converterParaModelo({ ...resultado, senha }))
+      map((resultado: any) => this.converterParaModelo(resultado))
     );
   }
 
@@ -83,26 +89,41 @@ export class UsuarioService {
 
 
   salvarSessao(usuario: UsuarioModel) {
-    if (!localStorage.getItem('usuarioSessao')) {
-      localStorage.setItem('usuarioSessao', JSON.stringify({}));
-    }
-    localStorage.setItem('usuarioSessao', JSON.stringify(this.converterParaModelo(usuario)));
+    const { senha, ...dados } = this.converterParaModelo(usuario);
+    localStorage.setItem('usuarioSessao', JSON.stringify(dados));
     this.lembreteEventos.notificar();
   }
 
   excluirSessao() {
-    localStorage.removeItem('usuarioSessao');
-    localStorage.removeItem('token');
-    this.lembreteEventos.notificar();
+    this.sessao.sair();
   }
 
   obterUsuarioSessao() {
     const json = localStorage.getItem('usuarioSessao');
     if (!json) return null;
     try {
-      return this.converterParaModelo(JSON.parse(json));
+      const usuario = this.converterParaModelo(JSON.parse(json));
+      if (usuario.senha !== undefined) {
+        this.salvarSessao(usuario);
+        delete usuario.senha;
+      }
+      return usuario;
     } catch {
+      console.error('Não foi possível ler a sessão salva.');
       return null;
+    }
+  }
+
+  sessaoValida(): boolean {
+    const token = localStorage.getItem('token');
+    const usuario = this.obterUsuarioSessao();
+    if (!token || !usuario?.id) return false;
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/'))) as { exp?: unknown };
+      return typeof payload.exp === 'number' && payload.exp * 1000 > Date.now();
+    } catch (erro: unknown) {
+      console.error('Não foi possível ler o token da sessão.', erro);
+      return false;
     }
   }
 
@@ -113,10 +134,9 @@ export class UsuarioService {
 
   // busca os dados atuais no backend (ex: streak atualizado por tarefas/check-ins)
   buscarUsuarioAtual(): Observable<UsuarioModel> {
-    const senhaAtual = this.obterUsuarioSessao()?.senha;
     return this.http.get<any>(`${this.API_URL}/me`).pipe(
       map((resultado: any) => {
-        const usuarioAtualizado = this.converterParaModelo({ ...resultado, senha: senhaAtual });
+        const usuarioAtualizado = this.converterParaModelo(resultado);
         this.salvarSessao(usuarioAtualizado);
         return usuarioAtualizado;
       })
@@ -134,7 +154,7 @@ export class UsuarioService {
 
     return this.http.put<any>(`${this.API_URL}/me`, payload).pipe(
       map((resultado: any) => {
-        const usuarioAtualizado = this.converterParaModelo({ ...resultado, senha: usuario.senha });
+        const usuarioAtualizado = this.converterParaModelo(resultado);
         this.salvarSessao(usuarioAtualizado);
         return usuarioAtualizado;
       })

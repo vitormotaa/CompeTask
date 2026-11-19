@@ -19,10 +19,12 @@ import org.springframework.web.server.ResponseStatusException;
 
 import br.cefetmg.pp_competask.dto.AutentificacaoRequestDTO;
 import br.cefetmg.pp_competask.dto.AutentificacaoResponseDTO;
+import br.cefetmg.pp_competask.dto.SessaoRequestDTO;
 import br.cefetmg.pp_competask.dto.UsuarioRequestDTO;
 import br.cefetmg.pp_competask.dto.UsuarioResponseDTO;
 import br.cefetmg.pp_competask.security.UsuarioLogado;
 import br.cefetmg.pp_competask.service.UsuarioService;
+import br.cefetmg.pp_competask.service.SessaoService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -37,6 +39,19 @@ public class UsuarioController {
     @Autowired
     private UsuarioService usuarioService;
 
+    @Autowired
+    private SessaoService sessaoService;
+
+    @PostMapping("/sessao/renovar")
+    public AutentificacaoResponseDTO renovarSessao(@RequestBody @Valid SessaoRequestDTO sessao) {
+        return new AutentificacaoResponseDTO(sessaoService.renovar(sessao.refreshToken()));
+    }
+
+    @PostMapping("/sessao/sair")
+    public ResponseEntity<Void> sairSessao(@RequestBody @Valid SessaoRequestDTO sessao) {
+        sessaoService.revogar(sessao.refreshToken());
+        return ResponseEntity.noContent().build();
+    }
 
     @GetMapping("/me")
     @Operation(summary = "Buscar usuário autenticado")
